@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:skyshare_frontend_mobile/core/services/supabase_service.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await dotenv.load();
+  await SupabaseService.instance.init();
   runApp(const MyApp());
 }
 
