@@ -3,7 +3,13 @@ import 'package:provider/provider.dart';
 import 'features/dashboard/providers/dashboard_provider.dart';
 import 'features/dashboard/presentation/dashboard_screen.dart';
 
-void main() {
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:skyshare_frontend_mobile/core/services/supabase_service.dart';
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await dotenv.load();
+  await SupabaseService.instance.init();
   runApp(const MyApp());
 }
 
