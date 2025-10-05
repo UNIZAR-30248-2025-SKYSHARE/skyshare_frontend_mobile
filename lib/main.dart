@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:skyshare_frontend_mobile/features/dashboard/data/repositories/light_pollution_repository.dart';
+import 'package:skyshare_frontend_mobile/features/dashboard/data/repositories/location_repository.dart';
+import 'package:skyshare_frontend_mobile/features/dashboard/data/repositories/visible_sky_repository.dart';
+import 'package:skyshare_frontend_mobile/features/dashboard/data/repositories/weather_repository.dart';
 import 'features/dashboard/providers/dashboard_provider.dart';
 import 'features/dashboard/presentation/dashboard_screen.dart';
 
@@ -18,10 +22,20 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final weatherRepository = WeatherRepository();
+    final visibleSkyRepository = VisibleSkyRepository();
+    final lightPollutionRepository = LightPollutionRepository();
+    final locationRepository = LocationRepository();
+    
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(
-          create: (_) => DashboardProvider(),
+          create: (_) => DashboardProvider(
+            weatherRepository: weatherRepository,
+            visibleSkyRepository: visibleSkyRepository,
+            lightPollutionRepository: lightPollutionRepository,
+            locationRepository: locationRepository,
+          ),
         ),
       ],
       child: MaterialApp(
