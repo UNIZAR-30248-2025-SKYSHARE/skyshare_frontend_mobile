@@ -23,13 +23,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _loadData();
+      final provider = context.read<DashboardProvider>();
+      provider.detectAndSyncLocation(userId: 1);
     });
   }
 
   Future<void> _loadData() async {
     final provider = context.read<DashboardProvider>();
-    await provider.loadDashboardData(latitude: 37.7749, longitude: -122.4194);
+    await provider.loadDashboardData();
   }
 
   void _onNavTapped(int index) {
@@ -45,8 +46,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
         child: SafeArea(
           child: Consumer<DashboardProvider>(
             builder: (context, provider, child) {
-              if (provider.isLoading) {
-                return const Center(child: CircularProgressIndicator(valueColor: AlwaysStoppedAnimation<Color>(Colors.white)));
+              final locName = provider.selectedLocation?.name ?? 'Detectando ubicación...';
+              final country = provider.selectedLocation?.country ?? '';
+
+              if (provider.isLoading && provider.selectedLocation == null) {
+                return const Center(
+                  child: CircularProgressIndicator(valueColor: AlwaysStoppedAnimation<Color>(Colors.white)),
+                );
               }
 
               if (provider.errorMessage != null) {
@@ -56,7 +62,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     const SizedBox(height: 16),
                     Text(provider.errorMessage!, style: const TextStyle(color: Colors.white), textAlign: TextAlign.center),
                     const SizedBox(height: 16),
-                    ElevatedButton(onPressed: _loadData, child: const Text('Reintentar')),
+                    ElevatedButton(onPressed: () => provider.detectAndSyncLocation(userId: 1), child: const Text('Reintentar')),
                   ]),
                 );
               }
@@ -67,15 +73,16 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 color: Colors.white,
                 child: ListView(padding: const EdgeInsets.fromLTRB(16, 20, 16, 120), children: [
                   const SizedBox(height: 24),
-                  LocationHeader(cityName: 'Zaragoza', countryName: 'España'),
+                  LocationHeader(cityName: locName, countryName: country),
                   const SizedBox(height: 24),
                   if (provider.weather != null) WeatherCard(weather: provider.weather!),
                   const SizedBox(height: 24),
-                  if (provider.lightPollution != null) LightPollutionBar(value: provider.lightPollution!.bortleScale.toDouble()),
+                  if (provider.lightPollution != null)
+                    LightPollutionBar(value: (provider.lightPollution!.bortleScale).toDouble()),
                   const SizedBox(height: 24),
                   if (provider.constellations.isNotEmpty) VisibleSkySection(constellations: provider.constellations),
                   const SizedBox(height: 24),
-                  if (provider.skyIndicator != null) SkyIndicator(value: provider.skyIndicator!.score),
+                  if (provider.skyIndicator != null) SkyIndicator(value: provider.skyIndicator!.value),
                 ]),
               );
             },
@@ -85,9 +92,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
       bottomNavigationBar: AppNavigation(
         selectedIndex: _selectedIndex,
         onTap: _onNavTapped,
-        locationCount: 2, 
-        onAddLocation: () {
-        },
+        locationCount: 2,
+        onAddLocation: () {},
       ),
     );
   }
