@@ -1,19 +1,24 @@
 class SkyIndicator {
-  final double score;
-  final int astronomicalEvents;
-  final double cloudCoverage;
-  final double humidity;
-  final double moonIllumination;
-  final int bortleScale;
+  final double value;
+  final String quality;
+  final String description;
 
   SkyIndicator({
-    required this.score,
-    required this.astronomicalEvents,
-    required this.cloudCoverage,
-    required this.humidity,
-    required this.moonIllumination,
-    required this.bortleScale,
+    required this.value,
+    required this.quality,
+    required this.description,
   });
+
+  factory SkyIndicator.fromValue(double dbValue) {
+    final quality = _getQuality(dbValue);
+    final description = _getDescription(dbValue);
+    
+    return SkyIndicator(
+      value: dbValue,
+      quality: quality,
+      description: description,
+    );
+  }
 
   factory SkyIndicator.calculate({
     required int astronomicalEvents,
@@ -22,53 +27,62 @@ class SkyIndicator {
     required double moonIllumination,
     required int bortleScale,
   }) {
-    const wA = 0.40;
-    const wNubes = 0.25;
-    const wLuz = 0.20;
-    const wLuna = 0.10;
-    const wHum = 0.05;
+    final normalizedClouds = (100 - cloudCoverage) / 100;
+    final normalizedHumidity = (100 - humidity) / 100;
+    final normalizedMoon = (100 - moonIllumination) / 100;
+    final normalizedBortle = (10 - bortleScale) / 9;
+    final normalizedEvents = (astronomicalEvents / 10).clamp(0.0, 1.0);
 
-    final a = astronomicalEvents / 10.0;
-    final nubes = (cloudCoverage / 100.0).clamp(0.0, 1.0);
-    final hum = (humidity / 100.0).clamp(0.0, 1.0);
-    final luna = (moonIllumination / 100.0).clamp(0.0, 1.0);
-    final luz = ((bortleScale - 1) / 8.0).clamp(0.0, 1.0);
+    const cloudWeight = 0.30;
+    const humidityWeight = 0.15;
+    const moonWeight = 0.20;
+    const bortleWeight = 0.25;
+    const eventsWeight = 0.10;
 
-    final nubesScore = (1.0 - nubes).clamp(0.0, 1.0);
-    final humScore = (1.0 - hum).clamp(0.0, 1.0);
-    final lunaScore = (1.0 - luna).clamp(0.0, 1.0);
-    final luzScore = (1.0 - luz).clamp(0.0, 1.0);
+    final rawScore = (normalizedClouds * cloudWeight) +
+        (normalizedHumidity * humidityWeight) +
+        (normalizedMoon * moonWeight) +
+        (normalizedBortle * bortleWeight) +
+        (normalizedEvents * eventsWeight);
 
-    final s = wA * a + wNubes * nubesScore + wLuz * luzScore + wLuna * lunaScore + wHum * humScore;
-    final indicator = (s * 10.0 * 10.0).roundToDouble() / 10.0;
+    final value = (rawScore * 100).clamp(0.0, 100.0);
+    final quality = _getQuality(value);
+    final description = _getDescription(value);
 
     return SkyIndicator(
-      score: indicator,
-      astronomicalEvents: astronomicalEvents,
-      cloudCoverage: (cloudCoverage).toDouble(),
-      humidity: (humidity).toDouble(),
-      moonIllumination: (moonIllumination).toDouble(),
-      bortleScale: bortleScale,
+      value: value,
+      quality: quality,
+      description: description,
     );
   }
 
-  String get qualityLabel {
-    if (score >= 9.0) return 'Excelente';
-    if (score >= 7.5) return 'Muy bueno';
-    if (score >= 6.0) return 'Bueno';
-    if (score >= 4.5) return 'Moderado';
-    if (score >= 3.0) return 'Regular';
-    return 'Malo';
+  static String _getQuality(double value) {
+    if (value >= 80) return 'Excelente';
+    if (value >= 60) return 'Buena';
+    if (value >= 40) return 'Aceptable';
+    if (value >= 20) return 'Pobre';
+    return 'Muy Pobre';
+  }
+
+  static String _getDescription(double value) {
+    if (value >= 80) {
+      return 'Condiciones óptimas para observación astronómica';
+    } else if (value >= 60) {
+      return 'Buenas condiciones para observación';
+    } else if (value >= 40) {
+      return 'Condiciones moderadas';
+    } else if (value >= 20) {
+      return 'Condiciones difíciles para observación';
+    } else {
+      return 'Condiciones muy desfavorables';
+    }
   }
 
   Map<String, dynamic> toMap() {
     return {
-      'score': score,
-      'astronomical_events': astronomicalEvents,
-      'cloud_coverage': cloudCoverage,
-      'humidity': humidity,
-      'moon_illumination': moonIllumination,
-      'bortle_scale': bortleScale,
+      'value': value,
+      'quality': quality,
+      'description': description,
     };
   }
 }

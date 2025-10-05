@@ -15,22 +15,26 @@ class LightPollution {
   });
 
   factory LightPollution.fromWeatherData(WeatherData w, Location location) {
-    final raw = w.lightPollution ?? 0.0;
-    final mapped = _mapContaminationToBortle(raw);
-    final label = _bortleLabel(mapped);
-    return LightPollution(bortleScale: mapped, sourceValue: raw, location: location, label: label);
+    final bortleFromDB = (w.lightPollution ?? 1.0).round().clamp(1, 9);
+    final label = _bortleLabel(bortleFromDB);
+    
+    return LightPollution(
+      bortleScale: bortleFromDB,
+      sourceValue: w.lightPollution ?? 0.0,
+      location: location,
+      label: label,
+    );
   }
 
-  static int _mapContaminationToBortle(double value) {
-    final v = value;
-    if (v <= 0.5) return 1;
-    if (v <= 1.5) return 2;
-    if (v <= 2.5) return 3;
-    if (v <= 3.5) return 4;
-    if (v <= 4.5) return 5;
-    if (v <= 5.5) return 6;
-    if (v <= 6.5) return 7;
-    if (v <= 7.5) return 8;
+  static int calculateBortleFromRaw(double rawValue) {
+    if (rawValue <= 0.5) return 1;
+    if (rawValue <= 1.5) return 2;
+    if (rawValue <= 2.5) return 3;
+    if (rawValue <= 3.5) return 4;
+    if (rawValue <= 4.5) return 5;
+    if (rawValue <= 5.5) return 6;
+    if (rawValue <= 6.5) return 7;
+    if (rawValue <= 7.5) return 8;
     return 9;
   }
 
