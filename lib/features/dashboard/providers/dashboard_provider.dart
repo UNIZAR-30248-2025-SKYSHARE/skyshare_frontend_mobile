@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../core/models/location_model.dart';
-import '../data/models/cielo_visible_model.dart';
+import '../data/models/visible_sky_model.dart';
 import '../data/models/weather_model.dart';
 import '../data/models/light_pollution_model.dart';
 import '../data/models/sky_indicator_model.dart';
@@ -19,7 +19,7 @@ class DashboardProvider extends ChangeNotifier {
   Location? selectedLocation;
   final List<Location> savedLocations = [];
 
-  List<Constellation> _constellations = [];
+  List<VisibleSkyItem> _constellations = [];
   WeatherData? _weather;
   LightPollution? _lightPollution;
   SkyIndicator? _skyIndicator;
@@ -33,7 +33,7 @@ class DashboardProvider extends ChangeNotifier {
     required this.locationRepository,
   });
 
-  List<Constellation> get constellations => _constellations;
+  List<VisibleSkyItem> get constellations => _constellations;
   WeatherData? get weather => _weather;
   LightPollution? get lightPollution => _lightPollution;
   SkyIndicator? get skyIndicator => _skyIndicator;

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import '../../data/models/cielo_visible_model.dart';
+import '../../data/models/visible_sky_model.dart';
 import 'constellation_card.dart';
 
 class VisibleSkySection extends StatelessWidget {
-  final List<Constellation> constellations;
+  final List<VisibleSkyItem> constellations;
 
   const VisibleSkySection({
     required this.constellations,

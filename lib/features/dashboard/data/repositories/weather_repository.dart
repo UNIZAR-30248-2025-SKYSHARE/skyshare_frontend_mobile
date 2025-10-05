@@ -12,7 +12,7 @@ class WeatherRepository {
         .from('informacion_meteorologica')
         .select()
         .eq('id_ubicacion', locationId)
-        .order('fecha_hora', ascending: false)
+        .order('ultima_actualizacion', ascending: false)
         .limit(1)
         .maybeSingle();
     if (resp == null) return null;
@@ -24,7 +24,7 @@ class WeatherRepository {
         .from('informacion_meteorologica')
         .select()
         .eq('id_ubicacion', locationId)
-        .order('fecha_hora', ascending: false)
+        .order('ultima_actualizacion', ascending: false)
         .limit(limit);
     final rows = (resp as List).map((e) => Map<String, dynamic>.from(e as Map)).toList();
     return rows.map(WeatherData.fromMap).toList();

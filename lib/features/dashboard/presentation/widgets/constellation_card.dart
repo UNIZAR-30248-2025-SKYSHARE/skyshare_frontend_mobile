@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import '../../data/models/cielo_visible_model.dart';
+import '../../data/models/visible_sky_model.dart';
 
 class ConstellationCard extends StatelessWidget {
-  final Constellation constellation;
+  final VisibleSkyItem constellation;
   final VoidCallback onTap;
 
   const ConstellationCard({

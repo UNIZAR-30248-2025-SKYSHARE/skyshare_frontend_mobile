@@ -25,7 +25,7 @@ class WeatherData {
     return WeatherData(
       id: (map['id_info_meteorologica'] ?? map['id'] ?? 0) as int,
       locationId: (map['id_ubicacion'] as int),
-      timestamp: DateTime.parse((map['fecha_hora'] as String)),
+      timestamp: DateTime.parse((map['ultima_actualizacion'] as String)),
       temperature: map['temperatura'] != null ? (map['temperatura'] as num).toDouble() : null,
       humidity: map['humedad'] != null ? (map['humedad'] as num).toDouble() : null,
       wind: map['viento'] != null ? (map['viento'] as num).toDouble() : null,
@@ -39,7 +39,7 @@ class WeatherData {
     return {
       'id_info_meteorologica': id,
       'id_ubicacion': locationId,
-      'fecha_hora': timestamp.toIso8601String(),
+      'ultima_actualizacion': timestamp.toIso8601String(),
       'temperatura': temperature,
       'humedad': humidity,
       'viento': wind,

@@ -14,7 +14,7 @@ class LightPollutionRepository {
         .from('informacion_meteorologica')
         .select()
         .eq('id_ubicacion', locationId)
-        .order('fecha_hora', ascending: false)
+        .order('ultima_actualizacion', ascending: false)
         .limit(1)
         .maybeSingle();
     if (resp == null) return null;
@@ -26,7 +26,7 @@ class LightPollutionRepository {
   Future<bool> insertLightPollutionForLocation(int locationId, double sourceValue) async {
     final now = DateTime.now().toIso8601String();
     final resp = await client.from('informacion_meteorologica').insert([
-      {'id_ubicacion': locationId, 'fecha_hora': now, 'contaminacion_luminica': sourceValue}
+      {'id_ubicacion': locationId, 'ultima_actualizacion': now, 'contaminacion_luminica': sourceValue}
     ]);
     return resp != null;
   }
