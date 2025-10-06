@@ -24,7 +24,7 @@ class SkyIndicator extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             const SizedBox(height: 16),
-            const Text('Sky Quality Index', style: TextStyle(color: Color.fromRGBO(255, 255, 255, 0.85), fontSize: 16)),
+            const Text('Puntuación del Cielo', style: TextStyle(color: Color.fromRGBO(255, 255, 255, 0.85), fontSize: 16)),
             const SizedBox(height: 8),
             Text('${clamped.toStringAsFixed(1)} / 10', style: TextStyle(color: color, fontSize: 28, fontWeight: FontWeight.bold)),
           ],

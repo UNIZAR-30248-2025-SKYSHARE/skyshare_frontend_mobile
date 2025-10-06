@@ -31,7 +31,7 @@ class ConstellationCard extends StatelessWidget {
         margin: const EdgeInsets.symmetric(vertical: 8),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         decoration: BoxDecoration(
-          color: const Color.fromRGBO(255, 255, 255, 0.3),
+          color: const Color.fromRGBO(0, 0, 0, 0.3),
           borderRadius: BorderRadius.circular(14),
           border: Border.all(color:const Color.fromRGBO(255, 255, 255, 0.12), width: 1.2),
           boxShadow: [const BoxShadow(color: Color.fromRGBO(0, 0, 0, 0.35), blurRadius: 10, offset: Offset(0, 6))],

@@ -262,9 +262,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
           children: [
             Text('Cielo visible', 
                 style: TextStyle(color: Colors.white70, fontSize: 16)),
-            SizedBox(height: 8),
-            Text('--- constelaciones visibles', 
-                style: TextStyle(color: Colors.white54)),
           ],
         ),
       ),
