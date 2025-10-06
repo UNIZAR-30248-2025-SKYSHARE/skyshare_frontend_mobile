@@ -14,6 +14,7 @@
         "geolocator",
         "http",
         "intl",
+        "mocktail",
         "provider",
         "supabase_flutter"
       ],
@@ -55,6 +56,15 @@
         "test_api",
         "vector_math",
         "vm_service"
+      ]
+    },
+    {
+      "name": "mocktail",
+      "version": "1.0.4",
+      "dependencies": [
+        "collection",
+        "matcher",
+        "test_api"
       ]
     },
     {

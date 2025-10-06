@@ -2,18 +2,15 @@ import 'package:flutter/material.dart';
 import '../../../core/models/location_model.dart';
 import '../data/models/visible_sky_model.dart';
 import '../data/models/weather_model.dart';
-import '../data/models/light_pollution_model.dart';
 import '../data/models/sky_indicator_model.dart';
 import '../data/repositories/weather_repository.dart';
 import '../data/repositories/visible_sky_repository.dart';
-import '../data/repositories/light_pollution_repository.dart';
 import '../data/repositories/location_repository.dart';
 import '../../../core/services/location_service.dart';
 
 class DashboardProvider extends ChangeNotifier {
   final WeatherRepository weatherRepository;
   final VisibleSkyRepository visibleSkyRepository;
-  final LightPollutionRepository lightPollutionRepository;
   final LocationRepository locationRepository;
 
   Location? selectedLocation;
@@ -21,7 +18,6 @@ class DashboardProvider extends ChangeNotifier {
 
   List<VisibleSkyItem> _constellations = [];
   WeatherData? _weather;
-  LightPollution? _lightPollution;
   SkyIndicator? _skyIndicator;
   bool _isLoading = false;
   String? _errorMessage;
@@ -29,13 +25,11 @@ class DashboardProvider extends ChangeNotifier {
   DashboardProvider({
     required this.weatherRepository,
     required this.visibleSkyRepository,
-    required this.lightPollutionRepository,
     required this.locationRepository,
   });
 
   List<VisibleSkyItem> get constellations => _constellations;
   WeatherData? get weather => _weather;
-  LightPollution? get lightPollution => _lightPollution;
   SkyIndicator? get skyIndicator => _skyIndicator;
   bool get isLoading => _isLoading;
   String? get errorMessage => _errorMessage;
@@ -99,7 +93,6 @@ class DashboardProvider extends ChangeNotifier {
       final futures = <Future>[];
       futures.add(_loadWeather(loc));
       futures.add(_loadConstellations(loc));
-      futures.add(_loadLightPollution(loc));
       await Future.wait(futures);
       
       _loadSkyIndicatorFromWeather();
@@ -127,29 +120,6 @@ class DashboardProvider extends ChangeNotifier {
     }
   }
 
-  Future<void> _loadLightPollution(Location loc) async {
-    if (loc.id != 0) {
-      _lightPollution = await lightPollutionRepoFetch(loc);
-      print('Light Pollution fetched: ${_lightPollution?.bortleScale}');
-    } else if (_weather != null) {
-      lightPollutionFromWeather(loc);
-    } else {
-      _lightPollution = null;
-    }
-  }
-
-  Future<LightPollution?> lightPollutionRepoFetch(Location loc) async {
-    return await lightPollutionRepository.fetchLatestForLocation(loc.id);
-  }
-
-  void lightPollutionFromWeather(Location loc) {
-    if (_weather != null) {
-      _lightPollution = LightPollution.fromWeatherData(_weather!, loc);
-    } else {
-      _lightPollution = null;
-    }
-  }
-
   void _loadSkyIndicatorFromWeather() {
     if (_weather == null) {
       _skyIndicator = null;
@@ -164,7 +134,7 @@ class DashboardProvider extends ChangeNotifier {
   }
 
   void _calculateSkyIndicatorFallback() {
-    if (_weather == null || _lightPollution == null) {
+    if (_weather == null) {
       _skyIndicator = null;
       return;
     }
@@ -174,7 +144,7 @@ class DashboardProvider extends ChangeNotifier {
       cloudCoverage: _weather!.cloudCoverage ?? 0.0,
       humidity: _weather!.humidity ?? 0.0,
       moonIllumination: 45.0,
-      bortleScale: _lightPollution!.bortleScale,
+      bortleScale: _weather!.lightPollution ?? 0.0,
     );
     
     print('WARNING: SkyIndicator calculado como fallback. Debería estar en la BD.');

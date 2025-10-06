@@ -82,7 +82,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   const SizedBox(height: 24),
                   if (provider.weather != null) WeatherCard(weather: provider.weather!),
                   const SizedBox(height: 24),
-                  if (provider.lightPollution != null) LightPollutionBar(value: (provider.lightPollution!.bortleScale).toDouble()),
+                  if (provider.weather!.lightPollution != null) LightPollutionBar(value: (provider.weather!.lightPollution)!.toDouble()),
                   const SizedBox(height: 24),
                   if (provider.constellations.isNotEmpty) VisibleSkySection(constellations: provider.constellations),
                   const SizedBox(height: 24),

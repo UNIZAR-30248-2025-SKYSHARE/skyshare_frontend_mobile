@@ -48,4 +48,28 @@ class WeatherData {
       'indicador_general_sobre_el_cielo': skyIndicator,
     };
   }
+
+  static String bortleLabel(int b) {
+    switch (b) {
+      case 1:
+        return 'Excelente (Clase 1)';
+      case 2:
+        return 'Muy bueno (Clase 2)';
+      case 3:
+        return 'Rural (Clase 3)';
+      case 4:
+        return 'Transición rural-suburbano (Clase 4)';
+      case 5:
+        return 'Suburbano (Clase 5)';
+      case 6:
+        return 'Suburbano brillante (Clase 6)';
+      case 7:
+        return 'Transición suburbano-urbano (Clase 7)';
+      case 8:
+        return 'Urbano (Clase 8)';
+      case 9:
+      default:
+        return 'Urbano interior (Clase 9)';
+    }
+  }
 }
