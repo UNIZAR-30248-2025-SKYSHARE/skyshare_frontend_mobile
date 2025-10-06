@@ -6,7 +6,7 @@ void main() {
   group('LocationHeader', () {
     testWidgets('muestra el nombre de la ciudad', (WidgetTester tester) async {
       await tester.pumpWidget(
-        MaterialApp(
+        const MaterialApp(
           home: Scaffold(
             body: LocationHeader(
               cityName: 'Madrid',
@@ -21,7 +21,7 @@ void main() {
 
     testWidgets('muestra el nombre del país', (WidgetTester tester) async {
       await tester.pumpWidget(
-        MaterialApp(
+        const MaterialApp(
           home: Scaffold(
             body: LocationHeader(
               cityName: 'Madrid',
@@ -36,7 +36,7 @@ void main() {
 
     testWidgets('aplica los estilos correctos', (WidgetTester tester) async {
       await tester.pumpWidget(
-        MaterialApp(
+        const MaterialApp(
           home: Scaffold(
             body: LocationHeader(
               cityName: 'Madrid',

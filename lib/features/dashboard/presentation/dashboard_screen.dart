@@ -173,7 +173,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   Widget _buildNoDataCard(String message) {
     return Card(
-      color: Colors.black.withOpacity(0.3),
+      color: const Color.fromRGBO(0, 0, 0, 0.3),
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Center(
@@ -187,11 +187,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
   }
 
-  // Widgets de shimmer/skeleton para loading
   Widget _buildShimmerWeatherCard() {
-    return Card(
-      color: Colors.black.withOpacity(0.3),
-      child: const Padding(
+    return const Card(
+      color: Color.fromRGBO(0, 0, 0, 0.3),
+      child: Padding(
         padding: EdgeInsets.all(16.0),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -233,9 +232,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   Widget _buildShimmerLightPollution() {
-    return Card(
-      color: Colors.black.withOpacity(0.3),
-      child: const Padding(
+    return const Card(
+      color: Color.fromRGBO(0, 0, 0, 0.3),
+      child: Padding(
         padding: EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -254,9 +253,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   Widget _buildShimmerConstellations() {
-    return Card(
-      color: Colors.black.withOpacity(0.3),
-      child: const Padding(
+    return const Card(
+      color: Color.fromRGBO(0, 0, 0, 0.3),
+      child: Padding(
         padding: EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -273,9 +272,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   Widget _buildShimmerSkyIndicator() {
-    return Card(
-      color: Colors.black.withOpacity(0.3),
-      child: const Padding(
+    return const Card(
+      color: Color.fromRGBO(0, 0, 0, 0.3),
+      child: Padding(
         padding: EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,

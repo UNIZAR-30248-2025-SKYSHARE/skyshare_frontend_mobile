@@ -28,13 +28,13 @@ class AppNavigation extends StatelessWidget {
     final showAdd = locationCount < maxLocations;
     final dotsCount = showAdd ? locationCount + 1 : locationCount;
     return Container(
-      decoration: BoxDecoration(
-        gradient: const LinearGradient(
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
           colors: [Color(0xFF131422), Color(0xFF161426)],
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
         ),
-        border: Border(top: BorderSide(color: Colors.white.withOpacity(0.03), width: 1)),
+        border: Border(top: BorderSide(color: Color.fromRGBO(255, 255, 255, 0.03), width: 1)),
       ),
       child: BottomAppBar(
         color: Colors.transparent,
@@ -65,8 +65,8 @@ class AppNavigation extends StatelessWidget {
                             margin: const EdgeInsets.symmetric(horizontal: 8),
                             width: 20,
                             height: 20,
-                            decoration: BoxDecoration(
-                              color: Colors.white.withOpacity(0.95),
+                            decoration: const BoxDecoration(
+                              color: Color.fromRGBO(255, 255, 255, 0.95),
                               shape: BoxShape.circle,
                             ),
                             child: const Center(child: Icon(Icons.add, size: 12, color: Colors.black)),
@@ -86,11 +86,11 @@ class AppNavigation extends StatelessWidget {
                           width: isActive ? 16 : 12,
                           height: isActive ? 16 : 12,
                           decoration: BoxDecoration(
-                            color: isActive ? Colors.white : Colors.white.withOpacity(0.65),
+                            color: isActive ? const Color(0xFFFFFFFF) : const Color.fromRGBO(255, 255, 255, 0.65),
                             shape: BoxShape.circle,
                             boxShadow: isActive
-                                ? [BoxShadow(color: Colors.white.withOpacity(0.12), blurRadius: 6, offset: const Offset(0, 2))]
-                                : null,
+                            ? [const BoxShadow(color: Color.fromRGBO(255, 255, 255, 0.12), blurRadius: 6, offset: Offset(0, 2))]
+                            : null,
                           ),
                         ),
                       );

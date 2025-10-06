@@ -14,7 +14,7 @@ void main() {
     late VoidCallback onTap;
 
     setUp(() {
-      onTap = MockVoidCallback();
+      onTap = MockVoidCallback().call;
       mockConstellation = VisibleSkyItem(
         id: 1,
         locationId: 1,

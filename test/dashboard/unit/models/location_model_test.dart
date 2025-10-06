@@ -46,7 +46,7 @@ void main() {
     });
 
     test('toMap converts back to map correctly', () {
-      final location = Location(
+      final location = const Location(
         id: 1,
         name: 'Madrid',
         country: 'Spain',

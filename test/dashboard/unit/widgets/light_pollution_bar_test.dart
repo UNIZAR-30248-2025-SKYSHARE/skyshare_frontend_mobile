@@ -6,7 +6,7 @@ void main() {
   group('LightPollutionBar', () {
     testWidgets('muestra el título correctamente', (WidgetTester tester) async {
       await tester.pumpWidget(
-        MaterialApp(
+        const MaterialApp(
           home: Scaffold(
             body: LightPollutionBar(value: 5.0),
           ),
@@ -18,7 +18,7 @@ void main() {
 
     testWidgets('muestra los valores extremos 1 y 9', (WidgetTester tester) async {
       await tester.pumpWidget(
-        MaterialApp(
+        const MaterialApp(
           home: Scaffold(
             body: LightPollutionBar(value: 5.0),
           ),
@@ -31,7 +31,7 @@ void main() {
 
     testWidgets('muestra el valor numérico correcto', (WidgetTester tester) async {
       await tester.pumpWidget(
-        MaterialApp(
+        const MaterialApp(
           home: Scaffold(
             body: LightPollutionBar(value: 3.5),
           ),
@@ -43,7 +43,7 @@ void main() {
 
     testWidgets('clampa valores fuera de rango', (WidgetTester tester) async {
       await tester.pumpWidget(
-        MaterialApp(
+        const MaterialApp(
           home: Scaffold(
             body: LightPollutionBar(value: 15.0),
           ),

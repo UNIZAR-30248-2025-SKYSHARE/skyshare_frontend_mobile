@@ -6,7 +6,7 @@ void main() {
   group('SkyIndicator', () {
     testWidgets('muestra el título correctamente', (WidgetTester tester) async {
       await tester.pumpWidget(
-        MaterialApp(
+        const MaterialApp(
           home: Scaffold(
             body: SkyIndicator(value: 7.5),
           ),
@@ -18,7 +18,7 @@ void main() {
 
     testWidgets('muestra el valor formateado correctamente', (WidgetTester tester) async {
       await tester.pumpWidget(
-        MaterialApp(
+        const MaterialApp(
           home: Scaffold(
             body: SkyIndicator(value: 7.5),
           ),
@@ -30,7 +30,7 @@ void main() {
 
     testWidgets('clampa valores fuera de rango', (WidgetTester tester) async {
       await tester.pumpWidget(
-        MaterialApp(
+        const MaterialApp(
           home: Scaffold(
             body: SkyIndicator(value: 15.0),
           ),
@@ -42,7 +42,7 @@ void main() {
 
     testWidgets('usa color verde para valores altos', (WidgetTester tester) async {
       await tester.pumpWidget(
-        MaterialApp(
+        const MaterialApp(
           home: Scaffold(
             body: SkyIndicator(value: 8.0),
           ),

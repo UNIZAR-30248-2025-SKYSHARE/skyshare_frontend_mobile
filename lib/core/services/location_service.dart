@@ -27,9 +27,15 @@ class LocationService {
     if (permission == LocationPermission.deniedForever || permission == LocationPermission.denied) {
       throw StateError('Location permission denied');
     }
-    final pos = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+
+    final settings = const LocationSettings(
+      accuracy: LocationAccuracy.high,
+      distanceFilter: 0,
+    );
+    
+    final pos = await Geolocator.getCurrentPosition(locationSettings: settings);
     final placemarks = await placemarkFromCoordinates(pos.latitude, pos.longitude);
-    final p = placemarks.isNotEmpty ? placemarks.first : Placemark();
+    final p = placemarks.isNotEmpty ? placemarks.first : const Placemark();
     final city = (p.locality ?? p.subAdministrativeArea ?? p.administrativeArea ?? '').trim();
     final country = (p.country ?? '').trim();
     return LocationResult(latitude: pos.latitude, longitude: pos.longitude, city: city, country: country);

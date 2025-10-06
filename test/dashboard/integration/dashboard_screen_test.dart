@@ -28,14 +28,10 @@ class TestDashboardProvider extends DashboardProvider {
   Future<void> Function({Location? location})? loadCallback;
 
   TestDashboardProvider({
-    required WeatherRepository weatherRepository,
-    required VisibleSkyRepository visibleSkyRepository,
-    required LocationRepository locationRepository,
-  }) : super(
-          weatherRepository: weatherRepository,
-          visibleSkyRepository: visibleSkyRepository,
-          locationRepository: locationRepository,
-        );
+    required super.weatherRepository,
+    required super.visibleSkyRepository,
+    required super.locationRepository,
+  });
 
   @override
   bool get isLoading => _testLoading;
@@ -99,7 +95,7 @@ void main() {
     late MockVisibleSkyRepository mockSkyRepo;
     late MockLocationRepository mockLocationRepo;
 
-    final mockLocation = Location(
+    final mockLocation = const Location(
       id: 1,
       name: 'Madrid',
       country: 'España',
@@ -275,7 +271,7 @@ void main() {
     late MockVisibleSkyRepository mockSkyRepo;
     late MockLocationRepository mockLocationRepo;
 
-    final mockLocation = Location(
+    final mockLocation = const Location(
       id: 1,
       name: 'Madrid',
       country: 'España',

@@ -31,8 +31,8 @@ class LocationHeader extends StatelessWidget {
           Text(
             countryName,
             textAlign: TextAlign.center,
-            style: TextStyle(
-              color: Colors.white.withOpacity(0.7),
+            style: const TextStyle(
+              color: Color.fromRGBO(255, 255, 255, 0.7),
               fontSize: 16,
               fontWeight: FontWeight.w400,
             ),

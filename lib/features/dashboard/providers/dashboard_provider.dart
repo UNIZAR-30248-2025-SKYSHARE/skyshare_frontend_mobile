@@ -146,8 +146,6 @@ class DashboardProvider extends ChangeNotifier {
       moonIllumination: 45.0,
       bortleScale: _weather!.lightPollution ?? 0.0,
     );
-    
-    print('WARNING: SkyIndicator calculado como fallback. Debería estar en la BD.');
   }
 
   void clearError() {
