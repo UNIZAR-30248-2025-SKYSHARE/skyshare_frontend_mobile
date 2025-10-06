@@ -42,9 +42,12 @@ dependencies:
   flutter_dotenv: ^6.0.0
   geolocator: ^14.0.2
   geocoding: ^4.0.0
-  mocktail: ^1.0.4
+  test: ^1.25.15
 
 dev_dependencies:
+  mocktail: ^1.0.4
+  mockito: ^5.4.2
+  build_runner: ^2.4.0
   flutter_test:
     sdk: flutter
 
