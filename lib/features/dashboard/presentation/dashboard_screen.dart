@@ -16,17 +16,26 @@ class DashboardScreen extends StatefulWidget {
 }
 
 class _DashboardScreenState extends State<DashboardScreen> {
+  bool _initialLoadCompleted = false;
+
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final provider = context.read<DashboardProvider>();
-      provider.detectAndSyncLocation(userId: 1);
+      _initializeData();
+    });
+  }
+
+  Future<void> _initializeData() async {
+    final provider = Provider.of<DashboardProvider>(context, listen: false);
+    await provider.detectAndSyncLocation(userId: 1);
+    setState(() {
+      _initialLoadCompleted = true;
     });
   }
 
   Future<void> _loadData() async {
-    final provider = context.read<DashboardProvider>();
+    final provider = Provider.of<DashboardProvider>(context, listen: false);
     await provider.loadDashboardData();
   }
 
@@ -43,15 +52,28 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   children: [
                     const Icon(Icons.error_outline, color: Colors.red, size: 48),
                     const SizedBox(height: 16),
-                    Text(provider.errorMessage!, style: const TextStyle(color: Colors.white), textAlign: TextAlign.center),
+                    Text(
+                      provider.errorMessage!,
+                      style: const TextStyle(color: Colors.white),
+                      textAlign: TextAlign.center,
+                    ),
                     const SizedBox(height: 16),
-                    ElevatedButton(onPressed: () => provider.detectAndSyncLocation(userId: 1), child: const Text('Reintentar')),
+                    ElevatedButton(
+                      onPressed: () {
+                        setState(() {
+                          _initialLoadCompleted = false;
+                        });
+                        _initializeData();
+                      },
+                      child: const Text('Reintentar'),
+                    ),
                   ],
                 ),
               );
             }
 
-            if (provider.isLoading && provider.selectedLocation == null) {
+            // Estado de carga inicial
+            if (!_initialLoadCompleted || (provider.isLoading && provider.selectedLocation == null)) {
               return const Center(
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
@@ -67,30 +89,205 @@ class _DashboardScreenState extends State<DashboardScreen> {
               );
             }
 
-            final locName = provider.selectedLocation?.name ?? '';
-            final country = provider.selectedLocation?.country ?? '';
+            // Estado de carga de datos después de tener ubicación
+            if (provider.isLoading && provider.selectedLocation != null) {
+              return _buildContentSkeleton(provider);
+            }
 
-            return RefreshIndicator(
-              onRefresh: _loadData,
-              backgroundColor: const Color(0xFF1A1F3A),
-              color: Colors.white,
-              child: ListView(
-                padding: const EdgeInsets.fromLTRB(16, 20, 16, 120),
-                children: [
-                  const SizedBox(height: 24),
-                  LocationHeader(cityName: locName, countryName: country),
-                  const SizedBox(height: 24),
-                  if (provider.weather != null) WeatherCard(weather: provider.weather!),
-                  const SizedBox(height: 24),
-                  if (provider.weather!.lightPollution != null) LightPollutionBar(value: (provider.weather!.lightPollution)!.toDouble()),
-                  const SizedBox(height: 24),
-                  if (provider.constellations.isNotEmpty) VisibleSkySection(constellations: provider.constellations),
-                  const SizedBox(height: 24),
-                  if (provider.skyIndicator != null) SkyIndicator(value: provider.skyIndicator!.value),
-                ],
-              ),
-            );
+            // Contenido principal
+            return _buildMainContent(provider);
           },
+        ),
+      ),
+    );
+  }
+
+  Widget _buildContentSkeleton(DashboardProvider provider) {
+    final locName = provider.selectedLocation?.name ?? 'Ubicación no disponible';
+    final country = provider.selectedLocation?.country ?? '';
+
+    return RefreshIndicator(
+      onRefresh: _loadData,
+      backgroundColor: const Color(0xFF1A1F3A),
+      color: Colors.white,
+      child: ListView(
+        padding: const EdgeInsets.fromLTRB(16, 20, 16, 120),
+        children: [
+          const SizedBox(height: 24),
+          LocationHeader(cityName: locName, countryName: country),
+          const SizedBox(height: 24),
+          _buildShimmerWeatherCard(),
+          const SizedBox(height: 24),
+          _buildShimmerLightPollution(),
+          const SizedBox(height: 24),
+          _buildShimmerConstellations(),
+          const SizedBox(height: 24),
+          _buildShimmerSkyIndicator(),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildMainContent(DashboardProvider provider) {
+    final locName = provider.selectedLocation?.name ?? 'Ubicación no disponible';
+    final country = provider.selectedLocation?.country ?? '';
+
+    return RefreshIndicator(
+      onRefresh: _loadData,
+      backgroundColor: const Color(0xFF1A1F3A),
+      color: Colors.white,
+      child: ListView(
+        padding: const EdgeInsets.fromLTRB(16, 20, 16, 120),
+        children: [
+          const SizedBox(height: 24),
+          LocationHeader(cityName: locName, countryName: country),
+          const SizedBox(height: 24),
+          
+          // Weather Card
+          provider.weather != null 
+              ? WeatherCard(weather: provider.weather!)
+              : _buildNoDataCard('Datos meteorológicos no disponibles'),
+          
+          const SizedBox(height: 24),
+          
+          // Light Pollution Bar
+          if (provider.weather?.lightPollution != null) 
+            LightPollutionBar(value: provider.weather!.lightPollution!.toDouble()),
+          
+          const SizedBox(height: 24),
+          
+          // Visible Sky Section
+          provider.constellations.isNotEmpty 
+              ? VisibleSkySection(constellations: provider.constellations)
+              : _buildNoDataCard('No hay datos de constelaciones visibles'),
+          
+          const SizedBox(height: 24),
+          
+          // Sky Indicator
+          if (provider.skyIndicator != null) 
+            SkyIndicator(value: provider.skyIndicator!.value),
+        ].where((widget) => widget != const SizedBox(height: 0)).toList(),
+      ),
+    );
+  }
+
+  Widget _buildNoDataCard(String message) {
+    return Card(
+      color: Colors.black.withOpacity(0.3),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Center(
+          child: Text(
+            message,
+            style: const TextStyle(color: Colors.white70),
+            textAlign: TextAlign.center,
+          ),
+        ),
+      ),
+    );
+  }
+
+  // Widgets de shimmer/skeleton para loading
+  Widget _buildShimmerWeatherCard() {
+    return Card(
+      color: Colors.black.withOpacity(0.3),
+      child: const Padding(
+        padding: EdgeInsets.all(16.0),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+            Column(
+              children: [
+                CircleAvatar(
+                  backgroundColor: Colors.white24,
+                  radius: 20,
+                ),
+                SizedBox(height: 8),
+                Text('---', style: TextStyle(color: Colors.white70)),
+              ],
+            ),
+            Column(
+              children: [
+                CircleAvatar(
+                  backgroundColor: Colors.white24,
+                  radius: 20,
+                ),
+                SizedBox(height: 8),
+                Text('---', style: TextStyle(color: Colors.white70)),
+              ],
+            ),
+            Column(
+              children: [
+                CircleAvatar(
+                  backgroundColor: Colors.white24,
+                  radius: 20,
+                ),
+                SizedBox(height: 8),
+                Text('---', style: TextStyle(color: Colors.white70)),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildShimmerLightPollution() {
+    return Card(
+      color: Colors.black.withOpacity(0.3),
+      child: const Padding(
+        padding: EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Contaminación lumínica', 
+                style: TextStyle(color: Colors.white70, fontSize: 16)),
+            SizedBox(height: 8),
+            LinearProgressIndicator(
+              valueColor: AlwaysStoppedAnimation<Color>(Colors.white24),
+              backgroundColor: Colors.white10,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildShimmerConstellations() {
+    return Card(
+      color: Colors.black.withOpacity(0.3),
+      child: const Padding(
+        padding: EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Cielo visible', 
+                style: TextStyle(color: Colors.white70, fontSize: 16)),
+            SizedBox(height: 8),
+            Text('--- constelaciones visibles', 
+                style: TextStyle(color: Colors.white54)),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildShimmerSkyIndicator() {
+    return Card(
+      color: Colors.black.withOpacity(0.3),
+      child: const Padding(
+        padding: EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Condiciones del cielo', 
+                style: TextStyle(color: Colors.white70, fontSize: 16)),
+            SizedBox(height: 8),
+            LinearProgressIndicator(
+              valueColor: AlwaysStoppedAnimation<Color>(Colors.white24),
+              backgroundColor: Colors.white10,
+            ),
+          ],
         ),
       ),
     );

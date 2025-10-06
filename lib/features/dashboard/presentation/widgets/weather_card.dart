@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../data/models/weather_model.dart';
+import 'package:skyshare_frontend_mobile/features/dashboard/data/models/weather_model.dart';
 
 class WeatherCard extends StatelessWidget {
   final WeatherData weather;
