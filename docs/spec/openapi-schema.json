@@ -5,7 +5,6 @@
     "title": "standard public schema",
     "version": "13.0.5"
   },
-  "host": "euiyvofcfxvxvnzubuxo.supabase.co:443",
   "basePath": "/",
   "schemes": [
     "https"
@@ -21,17 +20,6 @@
     "application/vnd.pgrst.object+json;nulls=stripped",
     "application/vnd.pgrst.object+json",
     "text/csv"
-  ],
-  "securityDefinitions": {
-    "apikey": {
-      "type": "apiKey",
-      "name": "apikey",
-      "in": "header",
-      "description": "Supabase anon/public API key. Paste the raw key here (do NOT include 'Bearer')."
-    }
-  },
-  "security": [
-    { "apikey": [] }
   ],
   "paths": {
     "/": {
@@ -474,269 +462,225 @@
     "/usuarioubicacion": {
       "get": {
         "parameters": [
-          {
-            "$ref": "#/parameters/rowFilter.usuarioubicacion.id_usuario"
-          },
-          {
-            "$ref": "#/parameters/rowFilter.usuarioubicacion.id_ubicacion"
-          },
-          {
-            "$ref": "#/parameters/rowFilter.usuarioubicacion.fecha_registro"
-          },
-          {
-            "$ref": "#/parameters/select"
-          },
-          {
-            "$ref": "#/parameters/order"
-          },
-          {
-            "$ref": "#/parameters/range"
-          },
-          {
-            "$ref": "#/parameters/rangeUnit"
-          },
-          {
-            "$ref": "#/parameters/offset"
-          },
-          {
-            "$ref": "#/parameters/limit"
-          },
-          {
-            "$ref": "#/parameters/preferCount"
-          }
+          { "$ref": "#/parameters/rowFilter.usuarioubicacion.id_usuario" },
+          { "$ref": "#/parameters/rowFilter.usuarioubicacion.id_ubicacion" },
+          { "$ref": "#/parameters/rowFilter.usuarioubicacion.fecha_registro" },
+          { "$ref": "#/parameters/select" },
+          { "$ref": "#/parameters/order" },
+          { "$ref": "#/parameters/range" },
+          { "$ref": "#/parameters/rangeUnit" },
+          { "$ref": "#/parameters/offset" },
+          { "$ref": "#/parameters/limit" },
+          { "$ref": "#/parameters/preferCount" }
         ],
         "responses": {
           "200": {
-            "description": "OK",
-            "schema": {
-              "items": {
-                "$ref": "#/definitions/usuarioubicacion"
-              },
-              "type": "array"
+            "description": "OK. Returns user-location associations.",
+            "schema": { "type": "array", "items": { "$ref": "#/definitions/usuarioubicacion" } },
+            "examples": {
+              "application/json": [
+                { "id_usuario": 42, "id_ubicacion": 1, "fecha_registro": "2025-10-08" }
+              ]
+            },
+            "x-examples": {
+              "sampleAssociations": [
+                { "id_usuario": 42, "id_ubicacion": 1, "fecha_registro": "2025-10-08" },
+                { "id_usuario": 43, "id_ubicacion": 10, "fecha_registro": "2025-09-01" }
+              ]
             }
-          },
-          "206": {
-            "description": "Partial Content"
           }
         },
-        "tags": [
-          "usuarioubicacion"
-        ]
+        "tags": ["usuarioubicacion"]
       },
       "post": {
         "parameters": [
           {
-            "$ref": "#/parameters/body.usuarioubicacion"
+            "name": "usuarioubicacion",
+            "in": "body",
+            "description": "User-location association object to create",
+            "required": true,
+            "schema": { "$ref": "#/definitions/usuarioubicacion" },
+            "examples": {
+              "application/json": { "id_usuario": 42, "id_ubicacion": 1, "fecha_registro": "2025-10-08" }
+            },
+            "x-examples": {
+              "linkUserToPlace": { "id_usuario": 42, "id_ubicacion": 1, "fecha_registro": "2025-10-08" }
+            }
           },
-          {
-            "$ref": "#/parameters/select"
-          },
-          {
-            "$ref": "#/parameters/preferPost"
-          }
+          { "$ref": "#/parameters/select" },
+          { "$ref": "#/parameters/preferPost" }
         ],
         "responses": {
           "201": {
-            "description": "Created"
+            "description": "Created. Returns the created association.",
+            "schema": { "$ref": "#/definitions/usuarioubicacion" },
+            "examples": { "application/json": { "id_usuario": 42, "id_ubicacion": 1, "fecha_registro": "2025-10-08" } }
           }
         },
-        "tags": [
-          "usuarioubicacion"
-        ]
-      },
-      "delete": {
-        "parameters": [
-          {
-            "$ref": "#/parameters/rowFilter.usuarioubicacion.id_usuario"
-          },
-          {
-            "$ref": "#/parameters/rowFilter.usuarioubicacion.id_ubicacion"
-          },
-          {
-            "$ref": "#/parameters/rowFilter.usuarioubicacion.fecha_registro"
-          },
-          {
-            "$ref": "#/parameters/preferReturn"
-          }
-        ],
-        "responses": {
-          "204": {
-            "description": "No Content"
-          }
-        },
-        "tags": [
-          "usuarioubicacion"
-        ]
+        "tags": ["usuarioubicacion"]
       },
       "patch": {
         "parameters": [
+          { "$ref": "#/parameters/rowFilter.usuarioubicacion.id_usuario" },
+          { "$ref": "#/parameters/rowFilter.usuarioubicacion.id_ubicacion" },
           {
-            "$ref": "#/parameters/rowFilter.usuarioubicacion.id_usuario"
+            "name": "usuarioubicacion",
+            "in": "body",
+            "description": "Fields to update for the user-location association",
+            "required": true,
+            "schema": { "$ref": "#/definitions/usuarioubicacion" },
+            "examples": { "application/json": { "fecha_registro": "2025-10-09" } },
+            "x-examples": { "updateDate": { "fecha_registro": "2025-10-09" } }
           },
-          {
-            "$ref": "#/parameters/rowFilter.usuarioubicacion.id_ubicacion"
-          },
-          {
-            "$ref": "#/parameters/rowFilter.usuarioubicacion.fecha_registro"
-          },
-          {
-            "$ref": "#/parameters/body.usuarioubicacion"
-          },
-          {
-            "$ref": "#/parameters/preferReturn"
-          }
+          { "$ref": "#/parameters/preferReturn" }
         ],
         "responses": {
-          "204": {
-            "description": "No Content"
-          }
+          "204": { "description": "No Content. Update accepted." },
+          "200": { "description": "Optional: returns updated resource when `Prefer: return=representation` is used." }
         },
-        "tags": [
-          "usuarioubicacion"
-        ]
+        "tags": ["usuarioubicacion"]
+      },
+      "delete": {
+        "parameters": [
+          { "$ref": "#/parameters/rowFilter.usuarioubicacion.id_usuario" },
+          { "$ref": "#/parameters/rowFilter.usuarioubicacion.id_ubicacion" },
+          { "$ref": "#/parameters/preferReturn" }
+        ],
+        "responses": {
+          "204": { "description": "No Content. Resource deleted." },
+          "200": { "description": "Optional: returns deleted resource when `Prefer: return=representation` is used." }
+        },
+        "tags": ["usuarioubicacion"]
       }
     },
     "/ubicacion": {
       "get": {
         "parameters": [
-          {
-            "$ref": "#/parameters/rowFilter.ubicacion.id_ubicacion"
-          },
-          {
-            "$ref": "#/parameters/rowFilter.ubicacion.latitud"
-          },
-          {
-            "$ref": "#/parameters/rowFilter.ubicacion.longitud"
-          },
-          {
-            "$ref": "#/parameters/rowFilter.ubicacion.nombre"
-          },
-          {
-            "$ref": "#/parameters/rowFilter.ubicacion.pais"
-          },
-          {
-            "$ref": "#/parameters/select"
-          },
-          {
-            "$ref": "#/parameters/order"
-          },
-          {
-            "$ref": "#/parameters/range"
-          },
-          {
-            "$ref": "#/parameters/rangeUnit"
-          },
-          {
-            "$ref": "#/parameters/offset"
-          },
-          {
-            "$ref": "#/parameters/limit"
-          },
-          {
-            "$ref": "#/parameters/preferCount"
-          }
+          { "$ref": "#/parameters/rowFilter.ubicacion.id_ubicacion" },
+          { "$ref": "#/parameters/rowFilter.ubicacion.latitud" },
+          { "$ref": "#/parameters/rowFilter.ubicacion.longitud" },
+          { "$ref": "#/parameters/rowFilter.ubicacion.nombre" },
+          { "$ref": "#/parameters/rowFilter.ubicacion.pais" },
+          { "$ref": "#/parameters/select" },
+          { "$ref": "#/parameters/order" },
+          { "$ref": "#/parameters/range" },
+          { "$ref": "#/parameters/rangeUnit" },
+          { "$ref": "#/parameters/offset" },
+          { "$ref": "#/parameters/limit" },
+          { "$ref": "#/parameters/preferCount" }
         ],
         "responses": {
           "200": {
-            "description": "OK",
-            "schema": {
-              "items": {
-                "$ref": "#/definitions/ubicacion"
-              },
-              "type": "array"
+            "description": "OK. Returns a list of locations.",
+            "schema": { "type": "array", "items": { "$ref": "#/definitions/ubicacion" } },
+            "examples": {
+              "application/json": [
+                { "id_ubicacion": 1, "latitud": 40.416775, "longitud": -3.70379, "nombre": "Retiro Park", "pais": "Spain" },
+                { "id_ubicacion": 10, "latitud": 41.000, "longitud": -0.000, "nombre": "Zaragoza", "pais": "Spain" }
+              ]
+            },
+            "x-examples": {
+              "sampleList": [
+                {
+                  "id_ubicacion": 1,
+                  "latitud": 40.416775,
+                  "longitud": -3.70379,
+                  "nombre": "Retiro Park",
+                  "pais": "Spain"
+                },
+                {
+                  "id_ubicacion": 10,
+                  "latitud": 41.000,
+                  "longitud": -0.000,
+                  "nombre": "Zaragoza",
+                  "pais": "Spain"
+                }
+              ]
             }
-          },
-          "206": {
-            "description": "Partial Content"
           }
         },
-        "tags": [
-          "ubicacion"
-        ]
+        "tags": ["ubicacion"]
       },
       "post": {
         "parameters": [
           {
-            "$ref": "#/parameters/body.ubicacion"
+            "name": "ubicacion",
+            "in": "body",
+            "description": "Location object to create",
+            "required": true,
+            "schema": { "$ref": "#/definitions/ubicacion" },
+            "examples": {
+              "application/json": { "latitud": 40.416775, "longitud": -3.70379, "nombre": "New Spot", "pais": "Spain" }
+            },
+            "x-examples": {
+              "createMinimal": { "latitud": 40.416775, "longitud": -3.70379, "nombre": "New Spot", "pais": "Spain" },
+              "createAtSea": { "latitud": 36.0, "longitud": -5.0, "nombre": "Coastal View", "pais": "Spain" }
+            }
           },
-          {
-            "$ref": "#/parameters/select"
-          },
-          {
-            "$ref": "#/parameters/preferPost"
-          }
+          { "$ref": "#/parameters/select" },
+          { "$ref": "#/parameters/preferPost" }
         ],
         "responses": {
           "201": {
-            "description": "Created"
+            "description": "Created. Returns the created location.",
+            "schema": { "$ref": "#/definitions/ubicacion" },
+            "examples": {
+              "application/json": { "id_ubicacion": 123, "latitud": 40.416775, "longitud": -3.70379, "nombre": "New Spot", "pais": "Spain" }
+            },
+            "x-examples": {
+              "createdExample": { "id_ubicacion": 123, "latitud": 40.416775, "longitud": -3.70379, "nombre": "New Spot", "pais": "Spain" }
+            }
           }
         },
-        "tags": [
-          "ubicacion"
-        ]
-      },
-      "delete": {
-        "parameters": [
-          {
-            "$ref": "#/parameters/rowFilter.ubicacion.id_ubicacion"
-          },
-          {
-            "$ref": "#/parameters/rowFilter.ubicacion.latitud"
-          },
-          {
-            "$ref": "#/parameters/rowFilter.ubicacion.longitud"
-          },
-          {
-            "$ref": "#/parameters/rowFilter.ubicacion.nombre"
-          },
-          {
-            "$ref": "#/parameters/rowFilter.ubicacion.pais"
-          },
-          {
-            "$ref": "#/parameters/preferReturn"
-          }
-        ],
-        "responses": {
-          "204": {
-            "description": "No Content"
-          }
-        },
-        "tags": [
-          "ubicacion"
-        ]
+        "tags": ["ubicacion"]
       },
       "patch": {
         "parameters": [
+          { "$ref": "#/parameters/rowFilter.ubicacion.id_ubicacion" },
           {
-            "$ref": "#/parameters/rowFilter.ubicacion.id_ubicacion"
+            "name": "ubicacion",
+            "in": "body",
+            "description": "Fields to update for a location (partial object)",
+            "required": true,
+            "schema": { "$ref": "#/definitions/ubicacion" },
+            "examples": {
+              "application/json": { "nombre": "Retiro Park - East", "pais": "Spain" }
+            },
+            "x-examples": {
+              "rename": { "nombre": "Retiro Park - East" },
+              "move": { "latitud": 40.417000, "longitud": -3.704000 }
+            }
           },
-          {
-            "$ref": "#/parameters/rowFilter.ubicacion.latitud"
-          },
-          {
-            "$ref": "#/parameters/rowFilter.ubicacion.longitud"
-          },
-          {
-            "$ref": "#/parameters/rowFilter.ubicacion.nombre"
-          },
-          {
-            "$ref": "#/parameters/rowFilter.ubicacion.pais"
-          },
-          {
-            "$ref": "#/parameters/body.ubicacion"
-          },
-          {
-            "$ref": "#/parameters/preferReturn"
-          }
+          { "$ref": "#/parameters/preferReturn" }
         ],
         "responses": {
-          "204": {
-            "description": "No Content"
+          "204": { "description": "No Content. Update accepted." },
+          "200": {
+            "description": "Optional: returns updated resource when `Prefer: return=representation` is used.",
+            "schema": { "$ref": "#/definitions/ubicacion" },
+            "examples": {
+              "application/json": { "id_ubicacion": 1, "latitud": 40.417000, "longitud": -3.704000, "nombre": "Retiro Park - East", "pais": "Spain" }
+            }
           }
         },
-        "tags": [
-          "ubicacion"
-        ]
+        "tags": ["ubicacion"]
+      },
+      "delete": {
+        "parameters": [
+          { "$ref": "#/parameters/rowFilter.ubicacion.id_ubicacion" },
+          { "$ref": "#/parameters/preferReturn" }
+        ],
+        "responses": {
+          "204": { "description": "No Content. Resource deleted." },
+          "200": {
+            "description": "Optional: returns deleted resource when `Prefer: return=representation` is used.",
+            "schema": { "$ref": "#/definitions/ubicacion" },
+            "examples": {
+              "application/json": { "id_ubicacion": 10, "latitud": 41.0, "longitud": -0.0, "nombre": "Alagón", "pais": "Spain" }
+            }
+          }
+        },
+        "tags": ["ubicacion"]
       }
     },
     "/usuariogrupo": {
@@ -1278,180 +1222,111 @@
     "/informacion_meteorologica": {
       "get": {
         "parameters": [
-          {
-            "$ref": "#/parameters/rowFilter.informacion_meteorologica.id_info_meteorologica"
-          },
-          {
-            "$ref": "#/parameters/rowFilter.informacion_meteorologica.id_ubicacion"
-          },
-          {
-            "$ref": "#/parameters/rowFilter.informacion_meteorologica.temperatura"
-          },
-          {
-            "$ref": "#/parameters/rowFilter.informacion_meteorologica.humedad"
-          },
-          {
-            "$ref": "#/parameters/rowFilter.informacion_meteorologica.viento"
-          },
-          {
-            "$ref": "#/parameters/rowFilter.informacion_meteorologica.nubosidad"
-          },
-          {
-            "$ref": "#/parameters/rowFilter.informacion_meteorologica.contaminacion_luminica"
-          },
-          {
-            "$ref": "#/parameters/rowFilter.informacion_meteorologica.indicador_general_sobre_el_cielo"
-          },
-          {
-            "$ref": "#/parameters/rowFilter.informacion_meteorologica.ultima_actualizacion"
-          },
-          {
-            "$ref": "#/parameters/select"
-          },
-          {
-            "$ref": "#/parameters/order"
-          },
-          {
-            "$ref": "#/parameters/range"
-          },
-          {
-            "$ref": "#/parameters/rangeUnit"
-          },
-          {
-            "$ref": "#/parameters/offset"
-          },
-          {
-            "$ref": "#/parameters/limit"
-          },
-          {
-            "$ref": "#/parameters/preferCount"
-          }
+          { "$ref": "#/parameters/rowFilter.informacion_meteorologica.id_info_meteorologica" },
+          { "$ref": "#/parameters/rowFilter.informacion_meteorologica.id_ubicacion" },
+          { "$ref": "#/parameters/rowFilter.informacion_meteorologica.temperatura" },
+          { "$ref": "#/parameters/rowFilter.informacion_meteorologica.humedad" },
+          { "$ref": "#/parameters/rowFilter.informacion_meteorologica.viento" },
+          { "$ref": "#/parameters/rowFilter.informacion_meteorologica.nubosidad" },
+          { "$ref": "#/parameters/rowFilter.informacion_meteorologica.contaminacion_luminica" },
+          { "$ref": "#/parameters/rowFilter.informacion_meteorologica.indicador_general_sobre_el_cielo" },
+          { "$ref": "#/parameters/rowFilter.informacion_meteorologica.ultima_actualizacion" },
+          { "$ref": "#/parameters/select" },
+          { "$ref": "#/parameters/order" },
+          { "$ref": "#/parameters/range" },
+          { "$ref": "#/parameters/rangeUnit" },
+          { "$ref": "#/parameters/offset" },
+          { "$ref": "#/parameters/limit" },
+          { "$ref": "#/parameters/preferCount" }
         ],
         "responses": {
           "200": {
-            "description": "OK",
-            "schema": {
-              "items": {
-                "$ref": "#/definitions/informacion_meteorologica"
-              },
-              "type": "array"
+            "description": "OK. Returns weather info records.",
+            "schema": { "type": "array", "items": { "$ref": "#/definitions/informacion_meteorologica" } },
+            "examples": {
+              "application/json": [
+                { "id_info_meteorologica": 5, "id_ubicacion": 1, "temperatura": 12.3, "humedad": 68, "viento": 3.4, "nubosidad": 20, "contaminacion_luminica": 18.5, "indicador_general_sobre_el_cielo": 7.8, "ultima_actualizacion": "2025-10-08T21:30:00Z" }
+              ]
+            },
+            "x-examples": {
+              "recentReadings": [
+                { "id_info_meteorologica": 5, "id_ubicacion": 1, "temperatura": 12.3, "humedad": 68, "viento": 3.4, "nubosidad": 20, "contaminacion_luminica": 18.5, "indicador_general_sobre_el_cielo": 7.8, "ultima_actualizacion": "2025-10-08T21:30:00Z" },
+                { "id_info_meteorologica": 6, "id_ubicacion": 2, "temperatura": 7.0, "humedad": 82, "viento": 1.2, "nubosidad": 10, "contaminacion_luminica": 20.0, "indicador_general_sobre_el_cielo": 8.2, "ultima_actualizacion": "2025-10-08T20:00:00Z" }
+              ]
             }
-          },
-          "206": {
-            "description": "Partial Content"
           }
         },
-        "tags": [
-          "informacion_meteorologica"
-        ]
+        "tags": ["informacion_meteorologica"]
       },
       "post": {
         "parameters": [
           {
-            "$ref": "#/parameters/body.informacion_meteorologica"
+            "name": "informacion_meteorologica",
+            "in": "body",
+            "description": "Weather information object to insert",
+            "required": true,
+            "schema": { "$ref": "#/definitions/informacion_meteorologica" },
+            "examples": {
+              "application/json": { "id_ubicacion": 1, "temperatura": 10.5, "humedad": 75, "viento": 2.1, "nubosidad": 15, "contaminacion_luminica": 17.0, "indicador_general_sobre_el_cielo": 8.0 }
+            },
+            "x-examples": {
+              "typicalReading": { "id_ubicacion": 1, "temperatura": 10.5, "humedad": 75, "viento": 2.1, "nubosidad": 15, "contaminacion_luminica": 17.0, "indicador_general_sobre_el_cielo": 8.0 },
+              "nightReading": { "id_ubicacion": 1, "temperatura": 6.2, "humedad": 90, "viento": 0.5, "nubosidad": 5, "contaminacion_luminica": 18.2, "indicador_general_sobre_el_cielo": 9.0 }
+            }
           },
-          {
-            "$ref": "#/parameters/select"
-          },
-          {
-            "$ref": "#/parameters/preferPost"
-          }
+          { "$ref": "#/parameters/select" },
+          { "$ref": "#/parameters/preferPost" }
         ],
         "responses": {
           "201": {
-            "description": "Created"
+            "description": "Created. Returns created weather info.",
+            "schema": { "$ref": "#/definitions/informacion_meteorologica" },
+            "examples": {
+              "application/json": { "id_info_meteorologica": 77, "id_ubicacion": 1, "temperatura": 10.5, "humedad": 75, "viento": 2.1, "nubosidad": 15, "contaminacion_luminica": 17.0, "indicador_general_sobre_el_cielo": 8.0, "ultima_actualizacion": "2025-10-08T21:35:00Z" }
+            }
           }
         },
-        "tags": [
-          "informacion_meteorologica"
-        ]
-      },
-      "delete": {
-        "parameters": [
-          {
-            "$ref": "#/parameters/rowFilter.informacion_meteorologica.id_info_meteorologica"
-          },
-          {
-            "$ref": "#/parameters/rowFilter.informacion_meteorologica.id_ubicacion"
-          },
-          {
-            "$ref": "#/parameters/rowFilter.informacion_meteorologica.temperatura"
-          },
-          {
-            "$ref": "#/parameters/rowFilter.informacion_meteorologica.humedad"
-          },
-          {
-            "$ref": "#/parameters/rowFilter.informacion_meteorologica.viento"
-          },
-          {
-            "$ref": "#/parameters/rowFilter.informacion_meteorologica.nubosidad"
-          },
-          {
-            "$ref": "#/parameters/rowFilter.informacion_meteorologica.contaminacion_luminica"
-          },
-          {
-            "$ref": "#/parameters/rowFilter.informacion_meteorologica.indicador_general_sobre_el_cielo"
-          },
-          {
-            "$ref": "#/parameters/rowFilter.informacion_meteorologica.ultima_actualizacion"
-          },
-          {
-            "$ref": "#/parameters/preferReturn"
-          }
-        ],
-        "responses": {
-          "204": {
-            "description": "No Content"
-          }
-        },
-        "tags": [
-          "informacion_meteorologica"
-        ]
+        "tags": ["informacion_meteorologica"]
       },
       "patch": {
         "parameters": [
+          { "$ref": "#/parameters/rowFilter.informacion_meteorologica.id_info_meteorologica" },
           {
-            "$ref": "#/parameters/rowFilter.informacion_meteorologica.id_info_meteorologica"
+            "name": "informacion_meteorologica",
+            "in": "body",
+            "description": "Fields to update for weather info (partial object)",
+            "required": true,
+            "schema": { "$ref": "#/definitions/informacion_meteorologica" },
+            "examples": {
+              "application/json": { "temperatura": 11.0, "humedad": 70 }
+            },
+            "x-examples": {
+              "updateTemp": { "temperatura": 11.0 },
+              "updateWindClouds": { "viento": 4.2, "nubosidad": 30 }
+            }
           },
-          {
-            "$ref": "#/parameters/rowFilter.informacion_meteorologica.id_ubicacion"
-          },
-          {
-            "$ref": "#/parameters/rowFilter.informacion_meteorologica.temperatura"
-          },
-          {
-            "$ref": "#/parameters/rowFilter.informacion_meteorologica.humedad"
-          },
-          {
-            "$ref": "#/parameters/rowFilter.informacion_meteorologica.viento"
-          },
-          {
-            "$ref": "#/parameters/rowFilter.informacion_meteorologica.nubosidad"
-          },
-          {
-            "$ref": "#/parameters/rowFilter.informacion_meteorologica.contaminacion_luminica"
-          },
-          {
-            "$ref": "#/parameters/rowFilter.informacion_meteorologica.indicador_general_sobre_el_cielo"
-          },
-          {
-            "$ref": "#/parameters/rowFilter.informacion_meteorologica.ultima_actualizacion"
-          },
-          {
-            "$ref": "#/parameters/body.informacion_meteorologica"
-          },
-          {
-            "$ref": "#/parameters/preferReturn"
-          }
+          { "$ref": "#/parameters/preferReturn" }
         ],
         "responses": {
-          "204": {
-            "description": "No Content"
+          "204": { "description": "No Content. Update accepted." },
+          "200": {
+            "description": "Optional: returns updated resource when `Prefer: return=representation` is used.",
+            "schema": { "$ref": "#/definitions/informacion_meteorologica" },
+            "examples": { "application/json": { "id_info_meteorologica": 77, "id_ubicacion": 1, "temperatura": 11.0, "humedad": 70, "viento": 2.1, "nubosidad": 15, "contaminacion_luminica": 17.0, "indicador_general_sobre_el_cielo": 8.0 } }
           }
         },
-        "tags": [
-          "informacion_meteorologica"
-        ]
+        "tags": ["informacion_meteorologica"]
+      },
+      "delete": {
+        "parameters": [
+          { "$ref": "#/parameters/rowFilter.informacion_meteorologica.id_info_meteorologica" },
+          { "$ref": "#/parameters/preferReturn" }
+        ],
+        "responses": {
+          "204": { "description": "No Content. Resource deleted." },
+          "200": { "description": "Optional: returns deleted resource when `Prefer: return=representation` is used." }
+        },
+        "tags": ["informacion_meteorologica"]
       }
     },
     "/comentario": {
@@ -1600,153 +1475,104 @@
     "/cielo_visible": {
       "get": {
         "parameters": [
-          {
-            "$ref": "#/parameters/rowFilter.cielo_visible.id_cielo_visible"
-          },
-          {
-            "$ref": "#/parameters/rowFilter.cielo_visible.id_ubicacion"
-          },
-          {
-            "$ref": "#/parameters/rowFilter.cielo_visible.tipo"
-          },
-          {
-            "$ref": "#/parameters/rowFilter.cielo_visible.nombre"
-          },
-          {
-            "$ref": "#/parameters/rowFilter.cielo_visible.descripcion"
-          },
-          {
-            "$ref": "#/parameters/rowFilter.cielo_visible.ultima_actualizacion"
-          },
-          {
-            "$ref": "#/parameters/select"
-          },
-          {
-            "$ref": "#/parameters/order"
-          },
-          {
-            "$ref": "#/parameters/range"
-          },
-          {
-            "$ref": "#/parameters/rangeUnit"
-          },
-          {
-            "$ref": "#/parameters/offset"
-          },
-          {
-            "$ref": "#/parameters/limit"
-          },
-          {
-            "$ref": "#/parameters/preferCount"
-          }
+          { "$ref": "#/parameters/rowFilter.cielo_visible.id_cielo_visible" },
+          { "$ref": "#/parameters/rowFilter.cielo_visible.id_ubicacion" },
+          { "$ref": "#/parameters/rowFilter.cielo_visible.tipo" },
+          { "$ref": "#/parameters/rowFilter.cielo_visible.nombre" },
+          { "$ref": "#/parameters/rowFilter.cielo_visible.descripcion" },
+          { "$ref": "#/parameters/rowFilter.cielo_visible.ultima_actualizacion" },
+          { "$ref": "#/parameters/select" },
+          { "$ref": "#/parameters/order" },
+          { "$ref": "#/parameters/range" },
+          { "$ref": "#/parameters/rangeUnit" },
+          { "$ref": "#/parameters/offset" },
+          { "$ref": "#/parameters/limit" },
+          { "$ref": "#/parameters/preferCount" }
         ],
         "responses": {
           "200": {
-            "description": "OK",
-            "schema": {
-              "items": {
-                "$ref": "#/definitions/cielo_visible"
-              },
-              "type": "array"
+            "description": "OK. Returns visible-sky objects.",
+            "schema": { "type": "array", "items": { "$ref": "#/definitions/cielo_visible" } },
+            "examples": {
+              "application/json": [
+                { "id_cielo_visible": 7, "id_ubicacion": 1, "tipo": "planet", "nombre": "Jupiter", "descripcion": "Visible after sunset", "ultima_actualizacion": "2025-10-08T21:30:00Z" }
+              ]
+            },
+            "x-examples": {
+              "sightings": [
+                { "id_cielo_visible": 7, "id_ubicacion": 1, "tipo": "planet", "nombre": "Jupiter", "descripcion": "Visible after sunset", "ultima_actualizacion": "2025-10-08T21:30:00Z" },
+                { "id_cielo_visible": 8, "id_ubicacion": 2, "tipo": "constellation", "nombre": "Orion", "descripcion": "High in the sky in winter", "ultima_actualizacion": "2025-10-08T00:00:00Z" }
+              ]
             }
-          },
-          "206": {
-            "description": "Partial Content"
           }
         },
-        "tags": [
-          "cielo_visible"
-        ]
+        "tags": ["cielo_visible"]
       },
       "post": {
         "parameters": [
           {
-            "$ref": "#/parameters/body.cielo_visible"
+            "name": "cielo_visible",
+            "in": "body",
+            "description": "Object representing something visible in the sky",
+            "required": true,
+            "schema": { "$ref": "#/definitions/cielo_visible" },
+            "examples": {
+              "application/json": { "id_ubicacion": 1, "tipo": "planet", "nombre": "Jupiter", "descripcion": "Visible in the east just after sunset" }
+            },
+            "x-examples": {
+              "planetSighting": { "id_ubicacion": 1, "tipo": "planet", "nombre": "Jupiter", "descripcion": "Visible in the east just after sunset" },
+              "meteorShower": { "id_ubicacion": 1, "tipo": "phenomenon", "nombre": "Perseids", "descripcion": "Peak visibility around August 12" }
+            }
           },
-          {
-            "$ref": "#/parameters/select"
-          },
-          {
-            "$ref": "#/parameters/preferPost"
-          }
+          { "$ref": "#/parameters/select" },
+          { "$ref": "#/parameters/preferPost" }
         ],
         "responses": {
           "201": {
-            "description": "Created"
+            "description": "Created. Returns created visible-sky object.",
+            "schema": { "$ref": "#/definitions/cielo_visible" },
+            "examples": {
+              "application/json": { "id_cielo_visible": 99, "id_ubicacion": 1, "tipo": "planet", "nombre": "Jupiter", "descripcion": "Visible in the east just after sunset", "ultima_actualizacion": "2025-10-08T21:40:00Z" }
+            }
           }
         },
-        "tags": [
-          "cielo_visible"
-        ]
-      },
-      "delete": {
-        "parameters": [
-          {
-            "$ref": "#/parameters/rowFilter.cielo_visible.id_cielo_visible"
-          },
-          {
-            "$ref": "#/parameters/rowFilter.cielo_visible.id_ubicacion"
-          },
-          {
-            "$ref": "#/parameters/rowFilter.cielo_visible.tipo"
-          },
-          {
-            "$ref": "#/parameters/rowFilter.cielo_visible.nombre"
-          },
-          {
-            "$ref": "#/parameters/rowFilter.cielo_visible.descripcion"
-          },
-          {
-            "$ref": "#/parameters/rowFilter.cielo_visible.ultima_actualizacion"
-          },
-          {
-            "$ref": "#/parameters/preferReturn"
-          }
-        ],
-        "responses": {
-          "204": {
-            "description": "No Content"
-          }
-        },
-        "tags": [
-          "cielo_visible"
-        ]
+        "tags": ["cielo_visible"]
       },
       "patch": {
         "parameters": [
+          { "$ref": "#/parameters/rowFilter.cielo_visible.id_cielo_visible" },
           {
-            "$ref": "#/parameters/rowFilter.cielo_visible.id_cielo_visible"
+            "name": "cielo_visible",
+            "in": "body",
+            "description": "Fields to update for a visible-sky record",
+            "required": true,
+            "schema": { "$ref": "#/definitions/cielo_visible" },
+            "examples": {
+              "application/json": { "descripcion": "Now visible at low altitude" }
+            },
+            "x-examples": {
+              "updateDescription": { "descripcion": "Now visible at low altitude" },
+              "changeType": { "tipo": "satellite", "nombre": "ISS" }
+            }
           },
-          {
-            "$ref": "#/parameters/rowFilter.cielo_visible.id_ubicacion"
-          },
-          {
-            "$ref": "#/parameters/rowFilter.cielo_visible.tipo"
-          },
-          {
-            "$ref": "#/parameters/rowFilter.cielo_visible.nombre"
-          },
-          {
-            "$ref": "#/parameters/rowFilter.cielo_visible.descripcion"
-          },
-          {
-            "$ref": "#/parameters/rowFilter.cielo_visible.ultima_actualizacion"
-          },
-          {
-            "$ref": "#/parameters/body.cielo_visible"
-          },
-          {
-            "$ref": "#/parameters/preferReturn"
-          }
+          { "$ref": "#/parameters/preferReturn" }
         ],
         "responses": {
-          "204": {
-            "description": "No Content"
-          }
+          "204": { "description": "No Content. Update accepted." },
+          "200": { "description": "Optional: returns updated resource when `Prefer: return=representation` is used." }
         },
-        "tags": [
-          "cielo_visible"
-        ]
+        "tags": ["cielo_visible"]
+      },
+      "delete": {
+        "parameters": [
+          { "$ref": "#/parameters/rowFilter.cielo_visible.id_cielo_visible" },
+          { "$ref": "#/parameters/preferReturn" }
+        ],
+        "responses": {
+          "204": { "description": "No Content. Resource deleted." },
+          "200": { "description": "Optional: returns deleted resource when `Prefer: return=representation` is used." }
+        },
+        "tags": ["cielo_visible"]
       }
     }
   },

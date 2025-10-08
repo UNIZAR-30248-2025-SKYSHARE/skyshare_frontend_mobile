@@ -6,6 +6,7 @@ window.onload = function() {
     url: "./spec/openapi-schema.json",
     dom_id: '#swagger-ui',
     deepLinking: true,
+    supportedSubmitMethods: [],
     presets: [
       SwaggerUIBundle.presets.apis,
       SwaggerUIStandalonePreset
