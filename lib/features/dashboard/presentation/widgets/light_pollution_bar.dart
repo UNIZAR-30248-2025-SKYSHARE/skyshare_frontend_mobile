@@ -26,12 +26,12 @@ class LightPollutionBar extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 4),
+        const Padding(
+          padding: EdgeInsets.symmetric(horizontal: 4),
           child: Text(
             'Contaminación Lumínica',
             style: TextStyle(
-              color: Colors.white.withOpacity(0.85),
+              color: Color.fromRGBO(255, 255, 255, 0.85),
               fontSize: 14,
             ),
           ),
@@ -109,8 +109,8 @@ class LightPollutionBar extends StatelessWidget {
           },
         ),
         const SizedBox(height: 10),
-        Row(
-          children: const <Widget>[
+        const Row(
+          children: <Widget>[
             Text('1', style: TextStyle(color: Colors.white70)),
             Spacer(),
             Text('9', style: TextStyle(color: Colors.white70)),

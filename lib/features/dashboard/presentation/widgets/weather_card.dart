@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../data/models/weather_model.dart';
+import 'package:skyshare_frontend_mobile/features/dashboard/data/models/weather_model.dart';
 
 class WeatherCard extends StatelessWidget {
   final WeatherData weather;
@@ -22,15 +22,15 @@ class WeatherCard extends StatelessWidget {
         gradient: const LinearGradient(
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
-          colors: [Color(0x1A1F3A), Color(0x26273A)],
+          colors: [Color(0x001a1f3a), Color(0x0026273a)],
         ),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.white.withOpacity(0.06), width: 1),
+        border: Border.all(color: const Color.fromRGBO(255, 255, 255, 0.06), width: 1),
         boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.25),
+          const BoxShadow(
+            color: Color.fromRGBO(0, 0, 0, 0.25),
             blurRadius: 10,
-            offset: const Offset(0, 6),
+            offset: Offset(0, 6),
           )
         ],
       ),
@@ -50,16 +50,16 @@ class WeatherCard extends StatelessWidget {
               const SizedBox(height: 8),
               Text(
                 'Humedad: $humidity%',
-                style: TextStyle(
-                  color: Colors.white.withOpacity(0.8),
+                style: const TextStyle(
+                  color: Color.fromRGBO(255, 255, 255, 0.8),
                   fontSize: 14,
                 ),
               ),
               const SizedBox(height: 4),
               Text(
                 'Nubosidad: $clouds%',
-                style: TextStyle(
-                  color: Colors.white.withOpacity(0.8),
+                style: const TextStyle(
+                  color: Color.fromRGBO(255, 255, 255, 0.8),
                   fontSize: 14,
                 ),
               ),
@@ -76,8 +76,8 @@ class WeatherCard extends StatelessWidget {
                   const SizedBox(width: 8),
                   Text(
                     _getSkyConditionLabel(weather.cloudCoverage),
-                    style: TextStyle(
-                      color: Colors.white.withOpacity(0.9),
+                    style: const TextStyle(
+                      color: Color.fromRGBO(255, 255, 255, 0.9),
                       fontSize: 14,
                     ),
                   ),
@@ -86,8 +86,8 @@ class WeatherCard extends StatelessWidget {
               const SizedBox(height: 12),
               Text(
                 'Viento: $wind km/h',
-                style: TextStyle(
-                  color: Colors.white.withOpacity(0.8),
+                style: const TextStyle(
+                  color: Color.fromRGBO(255, 255, 255, 0.8),
                   fontSize: 12,
                 ),
               ),

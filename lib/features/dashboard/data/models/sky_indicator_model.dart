@@ -25,7 +25,7 @@ class SkyIndicator {
     required double cloudCoverage,
     required double humidity,
     required double moonIllumination,
-    required int bortleScale,
+    required double bortleScale,
   }) {
     final normalizedClouds = (100 - cloudCoverage) / 100;
     final normalizedHumidity = (100 - humidity) / 100;

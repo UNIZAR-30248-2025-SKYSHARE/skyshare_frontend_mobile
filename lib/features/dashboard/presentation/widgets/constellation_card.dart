@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import '../../data/models/cielo_visible_model.dart';
+import '../../data/models/visible_sky_model.dart';
 
 class ConstellationCard extends StatelessWidget {
-  final Constellation constellation;
+  final VisibleSkyItem constellation;
   final VoidCallback onTap;
 
   const ConstellationCard({
@@ -31,10 +31,10 @@ class ConstellationCard extends StatelessWidget {
         margin: const EdgeInsets.symmetric(vertical: 8),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.03),
+          color: const Color.fromRGBO(0, 0, 0, 0.3),
           borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: Colors.white.withOpacity(0.12), width: 1.2),
-          boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.35), blurRadius: 10, offset: const Offset(0, 6))],
+          border: Border.all(color:const Color.fromRGBO(255, 255, 255, 0.12), width: 1.2),
+          boxShadow: [const BoxShadow(color: Color.fromRGBO(0, 0, 0, 0.35), blurRadius: 10, offset: Offset(0, 6))],
         ),
         child: Row(
           children: <Widget>[
@@ -49,7 +49,7 @@ class ConstellationCard extends StatelessWidget {
                   const SizedBox(height: 8),
                   Text(
                     ts,
-                    style: TextStyle(color: Colors.white.withOpacity(0.6), fontSize: 13),
+                    style: const TextStyle(color: Color.fromRGBO(255, 255, 255, 0.6), fontSize: 13),
                   ),
                 ],
               ),
@@ -60,7 +60,7 @@ class ConstellationCard extends StatelessWidget {
               height: 56,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(10),
-                color: Colors.white.withOpacity(0.03),
+                color: const Color.fromRGBO(255, 255, 255, 0.03),
               ),
               child: const Icon(Icons.star, color: Colors.lightBlueAccent, size: 32),
             ),

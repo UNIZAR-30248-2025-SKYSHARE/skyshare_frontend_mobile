@@ -6,7 +6,6 @@ import 'features/dashboard/providers/dashboard_provider.dart';
 import 'features/dashboard/presentation/dashboard_screen.dart';
 import 'features/dashboard/data/repositories/weather_repository.dart';
 import 'features/dashboard/data/repositories/visible_sky_repository.dart';
-import 'features/dashboard/data/repositories/light_pollution_repository.dart';
 import 'features/dashboard/data/repositories/location_repository.dart';
 import 'core/services/supabase_service.dart';
 import 'core/widgets/app_navigation.dart';
@@ -35,9 +34,7 @@ class MyApp extends StatelessWidget {
         Provider<VisibleSkyRepository>(
           create: (ctx) => VisibleSkyRepository(client: ctx.read<SupabaseClient>()),
         ),
-        Provider<LightPollutionRepository>(
-          create: (ctx) => LightPollutionRepository(client: ctx.read<SupabaseClient>()),
-        ),
+
         Provider<LocationRepository>(
           create: (ctx) => LocationRepository(client: ctx.read<SupabaseClient>()),
         ),
@@ -45,7 +42,6 @@ class MyApp extends StatelessWidget {
           create: (ctx) => DashboardProvider(
             weatherRepository: ctx.read<WeatherRepository>(),
             visibleSkyRepository: ctx.read<VisibleSkyRepository>(),
-            lightPollutionRepository: ctx.read<LightPollutionRepository>(),
             locationRepository: ctx.read<LocationRepository>(),
           ),
         ),

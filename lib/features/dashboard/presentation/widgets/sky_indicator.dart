@@ -24,7 +24,7 @@ class SkyIndicator extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             const SizedBox(height: 16),
-            Text('Sky Quality Index', style: TextStyle(color: Colors.white.withOpacity(0.85), fontSize: 16)),
+            const Text('Puntuación del Cielo', style: TextStyle(color: Color.fromRGBO(255, 255, 255, 0.85), fontSize: 16)),
             const SizedBox(height: 8),
             Text('${clamped.toStringAsFixed(1)} / 10', style: TextStyle(color: color, fontSize: 28, fontWeight: FontWeight.bold)),
           ],
@@ -47,7 +47,7 @@ class _GaugePainter extends CustomPainter {
     final backgroundPaint = Paint()
       ..style = PaintingStyle.stroke
       ..strokeWidth = 10
-      ..shader = SweepGradient(colors: [Colors.red, Colors.orange, Colors.yellow, Colors.lightGreen, Colors.green]).createShader(Rect.fromCircle(center: center, radius: radius))
+      ..shader = const SweepGradient(colors: [Colors.red, Colors.orange, Colors.yellow, Colors.lightGreen, Colors.green]).createShader(Rect.fromCircle(center: center, radius: radius))
       ..strokeCap = StrokeCap.round;
     canvas.drawArc(Rect.fromCircle(center: center, radius: radius), pi, pi, false, backgroundPaint);
     final angle = pi + (value / 10) * pi;

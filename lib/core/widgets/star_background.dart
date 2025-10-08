@@ -12,9 +12,9 @@ class StarBackground extends StatelessWidget {
   Widget build(BuildContext context) {
     return Stack(
       children: <Widget>[
-        Positioned.fill(
+        const Positioned.fill(
           child: DecoratedBox(
-            decoration: const BoxDecoration(
+            decoration: BoxDecoration(
               gradient: LinearGradient(
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
@@ -49,7 +49,7 @@ class _StarPainter extends CustomPainter {
       final dy = rnd.nextDouble() * size.height;
       final radius = rnd.nextDouble() * 1.6 + 0.25;
       final opacity = (rnd.nextDouble() * 0.7 + 0.12).clamp(0.12, 1.0);
-      final paint = Paint()..color = Colors.white.withOpacity(opacity);
+      final paint = Paint()..color = Color.fromRGBO(255, 255, 255, opacity);
       if (rnd.nextDouble() < 0.07) {
         paint.maskFilter = MaskFilter.blur(BlurStyle.normal, rnd.nextDouble() * 2.6 + 0.6);
       }
@@ -57,13 +57,13 @@ class _StarPainter extends CustomPainter {
     }
 
     final nebulaPaint = Paint()
-      ..shader = RadialGradient(colors: [Colors.white.withOpacity(0.04), Colors.transparent]).createShader(
+      ..shader = const RadialGradient(colors: [Color.fromRGBO(255, 255, 255, 0.04), Colors.transparent]).createShader(
         Rect.fromCircle(center: Offset(size.width * 0.8, size.height * 0.22), radius: size.width * 0.16),
       );
     canvas.drawOval(Rect.fromCenter(center: Offset(size.width * 0.8, size.height * 0.22), width: size.width * 0.32, height: size.height * 0.14), nebulaPaint);
 
     final nebulaPaint2 = Paint()
-      ..shader = RadialGradient(colors: [Colors.white.withOpacity(0.03), Colors.transparent]).createShader(
+      ..shader = const RadialGradient(colors: [Color.fromRGBO(255, 255, 255, 0.03), Colors.transparent]).createShader(
         Rect.fromCircle(center: Offset(size.width * 0.18, size.height * 0.72), radius: size.width * 0.20),
       );
     canvas.drawOval(Rect.fromCenter(center: Offset(size.width * 0.18, size.height * 0.72), width: size.width * 0.40, height: size.height * 0.18), nebulaPaint2);
