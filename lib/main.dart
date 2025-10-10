@@ -10,6 +10,9 @@ import 'features/dashboard/data/repositories/light_pollution_repository.dart';
 import 'features/dashboard/data/repositories/location_repository.dart';
 import 'core/services/supabase_service.dart';
 import 'core/widgets/app_navigation.dart';
+import 'features/interactive_map/presentation/map_screen.dart'; 
+import 'package:skyshare_frontend_mobile/features/interactive_map/providers/interactive_map_provider.dart';
+
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -29,6 +32,7 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         Provider<SupabaseClient>.value(value: supabase),
+        ChangeNotifierProvider(create: (_) => InteractiveMapProvider()),
         Provider<WeatherRepository>(
           create: (ctx) => WeatherRepository(client: ctx.read<SupabaseClient>()),
         ),
@@ -107,7 +111,7 @@ class _RootAppState extends State<RootApp> {
     final pages = <Widget>[
       const DashboardScreen(),                   
       const Center(child: Text('Luna - placeholder')),
-      const Center(child: Text('Mapa - placeholder')), 
+      const MapScreen(), 
       const Center(child: Text('Perfil - placeholder')), 
     ];
 
