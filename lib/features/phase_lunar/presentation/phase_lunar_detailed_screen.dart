@@ -29,7 +29,7 @@ class _PhaseLunarDetailedScreenState extends State<PhaseLunarDetailedScreen> {
   }
 
   Future<LunarPhase?> _fetchDetailedMoonData() async {
-    debugPrint( '🌙 Fetching lunar phase detail for id=${widget.lunarPhaseId}, date=${widget.date}');
+    debugPrint( ' Fetching lunar phase detail for id=${widget.lunarPhaseId}, date=${widget.date}');
   final repo = phase_lunar_repo.LunarPhaseRepository();
     return await repo.fetchLunarPhaseDetailByIdAndDate(
       lunarPhaseId: widget.lunarPhaseId,
