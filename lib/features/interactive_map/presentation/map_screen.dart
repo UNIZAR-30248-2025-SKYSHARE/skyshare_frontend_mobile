@@ -15,18 +15,21 @@ class MapScreen extends StatefulWidget {
 
 class _MapScreenState extends State<MapScreen> {
   final List<Marker> _markers = [];
+  final MapController _mapController = MapController();
 
   @override
   void initState() {
     super.initState();
-    // Al iniciar, obtenemos la ubicación del usuario
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      Provider.of<InteractiveMapProvider>(context, listen: false)
-          .fetchUserLocation();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      final mapProvider = Provider.of<InteractiveMapProvider>(context, listen: false);
+      await mapProvider.fetchUserLocation();
+
+      if (mapProvider.currentPosition != null) {
+        _mapController.move(mapProvider.currentPosition!, 14.5);
+      }
     });
   }
 
-  /// Muestra un diálogo al hacer tap en el mapa para crear un nuevo spot
   void _handleTap(TapPosition tapPosition, LatLng position) {
     showDialog(
       context: context,
@@ -50,7 +53,6 @@ class _MapScreenState extends State<MapScreen> {
     );
   }
 
-  /// Navega a la pantalla de creación de spot y agrega el marcador si se confirma
   void _navigateToCreateSpot(LatLng position) async {
     final result = await Navigator.push<Map<String, dynamic>>(
       context,
@@ -81,14 +83,21 @@ class _MapScreenState extends State<MapScreen> {
     }
   }
 
+  void _zoomIn() {
+    final zoom = _mapController.zoom + 1;
+    _mapController.move(_mapController.center, zoom);
+  }
+
+  void _zoomOut() {
+    final zoom = _mapController.zoom - 1;
+    _mapController.move(_mapController.center, zoom);
+  }
+
   @override
   Widget build(BuildContext context) {
     final mapProvider = Provider.of<InteractiveMapProvider>(context);
-
-    final initialCenter = mapProvider.currentPosition ?? LatLng(40.4168, -3.7038);
     final hasLocation = mapProvider.currentPosition != null;
 
-    // Marcador azul para la ubicación del usuario
     final userMarker = hasLocation
         ? Marker(
             point: mapProvider.currentPosition!,
@@ -106,20 +115,19 @@ class _MapScreenState extends State<MapScreen> {
       body: Stack(
         children: [
           FlutterMap(
+            mapController: _mapController,
             options: MapOptions(
-              initialCenter: initialCenter,
-              initialZoom: hasLocation ? 14.0 : 6.0,
+              center: hasLocation ? mapProvider.currentPosition : LatLng(40.4168, -3.7038),
+              zoom: hasLocation ? 14.5 : 6.0,
               minZoom: 1.0,
               maxZoom: 18.0,
-              keepAlive: true,
               onTap: _handleTap,
             ),
             children: [
               TileLayer(
-                urlTemplate:
-                    "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png",
-                subdomains: const ['a', 'b', 'c', 'd'],
-                userAgentPackageName: 'com.example.app',
+                urlTemplate: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+                subdomains: const ['a', 'b', 'c'],
+                userAgentPackageName: 'com.example.miapp',
               ),
               MarkerLayer(
                 markers: [
@@ -130,13 +138,9 @@ class _MapScreenState extends State<MapScreen> {
             ],
           ),
 
-          // Indicador de carga
           if (mapProvider.isLoading)
-            const Center(
-              child: CircularProgressIndicator(),
-            ),
+            const Center(child: CircularProgressIndicator()),
 
-          // Error de ubicación
           if (mapProvider.errorMessage != null)
             Positioned(
               bottom: 20,
@@ -155,14 +159,39 @@ class _MapScreenState extends State<MapScreen> {
               ),
             ),
 
-          // Botón flotante para centrar el mapa en la ubicación del usuario
+          Positioned(
+            bottom: 90,
+            right: 20,
+            child: Column(
+              children: [
+                FloatingActionButton(
+                  heroTag: 'zoomIn',
+                  mini: true,
+                  onPressed: _zoomIn,
+                  child: const Icon(Icons.add),
+                ),
+                const SizedBox(height: 8),
+                FloatingActionButton(
+                  heroTag: 'zoomOut',
+                  mini: true,
+                  onPressed: _zoomOut,
+                  child: const Icon(Icons.remove),
+                ),
+              ],
+            ),
+          ),
+
           Positioned(
             bottom: 20,
             right: 20,
             child: FloatingActionButton(
               backgroundColor: Colors.blueAccent,
               onPressed: () {
-                mapProvider.fetchUserLocation();
+                if (mapProvider.currentPosition != null) {
+                  _mapController.move(mapProvider.currentPosition!, 14.5);
+                } else {
+                  mapProvider.fetchUserLocation();
+                }
               },
               child: const Icon(Icons.my_location),
             ),
@@ -173,7 +202,6 @@ class _MapScreenState extends State<MapScreen> {
   }
 }
 
-/// Pantalla para crear un nuevo Spot con imagen, nombre y descripción
 class CreateSpotScreen extends StatefulWidget {
   final LatLng position;
 
@@ -266,7 +294,6 @@ class _CreateSpotScreenState extends State<CreateSpotScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // Selector de imagen circular
               Center(
                 child: GestureDetector(
                   onTap: _seleccionarImagen,
@@ -310,7 +337,6 @@ class _CreateSpotScreenState extends State<CreateSpotScreen> {
               ),
               const SizedBox(height: 24),
 
-              // Campo nombre
               TextFormField(
                 controller: _nombreController,
                 decoration: InputDecoration(
@@ -330,7 +356,6 @@ class _CreateSpotScreenState extends State<CreateSpotScreen> {
               ),
               const SizedBox(height: 16),
 
-              // Campo descripción
               TextFormField(
                 controller: _descripcionController,
                 decoration: InputDecoration(
@@ -352,7 +377,6 @@ class _CreateSpotScreenState extends State<CreateSpotScreen> {
               ),
               const SizedBox(height: 16),
 
-              // Información de ubicación
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
@@ -378,7 +402,6 @@ class _CreateSpotScreenState extends State<CreateSpotScreen> {
               ),
               const SizedBox(height: 24),
 
-              // Botón guardar
               FilledButton.icon(
                 onPressed: _guardarSpot,
                 icon: const Icon(Icons.save),
