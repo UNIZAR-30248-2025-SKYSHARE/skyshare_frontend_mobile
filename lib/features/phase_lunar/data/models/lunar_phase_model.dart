@@ -51,7 +51,8 @@ class LunarPhase {
       : (map['id_ubicacion'] is num ? (map['id_ubicacion'] as num).toInt() : null),
     fase: map['fase']?.toString() ?? '',
       porcentajeIluminacion:
-          (map['porcentaje_iluminacion'] as num?)?.toDouble(),
+        //(map['porcentaje_iluminacion'] as num?)?.toDouble(),
+        _tryParseDouble(map['porcentaje_iluminacion']),
       edadLunar: (map['edad_lunar'] as num?)?.toDouble(),
       horaSalida: map['hora_salida'] as String?,
       azimutSalida: (map['azimut_salida'] as num?)?.toDouble(),
@@ -76,16 +77,24 @@ class LunarPhase {
       'azimut_puesta': azimutPuesta,
       'altitud_actual': altitudActual,
       'proxima_fase': proximaFase,
-  'fecha': fecha?.toIso8601String(),
+      'fecha': fecha?.toIso8601String(),
     };
   }
 
   Map<String, dynamic> toBasicMap() {
     return {
       'id_luna': idLuna,
-  'fecha': fecha?.toIso8601String(),
+      'fecha': fecha?.toIso8601String(),
       'fase': fase,
       'porcentaje_iluminacion': porcentajeIluminacion,
     };
   }
+
+  static double? _tryParseDouble(dynamic value) {
+    if (value == null) return null;
+    if (value is num) return value.toDouble();
+    if (value is String) return double.tryParse(value);
+    return null;
+  }
+
 }
