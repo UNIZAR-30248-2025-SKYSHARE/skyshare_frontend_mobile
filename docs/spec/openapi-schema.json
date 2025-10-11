@@ -182,125 +182,119 @@
         ]
       }
     },
-"/fase_lunar": {
-  "get": {
-    "parameters": [
-      { "$ref": "#/parameters/rowFilter.fase_lunar.id_luna" },
-      { "$ref": "#/parameters/rowFilter.fase_lunar.id_ubicacion" },
-      { "$ref": "#/parameters/rowFilter.fase_lunar.fase" },
-      { "$ref": "#/parameters/rowFilter.fase_lunar.porcentaje_iluminacion" },
-      { "$ref": "#/parameters/rowFilter.fase_lunar.fecha" },
-      { "$ref": "#/parameters/select" },
-      { "$ref": "#/parameters/order" },
-      { "$ref": "#/parameters/range" },
-      { "$ref": "#/parameters/rangeUnit" },
-      { "$ref": "#/parameters/offset" },
-      { "$ref": "#/parameters/limit" },
-      { "$ref": "#/parameters/preferCount" }
-    ],
-    "responses": {
-      "200": {
-        "description": "OK",
-        "schema": {
-          "type": "array",
-          "items": { "$ref": "#/definitions/fase_lunar" },
-          "example": [
-            {
-              "id_luna": 1,
-              "id_ubicacion": 1,
-              "fase": "Luna llena",
-              "porcentaje_iluminacion": 100.00,
-              "edad_lunar": 15.00,
-              "hora_salida": "18:45:00",
-              "azimut_salida": 96.32,
-              "hora_puesta": "06:55:00",
-              "azimut_puesta": 263.47,
-              "altitud_actual": 65.20,
-              "proxima_fase": "Cuarto menguante",
-              "fecha_proxima_fase": "2025-10-24",
-              "fecha": "2025-10-17"
+    "/fase_lunar": {
+      "get": {
+        "parameters": [
+          { "$ref": "#/parameters/rowFilter.fase_lunar.id_luna" },
+          { "$ref": "#/parameters/rowFilter.fase_lunar.id_ubicacion" },
+          { "$ref": "#/parameters/rowFilter.fase_lunar.fase" },
+          { "$ref": "#/parameters/rowFilter.fase_lunar.porcentaje_iluminacion" },
+          { "$ref": "#/parameters/rowFilter.fase_lunar.fecha" },
+          { "$ref": "#/parameters/select" },
+          { "$ref": "#/parameters/order" },
+          { "$ref": "#/parameters/range" },
+          { "$ref": "#/parameters/rangeUnit" },
+          { "$ref": "#/parameters/offset" },
+          { "$ref": "#/parameters/limit" },
+          { "$ref": "#/parameters/preferCount" }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "array",
+              "items": { "$ref": "#/definitions/fase_lunar" },
+              "example": [
+                {
+                  "id_luna": 1,
+                  "id_ubicacion": 1,
+                  "fase": "Luna llena",
+                  "porcentaje_iluminacion": 100.00,
+                  "edad_lunar": 15.00,
+                  "hora_salida": "18:45:00",
+                  "azimut_salida": 96.32,
+                  "hora_puesta": "06:55:00",
+                  "azimut_puesta": 263.47,
+                  "altitud_actual": 65.20,
+                  "proxima_fase": "Cuarto menguante",
+                  "fecha_proxima_fase": "2025-10-24",
+                  "fecha": "2025-10-17"
+                }
+              ]
             }
-          ]
-        }
+          },
+          "206": { "description": "Partial Content" }
+        },
+        "tags": [ "fase_lunar" ]
       },
-      "206": { "description": "Partial Content" }
-    },
-    "tags": [ "fase_lunar" ]
-  },
-  "post": {
-    "parameters": [
-      { "$ref": "#/parameters/body.fase_lunar" },
-      { "$ref": "#/parameters/select" },
-      { "$ref": "#/parameters/preferPost" }
-    ],
-    "responses": {
-      "201": {
-        "description": "Created",
-        "examples": {
-          "application/json": {
-            "id_ubicacion": 1,
-            "fase": "Luna nueva",
-            "porcentaje_iluminacion": 0.00,
-            "edad_lunar": 0.00,
-            "hora_salida": "07:46:00",
-            "azimut_salida": 90.25,
-            "hora_puesta": "19:34:00",
-            "azimut_puesta": 270.40,
-            "altitud_actual": 0.00,
-            "proxima_fase": "Cuarto creciente",
-            "fecha_proxima_fase": "2025-10-09",
-            "fecha": "2025-10-02"
+      "post": {
+        "parameters": [
+          { "$ref": "#/parameters/body.fase_lunar" },
+          { "$ref": "#/parameters/select" },
+          { "$ref": "#/parameters/preferPost" }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created",
+            "examples": {
+              "application/json": {
+                "id_ubicacion": 1,
+                "fase": "Luna nueva",
+                "porcentaje_iluminacion": 0.00,
+                "edad_lunar": 0.00,
+                "hora_salida": "07:46:00",
+                "azimut_salida": 90.25,
+                "hora_puesta": "19:34:00",
+                "azimut_puesta": 270.40,
+                "altitud_actual": 0.00,
+                "proxima_fase": "Cuarto creciente",
+                "fecha_proxima_fase": "2025-10-09",
+                "fecha": "2025-10-02"
+              }
+            }
           }
-        }
-      }
-    },
-    "tags": [ "fase_lunar" ]
-  },
-  "delete": {
-    "parameters": [
-      { "$ref": "#/parameters/rowFilter.fase_lunar.id_luna" },
-      { "$ref": "#/parameters/rowFilter.fase_lunar.id_ubicacion" },
-      { "$ref": "#/parameters/rowFilter.fase_lunar.fase" },
-      { "$ref": "#/parameters/rowFilter.fase_lunar.porcentaje_iluminacion" },
-      { "$ref": "#/parameters/rowFilter.fase_lunar.fecha" },
-      { "$ref": "#/parameters/preferReturn" }
-    ],
-    "responses": {
-      "204": {
-        "description": "No Content",
-        "examples": {
-          "application/json": {
-            "message": "Fase lunar eliminada correctamente"
+        },
+        "tags": [ "fase_lunar" ]
+      },
+      "delete": {
+        "parameters": [
+          { "$ref": "#/parameters/rowFilter.fase_lunar.id_luna" },
+          { "$ref": "#/parameters/rowFilter.fase_lunar.id_ubicacion" },
+          { "$ref": "#/parameters/rowFilter.fase_lunar.fase" },
+          { "$ref": "#/parameters/rowFilter.fase_lunar.porcentaje_iluminacion" },
+          { "$ref": "#/parameters/rowFilter.fase_lunar.fecha" },
+          { "$ref": "#/parameters/preferReturn" }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content",
+            "examples": {
+              "application/json": { "message": "Fase lunar eliminada correctamente" }
+            }
           }
-        }
-      }
-    },
-    "tags": [ "fase_lunar" ]
-  },
-  "patch": {
-    "parameters": [
-      { "$ref": "#/parameters/rowFilter.fase_lunar.id_luna" },
-      { "$ref": "#/parameters/rowFilter.fase_lunar.id_ubicacion" },
-      { "$ref": "#/parameters/rowFilter.fase_lunar.fase" },
-      { "$ref": "#/parameters/rowFilter.fase_lunar.porcentaje_iluminacion" },
-      { "$ref": "#/parameters/rowFilter.fase_lunar.fecha" },
-      { "$ref": "#/parameters/body.fase_lunar" },
-      { "$ref": "#/parameters/preferReturn" }
-    ],
-    "responses": {
-      "204": {
-        "description": "No Content",
-        "examples": {
-          "application/json": {
-            "porcentaje_iluminacion": 99.85,
-            "mensaje": "Actualización correcta"
+        },
+        "tags": [ "fase_lunar" ]
+      },
+      "patch": {
+        "parameters": [
+          { "$ref": "#/parameters/rowFilter.fase_lunar.id_luna" },
+          { "$ref": "#/parameters/rowFilter.fase_lunar.id_ubicacion" },
+          { "$ref": "#/parameters/rowFilter.fase_lunar.fase" },
+          { "$ref": "#/parameters/rowFilter.fase_lunar.porcentaje_iluminacion" },
+          { "$ref": "#/parameters/rowFilter.fase_lunar.fecha" },
+          { "$ref": "#/parameters/body.fase_lunar" },
+          { "$ref": "#/parameters/preferReturn" }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content",
+            "examples": {
+              "application/json": { "porcentaje_iluminacion": 99.85, "mensaje": "Actualización correcta" }
+            }
           }
-        }
+        },
+        "tags": [ "fase_lunar" ]
       }
-    },
-    "tags": [ "fase_lunar" ]
-  }
-},
     },
     "/valoracion": {
       "get": {
