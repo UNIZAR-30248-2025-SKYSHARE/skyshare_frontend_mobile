@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../phase_lunar_detailed_screen.dart';
 import 'moon_phase_widget.dart';
 
 class PhaseLunarDetailedHeader extends StatelessWidget {
