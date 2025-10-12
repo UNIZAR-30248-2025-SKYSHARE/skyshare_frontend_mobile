@@ -30,12 +30,28 @@ class _MapScreenState extends State<MapScreen> {
     });
   }
 
-  void _handleTap(TapPosition tapPosition, LatLng position) {
+  void _handleTap(TapPosition tapPosition, LatLng position) async {
+    final mapProvider = Provider.of<InteractiveMapProvider>(context, listen: false);
+
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
+      barrierDismissible: false,
+      builder: (_) => const Center(child: CircularProgressIndicator()),
+    );
+
+    final result = await mapProvider.fetchSpotLocation(position);
+    if (mounted) Navigator.pop(context);
+
+    final city = result['city'] ?? 'Desconocida';
+    final country = result['country'] ?? 'Desconocido';
+
+    if (!mounted) return;
+
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
         title: const Text('Crear Spot'),
-        content: const Text('¿Quieres crear un spot en esta ubicación?\n\n'),
+        content: Text('Ciudad: $city\nPaís: $country'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
@@ -52,6 +68,51 @@ class _MapScreenState extends State<MapScreen> {
       ),
     );
   }
+
+  void _handleLongPress(TapPosition tapPosition, LatLng position) async {
+    final mapProvider = Provider.of<InteractiveMapProvider>(context, listen: false);
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => const Center(child: CircularProgressIndicator()),
+    );
+
+    final result = await mapProvider.fetchSpotLocation(position);
+    if (mounted) Navigator.pop(context);
+
+    final city = result['city'] ?? 'Desconocida';
+    final country = result['country'] ?? 'Desconocido';
+
+    if (!mounted) return;
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Crear Spot'),
+        content: Text(
+          '¿Quieres crear un spot en esta ubicación?\n\n'
+          'Ciudad: $city\nPaís: $country',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancelar'),
+          ),
+          FilledButton(
+            onPressed: () {
+              Navigator.pop(context);
+              _navigateToCreateSpot(position);
+            },
+            child: const Text('Sí, crear'),
+          ),
+        ],
+      ),
+    );
+  }
+
+
+
 
   void _navigateToCreateSpot(LatLng position) async {
     final result = await Navigator.push<Map<String, dynamic>>(
@@ -121,7 +182,8 @@ class _MapScreenState extends State<MapScreen> {
               zoom: hasLocation ? 14.5 : 6.0,
               minZoom: 1.0,
               maxZoom: 18.0,
-              onTap: _handleTap,
+              onTap: _handleTap,           // click normal
+              onLongPress: _handleLongPress // click largo
             ),
             children: [
               TileLayer(
