@@ -5,6 +5,8 @@ import 'package:image_picker/image_picker.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:provider/provider.dart';
 import '../providers/interactive_map_provider.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
+
 
 class MapScreen extends StatefulWidget {
   const MapScreen({super.key});
@@ -387,12 +389,19 @@ class _CreateSpotScreenState extends State<CreateSpotScreen> {
                             ],
                           )
                         : ClipOval(
-                            child: Image.file(
-                              _imagen!,
-                              fit: BoxFit.cover,
-                              width: 200,
-                              height: 200,
-                            ),
+                            child: kIsWeb
+                              ? Image.network(
+                                  _imagen!.path,
+                                  fit: BoxFit.cover,
+                                  width: 200,
+                                  height: 200,
+                                )
+                              : Image.file(
+                                  _imagen!,
+                                  fit: BoxFit.cover,
+                                  width: 200,
+                                  height: 200,
+                                ),
                           ),
                   ),
                 ),
