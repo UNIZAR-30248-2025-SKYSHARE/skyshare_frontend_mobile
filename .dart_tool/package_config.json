@@ -237,7 +237,7 @@
     },
     {
       "name": "functions_client",
-      "rootUri": "file:///home/marcos/.pub-cache/hosted/pub.dev/functions_client-2.4.4",
+      "rootUri": "file:///home/marcos/.pub-cache/hosted/pub.dev/functions_client-2.5.0",
       "packageUri": "lib/",
       "languageVersion": "3.0"
     },
@@ -321,7 +321,7 @@
     },
     {
       "name": "gotrue",
-      "rootUri": "file:///home/marcos/.pub-cache/hosted/pub.dev/gotrue-2.15.0",
+      "rootUri": "file:///home/marcos/.pub-cache/hosted/pub.dev/gotrue-2.16.0",
       "packageUri": "lib/",
       "languageVersion": "3.3"
     },
@@ -501,7 +501,7 @@
     },
     {
       "name": "path_provider_android",
-      "rootUri": "file:///home/marcos/.pub-cache/hosted/pub.dev/path_provider_android-2.2.18",
+      "rootUri": "file:///home/marcos/.pub-cache/hosted/pub.dev/path_provider_android-2.2.19",
       "packageUri": "lib/",
       "languageVersion": "3.7"
     },
@@ -579,7 +579,7 @@
     },
     {
       "name": "realtime_client",
-      "rootUri": "file:///home/marcos/.pub-cache/hosted/pub.dev/realtime_client-2.5.3",
+      "rootUri": "file:///home/marcos/.pub-cache/hosted/pub.dev/realtime_client-2.6.0",
       "packageUri": "lib/",
       "languageVersion": "3.0"
     },
@@ -729,13 +729,13 @@
     },
     {
       "name": "supabase",
-      "rootUri": "file:///home/marcos/.pub-cache/hosted/pub.dev/supabase-2.9.2",
+      "rootUri": "file:///home/marcos/.pub-cache/hosted/pub.dev/supabase-2.10.0",
       "packageUri": "lib/",
       "languageVersion": "3.3"
     },
     {
       "name": "supabase_flutter",
-      "rootUri": "file:///home/marcos/.pub-cache/hosted/pub.dev/supabase_flutter-2.10.2",
+      "rootUri": "file:///home/marcos/.pub-cache/hosted/pub.dev/supabase_flutter-2.10.3",
       "packageUri": "lib/",
       "languageVersion": "3.3"
     },
@@ -873,7 +873,7 @@
     },
     {
       "name": "win32",
-      "rootUri": "file:///home/marcos/.pub-cache/hosted/pub.dev/win32-5.14.0",
+      "rootUri": "file:///home/marcos/.pub-cache/hosted/pub.dev/win32-5.15.0",
       "packageUri": "lib/",
       "languageVersion": "3.8"
     },
