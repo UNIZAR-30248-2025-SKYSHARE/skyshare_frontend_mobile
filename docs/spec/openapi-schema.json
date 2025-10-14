@@ -39,150 +39,188 @@
         ]
       }
     },
+  {
+  "paths": {
     "/spot": {
       "get": {
         "parameters": [
-          {
-            "$ref": "#/parameters/rowFilter.spot.id_spot"
-          },
-          {
-            "$ref": "#/parameters/rowFilter.spot.id_usuario_creador"
-          },
-          {
-            "$ref": "#/parameters/rowFilter.spot.id_ubicacion"
-          },
-          {
-            "$ref": "#/parameters/rowFilter.spot.nombre"
-          },
-          {
-            "$ref": "#/parameters/rowFilter.spot.descripcion"
-          },
-          {
-            "$ref": "#/parameters/select"
-          },
-          {
-            "$ref": "#/parameters/order"
-          },
-          {
-            "$ref": "#/parameters/range"
-          },
-          {
-            "$ref": "#/parameters/rangeUnit"
-          },
-          {
-            "$ref": "#/parameters/offset"
-          },
-          {
-            "$ref": "#/parameters/limit"
-          },
-          {
-            "$ref": "#/parameters/preferCount"
-          }
+          {"$ref": "#/parameters/rowFilter.spot.id_spot"},
+          {"$ref": "#/parameters/rowFilter.spot.id_usuario_creador"},
+          {"$ref": "#/parameters/rowFilter.spot.id_ubicacion"},
+          {"$ref": "#/parameters/rowFilter.spot.nombre"},
+          {"$ref": "#/parameters/rowFilter.spot.descripcion"},
+          {"$ref": "#/parameters/select"},
+          {"$ref": "#/parameters/order"},
+          {"$ref": "#/parameters/range"},
+          {"$ref": "#/parameters/rangeUnit"},
+          {"$ref": "#/parameters/offset"},
+          {"$ref": "#/parameters/limit"},
+          {"$ref": "#/parameters/preferCount"}
         ],
         "responses": {
           "200": {
-            "description": "OK",
+            "description": "OK. Returns a list of stargazing spots.",
             "schema": {
-              "items": {
-                "$ref": "#/definitions/spot"
-              },
+              "items": {"$ref": "#/definitions/spot"},
               "type": "array"
+            },
+            "examples": {
+              "application/json": [
+                {
+                  "id_spot": 1,
+                  "id_usuario_creador": 42,
+                  "id_ubicacion": 5,
+                  "nombre": "Mirador del Teide",
+                  "descripcion": "Exceptional stargazing location at 2,300m altitude. Minimal light pollution with clear views of the Milky Way. Best visited during new moon phases. Bring warm clothing as temperatures drop significantly at night."
+                },
+                {
+                  "id_spot": 2,
+                  "id_usuario_creador": 38,
+                  "id_ubicacion": 12,
+                  "nombre": "Montsec Astronomical Park",
+                  "descripcion": "Certified Starlight Reserve with excellent sky quality. Features an observatory and designated observation areas. Ideal for deep-sky observations. Public facilities include parking and restrooms."
+                },
+                {
+                  "id_spot": 3,
+                  "id_usuario_creador": 42,
+                  "id_ubicacion": 8,
+                  "nombre": "Cabo de Gata Beach",
+                  "descripcion": "Coastal dark sky spot perfect for summer stargazing. Combine beach camping with astronomy. Southern horizon particularly clear for observing Sagittarius and Scorpius constellations. Limited facilities."
+                }
+              ]
             }
           },
-          "206": {
-            "description": "Partial Content"
-          }
+          "206": {"description": "Partial Content"}
         },
-        "tags": [
-          "spot"
-        ]
+        "tags": ["spot"]
       },
       "post": {
         "parameters": [
-          {
-            "$ref": "#/parameters/body.spot"
-          },
-          {
-            "$ref": "#/parameters/select"
-          },
-          {
-            "$ref": "#/parameters/preferPost"
-          }
+          {"$ref": "#/parameters/body.spot"},
+          {"$ref": "#/parameters/select"},
+          {"$ref": "#/parameters/preferPost"}
         ],
         "responses": {
           "201": {
-            "description": "Created"
+            "description": "Created. Returns the created stargazing spot.",
+            "schema": {"$ref": "#/definitions/spot"},
+            "examples": {
+              "application/json": {
+                "id_spot": 15,
+                "id_usuario_creador": 42,
+                "id_ubicacion": 3,
+                "nombre": "Sierra de Guadarrama Viewpoint",
+                "descripcion": "Mountain spot at 1,800m with panoramic views. Accessible by car year-round except heavy snow. Great for planetary observation and meteor showers. Nearby village offers accommodation."
+              }
+            }
           }
         },
-        "tags": [
-          "spot"
-        ]
-      },
-      "delete": {
-        "parameters": [
-          {
-            "$ref": "#/parameters/rowFilter.spot.id_spot"
-          },
-          {
-            "$ref": "#/parameters/rowFilter.spot.id_usuario_creador"
-          },
-          {
-            "$ref": "#/parameters/rowFilter.spot.id_ubicacion"
-          },
-          {
-            "$ref": "#/parameters/rowFilter.spot.nombre"
-          },
-          {
-            "$ref": "#/parameters/rowFilter.spot.descripcion"
-          },
-          {
-            "$ref": "#/parameters/preferReturn"
-          }
-        ],
-        "responses": {
-          "204": {
-            "description": "No Content"
-          }
-        },
-        "tags": [
-          "spot"
-        ]
+        "tags": ["spot"]
       },
       "patch": {
         "parameters": [
-          {
-            "$ref": "#/parameters/rowFilter.spot.id_spot"
-          },
-          {
-            "$ref": "#/parameters/rowFilter.spot.id_usuario_creador"
-          },
-          {
-            "$ref": "#/parameters/rowFilter.spot.id_ubicacion"
-          },
-          {
-            "$ref": "#/parameters/rowFilter.spot.nombre"
-          },
-          {
-            "$ref": "#/parameters/rowFilter.spot.descripcion"
-          },
-          {
-            "$ref": "#/parameters/body.spot"
-          },
-          {
-            "$ref": "#/parameters/preferReturn"
-          }
+          {"$ref": "#/parameters/rowFilter.spot.id_spot"},
+          {"$ref": "#/parameters/rowFilter.spot.id_usuario_creador"},
+          {"$ref": "#/parameters/rowFilter.spot.id_ubicacion"},
+          {"$ref": "#/parameters/rowFilter.spot.nombre"},
+          {"$ref": "#/parameters/rowFilter.spot.descripcion"},
+          {"$ref": "#/parameters/body.spot"},
+          {"$ref": "#/parameters/preferReturn"}
         ],
         "responses": {
-          "204": {
-            "description": "No Content"
+          "204": {"description": "No Content. Update accepted."},
+          "200": {
+            "description": "Optional: returns updated resource when `Prefer: return=representation` is used.",
+            "schema": {"$ref": "#/definitions/spot"},
+            "examples": {
+              "application/json": {
+                "id_spot": 1,
+                "id_usuario_creador": 42,
+                "id_ubicacion": 5,
+                "nombre": "Mirador del Teide - Updated",
+                "descripcion": "Exceptional stargazing location at 2,300m altitude. Minimal light pollution with clear views of the Milky Way. Best visited during new moon phases. Bring warm clothing as temperatures drop significantly at night. UPDATE: New parking area opened in 2025."
+              }
+            }
           }
         },
-        "tags": [
-          "spot"
-        ]
+        "tags": ["spot"]
+      },
+      "delete": {
+        "parameters": [
+          {"$ref": "#/parameters/rowFilter.spot.id_spot"},
+          {"$ref": "#/parameters/rowFilter.spot.id_usuario_creador"},
+          {"$ref": "#/parameters/rowFilter.spot.id_ubicacion"},
+          {"$ref": "#/parameters/rowFilter.spot.nombre"},
+          {"$ref": "#/parameters/rowFilter.spot.descripcion"},
+          {"$ref": "#/parameters/preferReturn"}
+        ],
+        "responses": {
+          "204": {"description": "No Content. Spot deleted."}
+        },
+        "tags": ["spot"]
       }
-    },
-    "/fase_lunar": {
+    }
+  },
+  "definitions": {
+    "spot": {
+      "required": ["id_spot", "id_usuario_creador", "id_ubicacion", "nombre"],
+      "properties": {
+        "id_spot": {
+          "description": "Primary Key. Unique identifier for the stargazing spot.",
+          "format": "integer",
+          "type": "integer"
+        },
+        "id_usuario_creador": {
+          "description": "Foreign Key to `usuario.id_usuario`. The user who created/submitted this spot.",
+          "format": "integer",
+          "type": "integer"
+        },
+        "id_ubicacion": {
+          "description": "Foreign Key to `ubicacion.id_ubicacion`. Geographic location of the stargazing spot.",
+          "format": "integer",
+          "type": "integer"
+        },
+        "nombre": {
+          "description": "Name of the stargazing spot (e.g., 'Mirador del Teide', 'Montsec Observatory').",
+          "format": "character varying",
+          "type": "string",
+          "maxLength": 255
+        },
+        "descripcion": {
+          "description": "Detailed description including sky quality, accessibility, best viewing times, facilities, and observation tips.",
+          "format": "text",
+          "type": "string"
+        }
+      },
+      "type": "object",
+      "example": {
+        "id_usuario_creador": 42,
+        "id_ubicacion": 5,
+        "nombre": "Picos de Europa Night Sky",
+        "descripcion": "Remote mountain location offering pristine dark skies. Bortle Class 2-3 zone. Access requires 4x4 vehicle and hiking. Perfect for astrophotography of the Milky Way core during summer months. No facilities available, bring all supplies."
+      }
+    }
+  },
+  "parameters": {
+    "body.spot": {
+      "name": "spot",
+      "description": "Stargazing spot object to create or update. Include location details, sky quality information, accessibility notes, and viewing recommendations.",
+      "required": false,
+      "in": "body",
+      "schema": {"$ref": "#/definitions/spot"},
+      "examples": {
+        "application/json": {
+          "id_usuario_creador": 42,
+          "id_ubicacion": 7,
+          "nombre": "Alqueva Dark Sky Reserve",
+          "descripcion": "World's first Starlight Tourism Destination. Exceptionally dark skies with minimal light pollution. Features multiple observation points, guided tours available. Best months: June-September. Facilities include parking, restrooms, and visitor center."
+        }
+      }
+    }
+  }
+}  
+},
+  "/fase_lunar": {
       "get": {
         "parameters": [
           { "$ref": "#/parameters/rowFilter.fase_lunar.id_luna" },
