@@ -1,47 +1,4 @@
-{
-  "swagger": "2.0",
-  "info": {
-    "description": "",
-    "title": "standard public schema",
-    "version": "13.0.5"
-  },
-  "basePath": "/",
-  "schemes": [
-    "https"
-  ],
-  "consumes": [
-    "application/json",
-    "application/vnd.pgrst.object+json;nulls=stripped",
-    "application/vnd.pgrst.object+json",
-    "text/csv"
-  ],
-  "produces": [
-    "application/json",
-    "application/vnd.pgrst.object+json;nulls=stripped",
-    "application/vnd.pgrst.object+json",
-    "text/csv"
-  ],
-  "paths": {
-    "/": {
-      "get": {
-        "produces": [
-          "application/openapi+json",
-          "application/json"
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        },
-        "summary": "OpenAPI description (this document)",
-        "tags": [
-          "Introspection"
-        ]
-      }
-    },
-  {
-  "paths": {
-    "/spot": {
+  "/spot": {
       "get": {
         "parameters": [
           {"$ref": "#/parameters/rowFilter.spot.id_spot"},
@@ -130,7 +87,7 @@
         "responses": {
           "204": {"description": "No Content. Update accepted."},
           "200": {
-            "description": "Optional: returns updated resource when `Prefer: return=representation` is used.",
+            "description": "Optional: returns updated resource when Prefer: return=representation is used.",
             "schema": {"$ref": "#/definitions/spot"},
             "examples": {
               "application/json": {
@@ -159,67 +116,7 @@
         },
         "tags": ["spot"]
       }
-    }
-  },
-  "definitions": {
-    "spot": {
-      "required": ["id_spot", "id_usuario_creador", "id_ubicacion", "nombre"],
-      "properties": {
-        "id_spot": {
-          "description": "Primary Key. Unique identifier for the stargazing spot.",
-          "format": "integer",
-          "type": "integer"
-        },
-        "id_usuario_creador": {
-          "description": "Foreign Key to `usuario.id_usuario`. The user who created/submitted this spot.",
-          "format": "integer",
-          "type": "integer"
-        },
-        "id_ubicacion": {
-          "description": "Foreign Key to `ubicacion.id_ubicacion`. Geographic location of the stargazing spot.",
-          "format": "integer",
-          "type": "integer"
-        },
-        "nombre": {
-          "description": "Name of the stargazing spot (e.g., 'Mirador del Teide', 'Montsec Observatory').",
-          "format": "character varying",
-          "type": "string",
-          "maxLength": 255
-        },
-        "descripcion": {
-          "description": "Detailed description including sky quality, accessibility, best viewing times, facilities, and observation tips.",
-          "format": "text",
-          "type": "string"
-        }
-      },
-      "type": "object",
-      "example": {
-        "id_usuario_creador": 42,
-        "id_ubicacion": 5,
-        "nombre": "Picos de Europa Night Sky",
-        "descripcion": "Remote mountain location offering pristine dark skies. Bortle Class 2-3 zone. Access requires 4x4 vehicle and hiking. Perfect for astrophotography of the Milky Way core during summer months. No facilities available, bring all supplies."
-      }
-    }
-  },
-  "parameters": {
-    "body.spot": {
-      "name": "spot",
-      "description": "Stargazing spot object to create or update. Include location details, sky quality information, accessibility notes, and viewing recommendations.",
-      "required": false,
-      "in": "body",
-      "schema": {"$ref": "#/definitions/spot"},
-      "examples": {
-        "application/json": {
-          "id_usuario_creador": 42,
-          "id_ubicacion": 7,
-          "nombre": "Alqueva Dark Sky Reserve",
-          "descripcion": "World's first Starlight Tourism Destination. Exceptionally dark skies with minimal light pollution. Features multiple observation points, guided tours available. Best months: June-September. Facilities include parking, restrooms, and visitor center."
-        }
-      }
-    }
-  }
-}  
-},
+    },
   "/fase_lunar": {
       "get": {
         "parameters": [
