@@ -11,9 +11,8 @@ import 'features/dashboard/data/repositories/location_repository.dart' as locati
 import 'features/interactive_map/data/repositories/location_repository.dart' as location_repository_map;
 import 'core/services/supabase_service.dart';
 import 'core/widgets/app_navigation.dart';
-import 'features/interactive_map/presentation/map_screen.dart'; 
+import 'features/interactive_map/presentation/map_screen.dart';
 import 'package:skyshare_frontend_mobile/features/interactive_map/providers/interactive_map_provider.dart';
-
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -33,11 +32,6 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         Provider<SupabaseClient>.value(value: supabase),
-        ChangeNotifierProvider(
-          create: (ctx) => InteractiveMapProvider(
-            locationRepository: ctx.read<location_repository_map.LocationRepository>()
-          )
-          ),
         Provider<WeatherRepository>(
           create: (ctx) => WeatherRepository(client: ctx.read<SupabaseClient>()),
         ),
@@ -49,6 +43,14 @@ class MyApp extends StatelessWidget {
         ),
         Provider<location_repository_dashboard.LocationRepository>(
           create: (ctx) => location_repository_dashboard.LocationRepository(client: ctx.read<SupabaseClient>()),
+        ),
+        Provider<location_repository_map.LocationRepository>(
+          create: (ctx) => location_repository_map.LocationRepository(),
+        ),
+        ChangeNotifierProvider(
+          create: (ctx) => InteractiveMapProvider(
+            locationRepository: ctx.read<location_repository_map.LocationRepository>()
+          )
         ),
         ChangeNotifierProvider<DashboardProvider>(
           create: (ctx) => DashboardProvider(
@@ -105,19 +107,17 @@ class _RootAppState extends State<RootApp> {
     });
   }
 
-  void _onAddLocation() {
-    // flujo para añadir ubicación (temporal: no-op)
-  }
+  void _onAddLocation() {}
 
   @override
   Widget build(BuildContext context) {
     final provider = context.watch<DashboardProvider>();
     final locationCount = provider.savedLocations.length;
     final pages = <Widget>[
-      const DashboardScreen(),                   
+      const DashboardScreen(),
       const Center(child: Text('Luna - placeholder')),
-      const MapScreen(), 
-      const Center(child: Text('Perfil - placeholder')), 
+      const MapScreen(),
+      const Center(child: Text('Perfil - placeholder')),
     ];
 
     return Scaffold(
