@@ -12,23 +12,30 @@ class ZoomControls extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Positioned(
-      bottom: 90,
-      right: 20,
-      child: Column(
+    return SizedBox.expand(
+      child: Stack(
         children: [
-          FloatingActionButton(
-            heroTag: 'zoomIn',
-            mini: true,
-            onPressed: onZoomIn,
-            child: const Icon(Icons.add),
-          ),
-          const SizedBox(height: 8),
-          FloatingActionButton(
-            heroTag: 'zoomOut',
-            mini: true,
-            onPressed: onZoomOut,
-            child: const Icon(Icons.remove),
+          Positioned(
+            bottom: 90,
+            right: 20,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                FloatingActionButton(
+                  heroTag: 'zoomIn',
+                  mini: true,
+                  onPressed: onZoomIn,
+                  child: const Icon(Icons.add),
+                ),
+                const SizedBox(height: 8),
+                FloatingActionButton(
+                  heroTag: 'zoomOut',
+                  mini: true,
+                  onPressed: onZoomOut,
+                  child: const Icon(Icons.remove),
+                ),
+              ],
+            ),
           ),
         ],
       ),

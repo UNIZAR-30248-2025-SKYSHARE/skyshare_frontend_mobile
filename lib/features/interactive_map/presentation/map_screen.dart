@@ -11,7 +11,9 @@ import './widgets/location_button.dart';
 import './widgets/create_spot.dart';
 
 class MapScreen extends StatefulWidget {
-  const MapScreen({super.key});
+  final TileProvider? tileProvider;
+  final String? urlTemplate;
+  const MapScreen({super.key, this.tileProvider, this.urlTemplate});
 
   @override
   State<MapScreen> createState() => _MapScreenState();
@@ -27,7 +29,6 @@ class _MapScreenState extends State<MapScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       final mapProvider = Provider.of<InteractiveMapProvider>(context, listen: false);
       await mapProvider.fetchUserLocation();
-
       if (mapProvider.currentPosition != null) {
         _mapController.move(mapProvider.currentPosition!, 14.5);
       }
@@ -40,17 +41,12 @@ class _MapScreenState extends State<MapScreen> {
 
   void _showLocationConfirmation(LatLng position, bool isLongPress) async {
     final mapProvider = Provider.of<InteractiveMapProvider>(context, listen: false);
-
     _showLoadingDialog();
-
     final result = await mapProvider.fetchSpotLocation(position);
     if (mounted) Navigator.pop(context);
-
     final city = result['city'] ?? 'Desconocida';
     final country = result['country'] ?? 'Desconocido';
-
     if (!mounted) return;
-
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
@@ -88,7 +84,6 @@ class _MapScreenState extends State<MapScreen> {
         builder: (context) => CreateSpotScreen(position: position),
       ),
     );
-
     if (result != null && mounted) {
       setState(() {
         _markers.add(
@@ -104,7 +99,6 @@ class _MapScreenState extends State<MapScreen> {
           ),
         );
       });
-
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Spot "${result['nombre']}" creado!')),
       );
@@ -133,7 +127,6 @@ class _MapScreenState extends State<MapScreen> {
   @override
   Widget build(BuildContext context) {
     final mapProvider = Provider.of<InteractiveMapProvider>(context);
-
     return Scaffold(
       body: Stack(
         children: [
@@ -142,6 +135,8 @@ class _MapScreenState extends State<MapScreen> {
             markers: _markers,
             onTap: _handleTap,
             onLongPress: _handleLongPress,
+            tileProvider: widget.tileProvider,
+            urlTemplate: widget.urlTemplate,
           ),
           LoadingOverlay(isLoading: mapProvider.isLoading),
           ErrorBanner(errorMessage: mapProvider.errorMessage),

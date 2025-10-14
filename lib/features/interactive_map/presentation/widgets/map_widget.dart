@@ -7,8 +7,10 @@ import '../../providers/interactive_map_provider.dart';
 class MapWidget extends StatelessWidget {
   final MapController mapController;
   final List<Marker> markers;
-  final Function(TapPosition, LatLng) onTap;
-  final Function(TapPosition, LatLng) onLongPress;
+  final void Function(TapPosition, LatLng) onTap;
+  final void Function(TapPosition, LatLng) onLongPress;
+  final String? urlTemplate;
+  final TileProvider? tileProvider;
 
   const MapWidget({
     super.key,
@@ -16,26 +18,23 @@ class MapWidget extends StatelessWidget {
     required this.markers,
     required this.onTap,
     required this.onLongPress,
+    this.urlTemplate,
+    this.tileProvider,
   });
 
   @override
   Widget build(BuildContext context) {
     final mapProvider = Provider.of<InteractiveMapProvider>(context);
     final hasLocation = mapProvider.currentPosition != null;
-
-    final userMarker = hasLocation
+    final Marker? userMarker = hasLocation
         ? Marker(
             point: mapProvider.currentPosition!,
             width: 40,
             height: 40,
-            child: const Icon(
-              Icons.my_location,
-              color: Colors.blueAccent,
-              size: 35,
-            ),
+            child: const Icon(Icons.my_location, color: Colors.blueAccent, size: 35),
           )
         : null;
-
+    final defaultUrl = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
     return FlutterMap(
       mapController: mapController,
       options: MapOptions(
@@ -48,9 +47,10 @@ class MapWidget extends StatelessWidget {
       ),
       children: [
         TileLayer(
-          urlTemplate: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+          urlTemplate: urlTemplate ?? defaultUrl,
           subdomains: const ['a', 'b', 'c'],
           userAgentPackageName: 'com.example.miapp',
+          tileProvider: tileProvider ?? NetworkTileProvider(),
         ),
         MarkerLayer(
           markers: [

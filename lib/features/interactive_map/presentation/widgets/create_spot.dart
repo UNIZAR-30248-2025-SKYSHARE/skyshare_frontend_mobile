@@ -128,18 +128,18 @@ class _CreateSpotScreenState extends State<CreateSpotScreen> {
                           )
                         : ClipOval(
                             child: kIsWeb
-                              ? Image.network(
-                                  _imagen!.path,
-                                  fit: BoxFit.cover,
-                                  width: 200,
-                                  height: 200,
-                                )
-                              : Image.file(
-                                  _imagen!,
-                                  fit: BoxFit.cover,
-                                  width: 200,
-                                  height: 200,
-                                ),
+                                ? Image.network(
+                                    _imagen!.path,
+                                    fit: BoxFit.cover,
+                                    width: 200,
+                                    height: 200,
+                                  )
+                                : Image.file(
+                                    _imagen!,
+                                    fit: BoxFit.cover,
+                                    width: 200,
+                                    height: 200,
+                                  ),
                           ),
                   ),
                 ),
@@ -194,13 +194,25 @@ class _CreateSpotScreenState extends State<CreateSpotScreen> {
                     const Icon(Icons.location_on, color: Colors.red),
                     const SizedBox(width: 8),
                     Expanded(
-                      child: Text(
-                        'Lat: ${widget.position.latitude.toStringAsFixed(5)}\n'
-                        'Lng: ${widget.position.longitude.toStringAsFixed(5)}',
-                        style: TextStyle(
-                          color: Colors.grey[300],
-                          fontSize: 12,
-                        ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Lat: ${widget.position.latitude.toStringAsFixed(5)}',
+                            style: TextStyle(
+                              color: Colors.grey[300],
+                              fontSize: 12,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            'Lng: ${widget.position.longitude.toStringAsFixed(5)}',
+                            style: TextStyle(
+                              color: Colors.grey[300],
+                              fontSize: 12,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ],

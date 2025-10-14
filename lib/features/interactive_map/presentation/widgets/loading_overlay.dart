@@ -9,8 +9,15 @@ class LoadingOverlay extends StatelessWidget {
   Widget build(BuildContext context) {
     if (!isLoading) return const SizedBox.shrink();
 
-    return const AbsorbPointer(
-      child: Center(child: CircularProgressIndicator()),
+    return SizedBox.expand(
+      child: Stack(
+        children: const [
+          AbsorbPointer(
+            absorbing: true,
+            child: Center(child: CircularProgressIndicator()),
+          ),
+        ],
+      ),
     );
   }
 }

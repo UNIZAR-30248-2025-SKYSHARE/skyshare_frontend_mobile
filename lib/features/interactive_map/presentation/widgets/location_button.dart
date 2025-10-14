@@ -7,13 +7,19 @@ class LocationButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Positioned(
-      bottom: 20,
-      right: 20,
-      child: FloatingActionButton(
-        backgroundColor: Colors.blueAccent,
-        onPressed: onPressed,
-        child: const Icon(Icons.my_location),
+    return SizedBox.expand(
+      child: Stack(
+        children: [
+          Positioned(
+            bottom: 20,
+            right: 20,
+            child: FloatingActionButton(
+              backgroundColor: Colors.blueAccent,
+              onPressed: onPressed,
+              child: const Icon(Icons.my_location),
+            ),
+          ),
+        ],
       ),
     );
   }
