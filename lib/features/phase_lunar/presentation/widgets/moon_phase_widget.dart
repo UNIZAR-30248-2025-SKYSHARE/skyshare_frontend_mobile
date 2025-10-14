@@ -33,19 +33,13 @@ class MoonPhaseWidget extends StatelessWidget {
 
     if (pct <= 0) return base;
 
-    // Render the illuminated portion by showing the image and covering
-    // the unlit part with a black rectangle clipped to the circle.
     final normalized = pct / 100.0;
     final visibleFraction = normalized;
 
     return Stack(
       alignment: Alignment.center,
       children: [
-        // black circular base
         base,
-
-        // Clip the moon image to the intersection of the circle and a
-        // left/right-aligned rectangle whose width is visibleFraction*size.
         ClipPath(
           clipper: _RectInCircleClipper(visibleFraction, leftToRight),
           child: Image.asset(
@@ -67,10 +61,9 @@ class MoonPhaseWidget extends StatelessWidget {
     );
   }
 }
-// Note: previous custom clipper removed in favor of a simpler width-based mask
 
 class _RectInCircleClipper extends CustomClipper<Path> {
-  final double visibleFraction; // 0..1
+  final double visibleFraction; 
   final bool leftToRight;
 
   _RectInCircleClipper(this.visibleFraction, this.leftToRight);
@@ -87,8 +80,6 @@ class _RectInCircleClipper extends CustomClipper<Path> {
 
     final rect = Path()..addRect(Rect.fromLTWH(left, 0, visibleWidth, size.height));
 
-    // intersect the circle and the rectangle so the visible area grows
-    // strictly from left to right (or viceversa)
     return Path.combine(PathOperation.intersect, circle, rect);
   }
 

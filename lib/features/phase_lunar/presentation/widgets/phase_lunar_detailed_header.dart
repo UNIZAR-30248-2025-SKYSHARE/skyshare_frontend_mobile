@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'moon_phase_widget.dart';
 
 class PhaseLunarDetailedHeader extends StatelessWidget {
-  final dynamic phase; // LunarPhase, using dynamic here to avoid import cycles if any
+  final dynamic phase;
   final double size;
 
   const PhaseLunarDetailedHeader({super.key, required this.phase, this.size = 220});

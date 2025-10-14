@@ -30,12 +30,6 @@ class LunarPhaseItem extends StatelessWidget {
       color: Colors.transparent,
       child: InkWell(
         onTap: () {
-          debugPrint('───────────────────────────────');
-          debugPrint('LunarPhaseItem TAPPED');
-          debugPrint('Phase: $phaseName');
-          debugPrint('ID: ${phase.idLuna}');
-          debugPrint('───────────────────────────────');
-          onTap?.call();
         },
         borderRadius: BorderRadius.circular(12),
         child: Ink(
