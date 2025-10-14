@@ -115,7 +115,6 @@
           "204": {"description": "No Content. Spot deleted."}
         },
         "tags": ["spot"]
-      }
     },
   "/fase_lunar": {
       "get": {
