@@ -38,7 +38,6 @@ class _MapScreenState extends State<MapScreen> {
   }
 
   void _handleTap(TapPosition tapPosition, LatLng position) => _showLocationConfirmation(position, false);
-
   void _handleLongPress(TapPosition tapPosition, LatLng position) => _showLocationConfirmation(position, true);
 
   void _showLocationConfirmation(LatLng position, bool isLongPress) async {
@@ -93,11 +92,7 @@ class _MapScreenState extends State<MapScreen> {
             point: position,
             width: 40,
             height: 40,
-            child: const Icon(
-              Icons.location_on,
-              color: Colors.red,
-              size: 40,
-            ),
+            child: const Icon(Icons.location_on, color: Colors.red, size: 40),
           ),
         );
       });
@@ -110,13 +105,13 @@ class _MapScreenState extends State<MapScreen> {
   }
 
   void _zoomIn() {
-    final zoom = _mapController.zoom + 1;
-    _mapController.move(_mapController.center, zoom);
+    final zoom = _mapController.camera.zoom + 1;
+    _mapController.move(_mapController.camera.center, zoom);
   }
 
   void _zoomOut() {
-    final zoom = _mapController.zoom - 1;
-    _mapController.move(_mapController.center, zoom);
+    final zoom = _mapController.camera.zoom - 1;
+    _mapController.move(_mapController.camera.center, zoom);
   }
 
   void _moveToCurrentLocation() {
@@ -178,10 +173,7 @@ class _MapScreenState extends State<MapScreen> {
           ),
           LoadingOverlay(isLoading: mapProvider.isLoading),
           ErrorBanner(errorMessage: mapProvider.errorMessage),
-          ZoomControls(
-            onZoomIn: _zoomIn,
-            onZoomOut: _zoomOut,
-          ),
+          ZoomControls(onZoomIn: _zoomIn, onZoomOut: _zoomOut),
           LocationButton(onPressed: _moveToCurrentLocation),
         ],
       ),
