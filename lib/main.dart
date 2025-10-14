@@ -7,7 +7,8 @@ import 'features/dashboard/presentation/dashboard_screen.dart';
 import 'features/dashboard/data/repositories/weather_repository.dart';
 import 'features/dashboard/data/repositories/visible_sky_repository.dart';
 import 'features/dashboard/data/repositories/light_pollution_repository.dart';
-import 'features/dashboard/data/repositories/location_repository.dart';
+import 'features/dashboard/data/repositories/location_repository.dart' as location_repository_dashboard;
+import 'features/interactive_map/data/repositories/location_repository.dart' as location_repository_map;
 import 'core/services/supabase_service.dart';
 import 'core/widgets/app_navigation.dart';
 import 'features/interactive_map/presentation/map_screen.dart'; 
@@ -32,7 +33,11 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         Provider<SupabaseClient>.value(value: supabase),
-        ChangeNotifierProvider(create: (_) => InteractiveMapProvider()),
+        ChangeNotifierProvider(
+          create: (ctx) => InteractiveMapProvider(
+            locationRepository: ctx.read<location_repository_map.LocationRepository>()
+          )
+          ),
         Provider<WeatherRepository>(
           create: (ctx) => WeatherRepository(client: ctx.read<SupabaseClient>()),
         ),
@@ -42,15 +47,15 @@ class MyApp extends StatelessWidget {
         Provider<LightPollutionRepository>(
           create: (ctx) => LightPollutionRepository(client: ctx.read<SupabaseClient>()),
         ),
-        Provider<LocationRepository>(
-          create: (ctx) => LocationRepository(client: ctx.read<SupabaseClient>()),
+        Provider<location_repository_dashboard.LocationRepository>(
+          create: (ctx) => location_repository_dashboard.LocationRepository(client: ctx.read<SupabaseClient>()),
         ),
         ChangeNotifierProvider<DashboardProvider>(
           create: (ctx) => DashboardProvider(
             weatherRepository: ctx.read<WeatherRepository>(),
             visibleSkyRepository: ctx.read<VisibleSkyRepository>(),
             lightPollutionRepository: ctx.read<LightPollutionRepository>(),
-            locationRepository: ctx.read<LocationRepository>(),
+            locationRepository: ctx.read<location_repository_dashboard.LocationRepository>(),
           ),
         ),
       ],
