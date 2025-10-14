@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:skyshare_frontend_mobile/features/phase_lunar/providers/lunar_phase_provider.dart';
 import 'package:skyshare_frontend_mobile/features/phase_lunar/data/models/lunar_phase_model.dart';
-import 'package:skyshare_frontend_mobile/features/phase_lunar/data/repositories/lunar_phase_repository.dart' as phase_lunar_repo;
 import '../../../core/widgets/star_background.dart';
 import 'widgets/moon_phase_widget.dart';
 
@@ -9,10 +10,10 @@ class PhaseLunarDetailedScreen extends StatefulWidget {
   final DateTime date;
 
   const PhaseLunarDetailedScreen({
-    Key? key,
+    super.key,
     required this.lunarPhaseId,
     required this.date,
-  }) : super(key: key);
+  });
 
   @override
   State<PhaseLunarDetailedScreen> createState() =>
@@ -25,16 +26,14 @@ class _PhaseLunarDetailedScreenState extends State<PhaseLunarDetailedScreen> {
   @override
   void initState() {
     super.initState();
-    _detailedPhaseFuture = _fetchDetailedMoonData();
-  }
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final provider = Provider.of<LunarPhaseProvider>(context, listen: false);
+      setState(() {
+        _detailedPhaseFuture = provider.fetchDetail(widget.lunarPhaseId, widget.date);
+      });
+    });
 
-  Future<LunarPhase?> _fetchDetailedMoonData() async {
-    debugPrint( ' Fetching lunar phase detail for id=${widget.lunarPhaseId}, date=${widget.date}');
-  final repo = phase_lunar_repo.LunarPhaseRepository();
-    return await repo.fetchLunarPhaseDetailByIdAndDate(
-      lunarPhaseId: widget.lunarPhaseId,
-      date: widget.date,
-    );
+    _detailedPhaseFuture = Future<LunarPhase?>.value(null);
   }
 
   String _formatDate(DateTime d) =>
@@ -71,14 +70,11 @@ class _PhaseLunarDetailedScreenState extends State<PhaseLunarDetailedScreen> {
 
             return SafeArea(
               child: SingleChildScrollView(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 20.0, vertical: 18.0),
+                padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 18.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     const SizedBox(height: 8),
-
-                    // Luna grande
                     Center(
                       child: MoonPhaseWidget(
                         percentage: iluminacion,
@@ -87,8 +83,6 @@ class _PhaseLunarDetailedScreenState extends State<PhaseLunarDetailedScreen> {
                       ),
                     ),
                     const SizedBox(height: 20),
-
-                    // Fecha
                     Text(
                       _formatDate(widget.date),
                       textAlign: TextAlign.center,
@@ -98,8 +92,6 @@ class _PhaseLunarDetailedScreenState extends State<PhaseLunarDetailedScreen> {
                       ),
                     ),
                     const SizedBox(height: 24),
-
-                    // Main information
                     _InfoCard(
                       title: 'Current Lunar Phase',
                       icon: Icons.nightlight_round,
@@ -114,8 +106,6 @@ class _PhaseLunarDetailedScreenState extends State<PhaseLunarDetailedScreen> {
                       ],
                     ),
                     const SizedBox(height: 16),
-
-                    // Times
                     _InfoCard(
                       title: 'Times',
                       icon: Icons.access_time,
@@ -130,8 +120,6 @@ class _PhaseLunarDetailedScreenState extends State<PhaseLunarDetailedScreen> {
                       ],
                     ),
                     const SizedBox(height: 16),
-
-                    // Additional info
                     _InfoCard(
                       title: 'Additional info',
                       icon: Icons.info_outline,
@@ -152,7 +140,6 @@ class _PhaseLunarDetailedScreenState extends State<PhaseLunarDetailedScreen> {
     );
   }
 }
-
 class _InfoCard extends StatelessWidget {
   final String title;
   final IconData icon;

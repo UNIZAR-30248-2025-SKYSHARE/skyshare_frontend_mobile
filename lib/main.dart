@@ -8,6 +8,8 @@ import 'features/dashboard/data/repositories/weather_repository.dart';
 import 'features/dashboard/data/repositories/visible_sky_repository.dart';
 import 'features/dashboard/data/repositories/light_pollution_repository.dart';
 import 'features/dashboard/data/repositories/location_repository.dart';
+import 'features/phase_lunar/data/repositories/lunar_phase_repository.dart' as phase_lunar_repo;
+import 'features/phase_lunar/providers/lunar_phase_provider.dart';
 import 'core/services/supabase_service.dart';
 import 'core/widgets/app_navigation.dart';
 
@@ -40,6 +42,12 @@ class MyApp extends StatelessWidget {
         ),
         Provider<LocationRepository>(
           create: (ctx) => LocationRepository(client: ctx.read<SupabaseClient>()),
+        ),
+        Provider<phase_lunar_repo.LunarPhaseRepository>(
+          create: (ctx) => phase_lunar_repo.LunarPhaseRepository(client: ctx.read<SupabaseClient>()),
+        ),
+        ChangeNotifierProvider<LunarPhaseProvider>(
+          create: (ctx) => LunarPhaseProvider(repo: ctx.read<phase_lunar_repo.LunarPhaseRepository>()),
         ),
         ChangeNotifierProvider<DashboardProvider>(
           create: (ctx) => DashboardProvider(
