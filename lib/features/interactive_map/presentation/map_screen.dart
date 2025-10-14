@@ -8,6 +8,7 @@ import './widgets/loading_overlay.dart';
 import './widgets/error_banner.dart';
 import './widgets/zoom_controls.dart';
 import './widgets/location_button.dart';
+import './widgets/filter_widget.dart'; // Esto incluye FilterType
 import './widgets/create_spot.dart';
 import '../data/models/spot_model.dart';
 
@@ -23,6 +24,8 @@ class MapScreen extends StatefulWidget {
 class _MapScreenState extends State<MapScreen> {
   final List<Marker> _createdMarkers = [];
   final MapController _mapController = MapController();
+  String _filterValue = '';
+  FilterType _filterType = FilterType.nombre;
 
   @override
   void initState() {
@@ -123,8 +126,48 @@ class _MapScreenState extends State<MapScreen> {
     }
   }
 
+  void _onFilterChanged(FilterType type, String value) {
+    setState(() {
+      _filterType = type;
+      _filterValue = value.toLowerCase();
+    });
+  }
+
+  void _onFilterClear() {
+    setState(() {
+      _filterValue = '';
+    });
+  }
+
+  List<Spot> _filterSpots(List<Spot> spots) {
+    if (_filterValue.isEmpty) return spots;
+    
+    switch (_filterType) {
+      case FilterType.nombre:
+        return spots.where((spot) {
+          return spot.nombre.toLowerCase().contains(_filterValue);
+        }).toList();
+        
+      case FilterType.valoracion:
+        final minRating = double.tryParse(_filterValue);
+        if (minRating == null) return spots;
+        return spots.where((spot) {
+          if (spot.valoracionMedia == null) return false;
+          return spot.valoracionMedia! >= minRating;
+        }).toList();
+    }
+  }
+
+  Color _getMarkerColor(Spot spot) {
+    if (spot.valoracionMedia == null) return Colors.grey;
+    if (spot.valoracionMedia! >= 4.5) return Colors.green;
+    if (spot.valoracionMedia! >= 3.5) return Colors.orange;
+    return Colors.red;
+  }
+
   List<Marker> _spotsToMarkers(List<Spot> spots) {
     return spots.map((s) {
+      final color = _getMarkerColor(s);
       return Marker(
         point: LatLng(s.lat, s.lng),
         width: 40,
@@ -139,27 +182,112 @@ class _MapScreenState extends State<MapScreen> {
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(s.nombre, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            s.nombre,
+                            style: const TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                        if (s.valoracionMedia != null)
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 4,
+                            ),
+                            decoration: BoxDecoration(
+                              color: color.withOpacity(0.2),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(Icons.star, color: color, size: 16),
+                                const SizedBox(width: 4),
+                                Text(
+                                  s.valoracionMedia!.toStringAsFixed(1),
+                                  style: TextStyle(
+                                    color: color,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                      ],
+                    ),
                     const SizedBox(height: 8),
-                    if (s.descripcion != null) Text(s.descripcion!),
-                    const SizedBox(height: 8),
-                    Text('ID: ${s.id}'),
+                    if (s.descripcion != null) ...[
+                      Text(s.descripcion!),
+                      const SizedBox(height: 8),
+                    ],
+                    Text(
+                      'ID: ${s.id} • ${s.totalValoraciones} valoracion${s.totalValoraciones != 1 ? 'es' : ''}',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Colors.grey[600],
+                      ),
+                    ),
                   ],
                 ),
               ),
             );
           },
-          child: const Icon(Icons.location_on, color: Colors.orange, size: 36),
+          child: Stack(
+            children: [
+              Icon(Icons.location_on, color: color, size: 36),
+              if (s.valoracionMedia != null)
+                Positioned(
+                  top: 2,
+                  left: 8,
+                  right: 8,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 2),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Text(
+                      s.valoracionMedia!.toStringAsFixed(1),
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                        fontSize: 9,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black87,
+                      ),
+                    ),
+                  ),
+                ),
+            ],
+          ),
         ),
       );
     }).toList();
   }
 
+  String _getFilterDescription() {
+    if (_filterValue.isEmpty) return '';
+    
+    switch (_filterType) {
+      case FilterType.nombre:
+        return 'nombre contiene "$_filterValue"';
+      case FilterType.valoracion:
+        final rating = double.tryParse(_filterValue);
+        return rating != null ? 'valoración ≥ $rating ⭐' : '';
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final mapProvider = Provider.of<InteractiveMapProvider>(context);
-    final baseMarkers = _spotsToMarkers(mapProvider.spots);
+    final filteredSpots = _filterSpots(mapProvider.spots);
+    final baseMarkers = _spotsToMarkers(filteredSpots);
     final markers = [...baseMarkers, ..._createdMarkers];
+    
     return Scaffold(
       body: Stack(
         children: [
@@ -173,8 +301,51 @@ class _MapScreenState extends State<MapScreen> {
           ),
           LoadingOverlay(isLoading: mapProvider.isLoading),
           ErrorBanner(errorMessage: mapProvider.errorMessage),
+          FilterWidget(
+            onFilterChanged: _onFilterChanged,
+            onClear: _onFilterClear,
+          ),
           ZoomControls(onZoomIn: _zoomIn, onZoomOut: _zoomOut),
           LocationButton(onPressed: _moveToCurrentLocation),
+          if (_filterValue.isNotEmpty)
+            Positioned(
+              top: 106,
+              left: 16,
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(12),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.1),
+                      blurRadius: 4,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      '${filteredSpots.length} spot${filteredSpots.length != 1 ? 's' : ''}',
+                      style: const TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    Text(
+                      _getFilterDescription(),
+                      style: TextStyle(
+                        fontSize: 11,
+                        color: Colors.grey[600],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
         ],
       ),
     );
