@@ -9,6 +9,7 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:skyshare_frontend_mobile/features/interactive_map/presentation/map_screen.dart';
 import 'package:skyshare_frontend_mobile/features/interactive_map/providers/interactive_map_provider.dart';
 import 'package:skyshare_frontend_mobile/features/interactive_map/data/repositories/location_repository.dart';
+import 'package:skyshare_frontend_mobile/features/interactive_map/data/models/spot_model.dart';
 
 class MockLocationRepository extends Mock implements LocationRepository {}
 
@@ -92,5 +93,36 @@ void main() {
     
     expect(result['city'], 'Madrid');
     expect(result['country'], 'España');
+  });
+
+  testWidgets('debería mostrar marcadores de spots en el mapa', (tester) async {
+    when(() => mockLocationRepository.getCurrentLatLng())
+        .thenAnswer((_) async => LatLng(40.4168, -3.7038));
+
+    final spot = Spot(
+      id: 1,
+      ubicacionId: 2,
+      creadorId: 3,
+      nombre: 'Spot de prueba',
+      lat: 40.417,
+      lng: -3.704,
+      descripcion: 'Lugar bonito',
+    );
+
+    when(() => mockLocationRepository.fetchSpots(limit: any(named: 'limit')))
+        .thenAnswer((_) async => [spot]);
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: ChangeNotifierProvider<InteractiveMapProvider>(
+          create: (_) => mapProvider,
+          child: MapScreen(tileProvider: TestTileProvider()),
+        ),
+      ),
+    );
+
+    await tester.pumpAndSettle();
+
+    expect(find.byIcon(Icons.location_on), findsWidgets);
   });
 }
