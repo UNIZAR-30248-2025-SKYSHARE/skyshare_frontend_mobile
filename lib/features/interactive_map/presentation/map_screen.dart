@@ -9,6 +9,7 @@ import './widgets/error_banner.dart';
 import './widgets/zoom_controls.dart';
 import './widgets/location_button.dart';
 import './widgets/create_spot.dart';
+import '../data/models/spot_model.dart';
 
 class MapScreen extends StatefulWidget {
   final TileProvider? tileProvider;
@@ -20,7 +21,7 @@ class MapScreen extends StatefulWidget {
 }
 
 class _MapScreenState extends State<MapScreen> {
-  final List<Marker> _markers = [];
+  final List<Marker> _createdMarkers = [];
   final MapController _mapController = MapController();
 
   @override
@@ -29,6 +30,7 @@ class _MapScreenState extends State<MapScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       final mapProvider = Provider.of<InteractiveMapProvider>(context, listen: false);
       await mapProvider.fetchUserLocation();
+      await mapProvider.fetchSpots();
       if (mapProvider.currentPosition != null) {
         _mapController.move(mapProvider.currentPosition!, 14.5);
       }
@@ -86,7 +88,7 @@ class _MapScreenState extends State<MapScreen> {
     );
     if (result != null && mounted) {
       setState(() {
-        _markers.add(
+        _createdMarkers.add(
           Marker(
             point: position,
             width: 40,
@@ -102,6 +104,8 @@ class _MapScreenState extends State<MapScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Spot "${result['nombre']}" creado!')),
       );
+      final mapProvider = Provider.of<InteractiveMapProvider>(context, listen: false);
+      await mapProvider.fetchSpots();
     }
   }
 
@@ -124,15 +128,49 @@ class _MapScreenState extends State<MapScreen> {
     }
   }
 
+  List<Marker> _spotsToMarkers(List<Spot> spots) {
+    return spots.map((s) {
+      return Marker(
+        point: LatLng(s.lat, s.lng),
+        width: 40,
+        height: 40,
+        child: GestureDetector(
+          onTap: () {
+            showModalBottomSheet(
+              context: context,
+              builder: (_) => Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(s.nombre, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                    const SizedBox(height: 8),
+                    if (s.descripcion != null) Text(s.descripcion!),
+                    const SizedBox(height: 8),
+                    Text('ID: ${s.id}'),
+                  ],
+                ),
+              ),
+            );
+          },
+          child: const Icon(Icons.location_on, color: Colors.orange, size: 36),
+        ),
+      );
+    }).toList();
+  }
+
   @override
   Widget build(BuildContext context) {
     final mapProvider = Provider.of<InteractiveMapProvider>(context);
+    final baseMarkers = _spotsToMarkers(mapProvider.spots);
+    final markers = [...baseMarkers, ..._createdMarkers];
     return Scaffold(
       body: Stack(
         children: [
           MapWidget(
             mapController: _mapController,
-            markers: _markers,
+            markers: markers,
             onTap: _handleTap,
             onLongPress: _handleLongPress,
             tileProvider: widget.tileProvider,
