@@ -1,23 +1,37 @@
 import 'package:flutter/material.dart';
 import 'package:skyshare_frontend_mobile/features/phase_lunar/data/models/lunar_phase_model.dart';
-import 'package:skyshare_frontend_mobile/features/phase_lunar/data/repositories/lunar_phase_repository.dart' as phase_lunar_repo;
+import 'package:skyshare_frontend_mobile/features/phase_lunar/data/repositories/lunar_phase_repository.dart';
+import 'package:skyshare_frontend_mobile/features/phase_lunar/data/repositories/location_repository.dart';
 
 class LunarPhaseProvider extends ChangeNotifier {
-  final phase_lunar_repo.LunarPhaseRepository repo;
+  final LunarPhaseRepository lunarPhaseRepo;
+  final LocationRepository locationRepo;
 
-  LunarPhaseProvider({ required this.repo });
+  LunarPhaseProvider({
+    required this.lunarPhaseRepo,
+    required this.locationRepo,
+  });
 
   List<LunarPhase> phases = [];
   bool isLoading = false;
   String? error;
+  int? currentLocationId;
 
-  Future<void> loadNext7Days(int locationId) async {
+  Future<void> loadNext7Days() async {
     isLoading = true;
     error = null;
     notifyListeners();
 
     try {
-      final fetched = await repo.fetchNext7DaysSimple(locationId);
+      currentLocationId = await locationRepo.getCurrentLocationId(1);
+      
+      if (currentLocationId == null) {
+        throw Exception('No location found for user');
+      }
+
+      final fetched = await lunarPhaseRepo.fetchNext7DaysSimple(currentLocationId!);
+
+      print('Fetched lunar phases: $fetched');
       phases = fetched.map((d) {
         return LunarPhase(
           idLuna: d.idLuna,
@@ -43,7 +57,7 @@ class LunarPhaseProvider extends ChangeNotifier {
 
   Future<LunarPhase?> fetchDetail(int lunarPhaseId, DateTime date) async {
     try {
-      return await repo.fetchLunarPhaseDetailByIdAndDate(
+      return await lunarPhaseRepo.fetchLunarPhaseDetailByIdAndDate(
         lunarPhaseId: lunarPhaseId,
         date: date,
       );
@@ -56,6 +70,13 @@ class LunarPhaseProvider extends ChangeNotifier {
     phases = [];
     error = null;
     isLoading = false;
+    currentLocationId = null;
     notifyListeners();
+  }
+
+  Future<void> refreshData() async {
+    if (currentLocationId != null) {
+      await loadNext7Days();
+    }
   }
 }

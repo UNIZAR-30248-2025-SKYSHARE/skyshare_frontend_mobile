@@ -31,13 +31,9 @@ void main() {
       );
 
       expect(find.text('Luna Llena'), findsOneWidget);
-
       expect(find.text('Sábado, 11 Oct 2025'), findsOneWidget);
-
       expect(find.text('100%'), findsOneWidget);
-
       expect(find.byType(MoonPhaseWidget), findsOneWidget);
-
       expect(find.byIcon(Icons.arrow_forward_ios), findsOneWidget);
     });
 
@@ -81,8 +77,9 @@ void main() {
         ),
       );
 
-      await tester.tap(find.byType(InkWell));
-      await tester.pumpAndSettle();
+      final tappableFinder = find.byType(ListTile).first;
+      await tester.tap(tappableFinder);
+      await tester.pump();
 
       expect(tapped, isTrue);
     });

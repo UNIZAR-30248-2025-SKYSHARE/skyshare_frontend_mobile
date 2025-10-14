@@ -12,14 +12,16 @@ class LunarPhaseRepository {
     final now = DateTime.now();
     final startDate = DateTime(now.year, now.month, now.day);
     final endDate = startDate.add(const Duration(days: 7));
-
+    
     final resp = await client
         .from('fase_lunar')
         .select('id_luna, fase, porcentaje_iluminacion, fecha')
         .eq('id_ubicacion', locationId)
-        .gte('fecha', startDate.toIso8601String())
-        .lte('fecha', endDate.toIso8601String())
+        .gte('fecha', startDate.toIso8601String().split('T')[0])
+        .lte('fecha', endDate.toIso8601String().split('T')[0])
         .order('fecha', ascending: true);
+
+    print('LunarPhaseRepository.fetchNext7DaysSimple response: $resp');
 
     final rows = (resp as List)
         .map((e) => Map<String, dynamic>.from(e as Map))
@@ -35,23 +37,10 @@ class LunarPhaseRepository {
     final resp = await client
         .from('fase_lunar')
         .select(
-          '''
-          id_luna,
-          id_ubicacion,
-          fase,
-          porcentaje_iluminacion,
-          edad_lunar,
-          hora_salida,
-          azimut_salida,
-          hora_puesta,
-          azimut_puesta,
-          altitud_actual,
-          proxima_fase,
-          fecha
-          ''',
+          'id_luna, id_ubicacion, fase, porcentaje_iluminacion, edad_lunar, hora_salida, azimut_salida, hora_puesta, azimut_puesta, altitud_actual, proxima_fase, fecha',
         )
         .eq('id_luna', lunarPhaseId)
-        .eq('fecha', date.toIso8601String())
+        .eq('fecha', date.toIso8601String().split('T')[0])
         .maybeSingle();
 
     if (resp == null) return null;

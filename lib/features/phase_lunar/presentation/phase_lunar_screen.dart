@@ -15,8 +15,7 @@ class PhaseLunarScreen extends StatefulWidget {
 }
 
 class _PhaseLunarScreenState extends State<PhaseLunarScreen> {
-  final String _locationName = 'Zaragoza';
-  final int _locationId = 10;
+  String _locationName = 'Loading...';
 
   @override
   void initState() {
@@ -24,8 +23,25 @@ class _PhaseLunarScreenState extends State<PhaseLunarScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
       final provider = Provider.of<LunarPhaseProvider>(context, listen: false);
-      provider.loadNext7Days(_locationId);
+      _loadLocationName();
+      provider.loadNext7Days();
     });
+  }
+
+  Future<void> _loadLocationName() async {
+    try {
+      final provider = Provider.of<LunarPhaseProvider>(context, listen: false);
+      final locations = await provider.locationRepo.getSavedLocations(1);
+      if (locations.isNotEmpty) {
+        setState(() {
+          _locationName = locations.first['nombre'] as String? ?? 'Unknown location';
+        });
+      }
+    } catch (e) {
+      setState(() {
+        _locationName = 'Unknown location';
+      });
+    }
   }
 
   String _formatDate(DateTime d) =>
