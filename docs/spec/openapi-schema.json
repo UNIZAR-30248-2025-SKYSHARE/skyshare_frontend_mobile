@@ -1,4 +1,46 @@
-  "/spot": {
+{
+  "swagger": "2.0",
+  "info": {
+    "description": "",
+    "title": "standard public schema",
+    "version": "13.0.5"
+  },
+  "basePath": "/",
+  "schemes": [
+    "https"
+  ],
+  "consumes": [
+    "application/json",
+    "application/vnd.pgrst.object+json;nulls=stripped",
+    "application/vnd.pgrst.object+json",
+    "text/csv"
+  ],
+  "produces": [
+    "application/json",
+    "application/vnd.pgrst.object+json;nulls=stripped",
+    "application/vnd.pgrst.object+json",
+    "text/csv"
+  ],
+  "paths": {
+    "/": {
+      "get": {
+        "produces": [
+          "application/openapi+json",
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "summary": "OpenAPI description (this document)",
+        "tags": [
+          "Introspection"
+        ]
+      }
+    },
+
+    "/spot": {
       "get": {
         "parameters": [
           {"$ref": "#/parameters/rowFilter.spot.id_spot"},
@@ -2437,6 +2479,971 @@
     }
   },
   "externalDocs": {
+    "description": "PostgREST Documentation",
+    "url": "https://postgrest.org/en/v13/references/api.html"
+  }
+}
+},
+
+"definitions": {
+    "spot": {
+      "required": [
+        "id_spot",
+        "id_usuario_creador",
+        "id_ubicacion",
+        "nombre"
+      ],
+      "properties": {
+        "id_spot": {
+          "description": "Note:\nThis is a Primary Key.<pk/>",
+          "format": "integer",
+          "type": "integer"
+        },
+        "id_usuario_creador": {
+          "description": "Note:\nThis is a Foreign Key to `usuario.id_usuario`.<fk table='usuario' column='id_usuario'/>",
+          "format": "integer",
+          "type": "integer"
+        },
+        "id_ubicacion": {
+          "description": "Note:\nThis is a Foreign Key to `ubicacion.id_ubicacion`.<fk table='ubicacion' column='id_ubicacion'/>",
+          "format": "integer",
+          "type": "integer"
+        },
+        "nombre": {
+          "format": "character varying",
+          "type": "string"
+        },
+        "descripcion": {
+          "format": "text",
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "fase_lunar": {
+      "required": [
+        "id_luna",
+        "fase",
+        "fecha"
+      ],
+      "properties": {
+        "id_luna": {
+          "description": "Note:\nThis is a Primary Key.<pk/>",
+          "format": "integer",
+          "type": "integer"
+        },
+        "id_ubicacion": {
+          "description": "Note:\nThis is a Foreign Key to `ubicacion.id_ubicacion`.<fk table='ubicacion' column='id_ubicacion'/>",
+          "format": "integer",
+          "type": "integer"
+        },
+        "fase": {
+          "format": "character varying",
+          "maxLength": 50,
+          "type": "string"
+        },
+        "porcentaje_iluminacion": {
+          "format": "numeric",
+          "type": "number"
+        },
+        "fecha": {
+          "format": "date",
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "valoracion": {
+      "required": [
+        "id_usuario",
+        "id_spot"
+      ],
+      "properties": {
+        "id_usuario": {
+          "description": "Note:\nThis is a Primary Key.<pk/>\nThis is a Foreign Key to `usuario.id_usuario`.<fk table='usuario' column='id_usuario'/>",
+          "format": "integer",
+          "type": "integer"
+        },
+        "id_spot": {
+          "description": "Note:\nThis is a Primary Key.<pk/>\nThis is a Foreign Key to `spot.id_spot`.<fk table='spot' column='id_spot'/>",
+          "format": "integer",
+          "type": "integer"
+        },
+        "puntuacion": {
+          "format": "integer",
+          "type": "integer"
+        },
+        "fecha_valoracion": {
+          "format": "date",
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "usuarioubicacion": {
+      "required": ["id_usuario","id_ubicacion"],
+      "properties": {
+        "id_usuario": {
+          "description": "Foreign key to usuario.id_usuario.",
+          "format": "integer",
+          "type": "integer"
+        },
+        "id_ubicacion": {
+          "description": "Foreign key to ubicacion.id_ubicacion.",
+          "format": "integer",
+          "type": "integer"
+        },
+        "fecha_registro": {
+          "description": "Registration date of the user-location association (ISO date yyyy-mm-dd or timestamp if used).",
+          "format": "date",
+          "type": "string"
+        }
+      },
+      "type": "object",
+      "example": {
+        "id_usuario": 42,
+        "id_ubicacion": 1,
+        "fecha_registro": "2025-10-08"
+      }
+    },
+    "ubicacion": {
+      "required": ["id_ubicacion","latitud","longitud","nombre","pais"],
+      "properties": {
+        "id_ubicacion": {
+          "description": "Primary key for the location record.",
+          "format": "integer",
+          "type": "integer"
+        },
+        "latitud": {
+          "description": "Latitude in decimal degrees, WGS84. Range: -90 to 90. Unit: degrees.",
+          "format": "double precision",
+          "type": "number"
+        },
+        "longitud": {
+          "description": "Longitude in decimal degrees, WGS84. Range: -180 to 180. Unit: degrees.",
+          "format": "double precision",
+          "type": "number"
+        },
+        "nombre": {
+          "description": "Human-readable name for the location (e.g. 'Retiro Park').",
+          "type": "string"
+        },
+        "pais": {
+          "description": "Country name or ISO code.",
+          "type": "string"
+        }
+      },
+      "type": "object",
+      "example": {
+        "latitud": 40.416775,
+        "longitud": -3.703790,
+        "nombre": "Retiro Park",
+        "pais": "Spain"
+      }
+    },
+    "usuariogrupo": {
+      "required": [
+        "id_usuario",
+        "id_grupo"
+      ],
+      "properties": {
+        "id_usuario": {
+          "description": "Note:\nThis is a Primary Key.<pk/>\nThis is a Foreign Key to `usuario.id_usuario`.<fk table='usuario' column='id_usuario'/>",
+          "format": "integer",
+          "type": "integer"
+        },
+        "id_grupo": {
+          "description": "Note:\nThis is a Primary Key.<pk/>\nThis is a Foreign Key to `grupoobservacion.id_grupo`.<fk table='grupoobservacion' column='id_grupo'/>",
+          "format": "integer",
+          "type": "integer"
+        },
+        "propietario": {
+          "default": false,
+          "format": "boolean",
+          "type": "boolean"
+        },
+        "fecha_union": {
+          "format": "date",
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "grupoobservacion": {
+      "required": [
+        "id_grupo",
+        "nombre",
+        "fecha_creacion"
+      ],
+      "properties": {
+        "id_grupo": {
+          "description": "Note:\nThis is a Primary Key.<pk/>",
+          "format": "integer",
+          "type": "integer"
+        },
+        "nombre": {
+          "format": "character varying",
+          "type": "string"
+        },
+        "descripcion": {
+          "format": "text",
+          "type": "string"
+        },
+        "fecha_creacion": {
+          "format": "date",
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "seguidores": {
+      "required": [
+        "id_seguidor",
+        "id_seguido"
+      ],
+      "properties": {
+        "id_seguidor": {
+          "description": "Note:\nThis is a Primary Key.<pk/>\nThis is a Foreign Key to `usuario.id_usuario`.<fk table='usuario' column='id_usuario'/>",
+          "format": "integer",
+          "type": "integer"
+        },
+        "id_seguido": {
+          "description": "Note:\nThis is a Primary Key.<pk/>\nThis is a Foreign Key to `usuario.id_usuario`.<fk table='usuario' column='id_usuario'/>",
+          "format": "integer",
+          "type": "integer"
+        },
+        "fecha_seguimiento": {
+          "format": "date",
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "usuario": {
+      "required": [
+        "id_usuario",
+        "nombre_usuario",
+        "email",
+        "contrasenia_hash"
+      ],
+      "properties": {
+        "id_usuario": {
+          "description": "Note:\nThis is a Primary Key.<pk/>",
+          "format": "integer",
+          "type": "integer"
+        },
+        "nombre_usuario": {
+          "format": "character varying",
+          "type": "string"
+        },
+        "email": {
+          "format": "character varying",
+          "type": "string"
+        },
+        "contrasenia_hash": {
+          "format": "character varying",
+          "type": "string"
+        },
+        "url_foto": {
+          "format": "character varying",
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "informacion_meteorologica": {
+      "required": ["id_info_meteorologica","id_ubicacion"],
+      "properties": {
+        "id_info_meteorologica": {
+          "description": "Primary key for the weather information record.",
+          "format": "integer",
+          "type": "integer"
+        },
+        "id_ubicacion": {
+          "description": "Foreign key to ubicacion.id_ubicacion.",
+          "format": "integer",
+          "type": "integer"
+        },
+        "temperatura": {
+          "description": "Temperature in degrees Celsius (°C).",
+          "format": "numeric",
+          "type": "number"
+        },
+        "humedad": {
+          "description": "Relative humidity in percent (%). Range: 0-100.",
+          "format": "numeric",
+          "type": "number"
+        },
+        "viento": {
+          "description": "Wind speed. Specify unit used in your system (m/s or km/h).",
+          "format": "numeric",
+          "type": "number"
+        },
+        "nubosidad": {
+          "description": "Cloudiness in percent (%).",
+          "format": "numeric",
+          "type": "number"
+        },
+        "contaminacion_luminica": {
+          "description": "Light pollution value (unit: mag/arcsec² or custom index). Document the unit in your data policy.",
+          "format": "numeric",
+          "type": "number"
+        },
+        "indicador_general_sobre_el_cielo": {
+          "description": "General sky quality indicator (e.g. scale 0-10).",
+          "format": "numeric",
+          "type": "number"
+        },
+        "ultima_actualizacion": {
+          "description": "ISO8601 timestamp of the last update (include timezone).",
+          "default": "now()",
+          "format": "timestamp without time zone",
+          "type": "string"
+        }
+      },
+      "type": "object",
+      "example": {
+        "id_ubicacion": 1,
+        "temperatura": 12.3,
+        "humedad": 68,
+        "viento": 3.4,
+        "nubosidad": 20,
+        "contaminacion_luminica": 18.5,
+        "indicador_general_sobre_el_cielo": 7.8
+      }
+    },
+    "comentario": {
+      "required": [
+        "id_comentario",
+        "id_usuario",
+        "id_spot",
+        "texto"
+      ],
+      "properties": {
+        "id_comentario": {
+          "description": "Note:\nThis is a Primary Key.<pk/>",
+          "format": "integer",
+          "type": "integer"
+        },
+        "id_usuario": {
+          "description": "Note:\nThis is a Foreign Key to `usuario.id_usuario`.<fk table='usuario' column='id_usuario'/>",
+          "format": "integer",
+          "type": "integer"
+        },
+        "id_spot": {
+          "description": "Note:\nThis is a Foreign Key to `spot.id_spot`.<fk table='spot' column='id_spot'/>",
+          "format": "integer",
+          "type": "integer"
+        },
+        "texto": {
+          "format": "text",
+          "type": "string"
+        },
+        "fecha_comentario": {
+          "format": "date",
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "cielo_visible": {
+      "required": ["id_cielo_visible","id_ubicacion","tipo","nombre"],
+      "properties": {
+        "id_cielo_visible": {
+          "description": "Primary key for the visible-sky object record.",
+          "format": "integer",
+          "type": "integer"
+        },
+        "id_ubicacion": {
+          "description": "Foreign key to ubicacion.id_ubicacion.",
+          "format": "integer",
+          "type": "integer"
+        },
+        "tipo": {
+          "description": "Type of visible object. Example values: 'star','planet','constellation','phenomenon','satellite'.",
+          "type": "string",
+          "enum": ["star","planet","constellation","phenomenon","satellite"]
+        },
+        "nombre": {
+          "description": "Name or identifier of the object (e.g. 'Jupiter', 'Orion').",
+          "type": "string"
+        },
+        "descripcion": {
+          "description": "Free text description with visibility notes and best viewing times.",
+          "type": "string"
+        },
+        "ultima_actualizacion": {
+          "description": "ISO8601 timestamp of the last update for this record.",
+          "default": "now()",
+          "format": "timestamp without time zone",
+          "type": "string"
+        }
+      },
+      "type": "object",
+      "example": {
+        "id_ubicacion": 1,
+        "tipo": "planet",
+        "nombre": "Jupiter",
+        "descripcion": "Visible in the east just after sunset.",
+        "ultima_actualizacion": "2025-10-08T21:30:00Z"
+      }
+    }
+  },
+
+"parameters": {
+    "preferParams": {
+      "name": "Prefer",
+      "description": "Preference",
+      "required": false,
+      "enum": [],
+      "in": "header",
+      "type": "string"
+    },
+    "preferReturn": {
+      "name": "Prefer",
+      "description": "Preference",
+      "required": false,
+      "enum": [
+        "return=representation",
+        "return=minimal",
+        "return=none"
+      ],
+      "in": "header",
+      "type": "string"
+    },
+    "preferCount": {
+      "name": "Prefer",
+      "description": "Preference",
+      "required": false,
+      "enum": [
+        "count=none"
+      ],
+      "in": "header",
+      "type": "string"
+    },
+    "preferPost": {
+      "name": "Prefer",
+      "description": "Preference",
+      "required": false,
+      "enum": [
+        "return=representation",
+        "return=minimal",
+        "return=none",
+        "resolution=ignore-duplicates",
+        "resolution=merge-duplicates"
+      ],
+      "in": "header",
+      "type": "string"
+    },
+    "select": {
+      "name": "select",
+      "description": "Filtering Columns",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "on_conflict": {
+      "name": "on_conflict",
+      "description": "On Conflict",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "order": {
+      "name": "order",
+      "description": "Ordering",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "range": {
+      "name": "Range",
+      "description": "Limiting and Pagination",
+      "required": false,
+      "in": "header",
+      "type": "string"
+    },
+    "rangeUnit": {
+      "name": "Range-Unit",
+      "description": "Limiting and Pagination",
+      "required": false,
+      "default": "items",
+      "in": "header",
+      "type": "string"
+    },
+    "offset": {
+      "name": "offset",
+      "description": "Limiting and Pagination",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "limit": {
+      "name": "limit",
+      "description": "Limiting and Pagination",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "body.spot": {
+      "name": "spot",
+      "description": "spot",
+      "required": false,
+      "in": "body",
+      "schema": {
+        "$ref": "#/definitions/spot"
+      }
+    },
+    "rowFilter.spot.id_spot": {
+      "name": "id_spot",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.spot.id_usuario_creador": {
+      "name": "id_usuario_creador",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.spot.id_ubicacion": {
+      "name": "id_ubicacion",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.spot.nombre": {
+      "name": "nombre",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.spot.descripcion": {
+      "name": "descripcion",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "body.fase_lunar": {
+      "name": "fase_lunar",
+      "description": "fase_lunar",
+      "required": false,
+      "in": "body",
+      "schema": {
+        "$ref": "#/definitions/fase_lunar"
+      }
+    },
+    "rowFilter.fase_lunar.id_luna": {
+      "name": "id_luna",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.fase_lunar.id_ubicacion": {
+      "name": "id_ubicacion",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.fase_lunar.fase": {
+      "name": "fase",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.fase_lunar.porcentaje_iluminacion": {
+      "name": "porcentaje_iluminacion",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.fase_lunar.fecha": {
+      "name": "fecha",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "body.valoracion": {
+      "name": "valoracion",
+      "description": "valoracion",
+      "required": false,
+      "in": "body",
+      "schema": {
+        "$ref": "#/definitions/valoracion"
+      }
+    },
+    "rowFilter.valoracion.id_usuario": {
+      "name": "id_usuario",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.valoracion.id_spot": {
+      "name": "id_spot",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.valoracion.puntuacion": {
+      "name": "puntuacion",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.valoracion.fecha_valoracion": {
+      "name": "fecha_valoracion",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "body.usuarioubicacion": {
+      "name": "usuarioubicacion",
+      "description": "usuarioubicacion",
+      "required": false,
+      "in": "body",
+      "schema": {
+        "$ref": "#/definitions/usuarioubicacion"
+      }
+    },
+    "rowFilter.usuarioubicacion.id_usuario": {
+      "name": "id_usuario",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.usuarioubicacion.id_ubicacion": {
+      "name": "id_ubicacion",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.usuarioubicacion.fecha_registro": {
+      "name": "fecha_registro",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "body.ubicacion": {
+      "name": "ubicacion",
+      "description": "ubicacion",
+      "required": false,
+      "in": "body",
+      "schema": {
+        "$ref": "#/definitions/ubicacion"
+      }
+    },
+    "rowFilter.ubicacion.id_ubicacion": {
+      "name": "id_ubicacion",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.ubicacion.latitud": {
+      "name": "latitud",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.ubicacion.longitud": {
+      "name": "longitud",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.ubicacion.nombre": {
+      "name": "nombre",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.ubicacion.pais": {
+      "name": "pais",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "body.usuariogrupo": {
+      "name": "usuariogrupo",
+      "description": "usuariogrupo",
+      "required": false,
+      "in": "body",
+      "schema": {
+        "$ref": "#/definitions/usuariogrupo"
+      }
+    },
+    "rowFilter.usuariogrupo.id_usuario": {
+      "name": "id_usuario",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.usuariogrupo.id_grupo": {
+      "name": "id_grupo",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.usuariogrupo.propietario": {
+      "name": "propietario",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.usuariogrupo.fecha_union": {
+      "name": "fecha_union",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "body.grupoobservacion": {
+      "name": "grupoobservacion",
+      "description": "grupoobservacion",
+      "required": false,
+      "in": "body",
+      "schema": {
+        "$ref": "#/definitions/grupoobservacion"
+      }
+    },
+    "rowFilter.grupoobservacion.id_grupo": {
+      "name": "id_grupo",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.grupoobservacion.nombre": {
+      "name": "nombre",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.grupoobservacion.descripcion": {
+      "name": "descripcion",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.grupoobservacion.fecha_creacion": {
+      "name": "fecha_creacion",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "body.seguidores": {
+      "name": "seguidores",
+      "description": "seguidores",
+      "required": false,
+      "in": "body",
+      "schema": {
+        "$ref": "#/definitions/seguidores"
+      }
+    },
+    "rowFilter.seguidores.id_seguidor": {
+      "name": "id_seguidor",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.seguidores.id_seguido": {
+      "name": "id_seguido",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.seguidores.fecha_seguimiento": {
+      "name": "fecha_seguimiento",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "body.usuario": {
+      "name": "usuario",
+      "description": "usuario",
+      "required": false,
+      "in": "body",
+      "schema": {
+        "$ref": "#/definitions/usuario"
+      }
+    },
+    "rowFilter.usuario.id_usuario": {
+      "name": "id_usuario",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.usuario.nombre_usuario": {
+      "name": "nombre_usuario",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.usuario.email": {
+      "name": "email",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.usuario.contrasenia_hash": {
+      "name": "contrasenia_hash",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.usuario.url_foto": {
+      "name": "url_foto",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "body.informacion_meteorologica": {
+      "name": "informacion_meteorologica",
+      "description": "informacion_meteorologica",
+      "required": false,
+      "in": "body",
+      "schema": {
+        "$ref": "#/definitions/informacion_meteorologica"
+      }
+    },
+    "rowFilter.informacion_meteorologica.id_info_meteorologica": {
+      "name": "id_info_meteorologica",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.informacion_meteorologica.id_ubicacion": {
+      "name": "id_ubicacion",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.informacion_meteorologica.temperatura": {
+      "name": "temperatura",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.informacion_meteorologica.humedad": {
+      "name": "humedad",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.informacion_meteorologica.viento": {
+      "name": "viento",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.informacion_meteorologica.nubosidad": {
+      "name": "nubosidad",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.informacion_meteorologica.contaminacion_luminica": {
+      "name": "contaminacion_luminica",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.informacion_meteorologica.indicador_general_sobre_el_cielo": {
+      "name": "indicador_general_sobre_el_cielo",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.informacion_meteorologica.ultima_actualizacion": {
+      "name": "ultima_actualizacion",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "body.comentario": {
+      "name": "comentario",
+      "description": "comentario",
+      "required": false,
+      "in": "body",
+      "schema": {
+        "$ref": "#/definitions/comentario"
+      }
+    },
+    "rowFilter.comentario.id_comentario": {
+      "name": "id_comentario",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.comentario.id_usuario": {
+      "name": "id_usuario",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.comentario.id_spot": {
+      "name": "id_spot",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.comentario.texto": {
+      "name": "texto",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.comentario.fecha_comentario": {
+      "name": "fecha_comentario",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "body.cielo_visible": {
+      "name": "cielo_visible",
+      "description": "cielo_visible",
+      "required": false,
+      "in": "body",
+      "schema": {
+        "$ref": "#/definitions/cielo_visible"
+      }
+    },
+    "rowFilter.cielo_visible.id_cielo_visible": {
+      "name": "id_cielo_visible",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.cielo_visible.id_ubicacion": {
+      "name": "id_ubicacion",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.cielo_visible.tipo": {
+      "name": "tipo",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.cielo_visible.nombre": {
+      "name": "nombre",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.cielo_visible.descripcion": {
+      "name": "descripcion",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.cielo_visible.ultima_actualizacion": {
+      "name": "ultima_actualizacion",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    }
+  },
+
+"externalDocs": {
     "description": "PostgREST Documentation",
     "url": "https://postgrest.org/en/v13/references/api.html"
   }
