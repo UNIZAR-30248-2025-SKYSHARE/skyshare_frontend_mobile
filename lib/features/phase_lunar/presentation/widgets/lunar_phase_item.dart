@@ -3,11 +3,6 @@ import '../../data/models/lunar_phase_model.dart';
 import 'moon_phase_widget.dart';
 
 /// Widget que representa una fila con información básica de una fase lunar.
-/// Muestra:
-/// - Imagen de la fase (iluminación)
-/// - Nombre de la fase
-/// - Día y fecha formateada
-/// - Porcentaje de iluminación
 class LunarPhaseItem extends StatelessWidget {
   final LunarPhase phase;
   final String weekday;
@@ -16,17 +11,16 @@ class LunarPhaseItem extends StatelessWidget {
   final VoidCallback? onTap;
 
   const LunarPhaseItem({
-    Key? key,
+    super.key,
     required this.phase,
     required this.weekday,
     required this.dateStr,
     this.imageSize = 44,
     this.onTap,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
-    // Use real model fields
     int pct = ((phase.porcentajeIluminacion ?? 0)).round();
     if (pct < 0) pct = 0;
     if (pct > 100) pct = 100;
@@ -46,10 +40,10 @@ class LunarPhaseItem extends StatelessWidget {
         borderRadius: BorderRadius.circular(12),
         child: Ink(
           decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.08),
+            color: const Color(0x14FFFFFF),
             borderRadius: BorderRadius.circular(12),
             border: Border.all(
-              color: Colors.white.withOpacity(0.2),
+              color: const Color(0x33FFFFFF),
               width: 1,
             ),
           ),
@@ -80,9 +74,9 @@ class LunarPhaseItem extends StatelessWidget {
                       const SizedBox(height: 4),
                       Text(
                         '$weekday, $dateStr',
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontSize: 14,
-                          color: Colors.white.withOpacity(0.7),
+                          color: Color(0xB2FFFFFF),
                         ),
                       ),
                     ],
@@ -96,7 +90,7 @@ class LunarPhaseItem extends StatelessWidget {
                     vertical: 6,
                   ),
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.12),
+                    color: const Color(0x1FFFFFFF),
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Text(
@@ -114,7 +108,7 @@ class LunarPhaseItem extends StatelessWidget {
                 Icon(
                   Icons.arrow_forward_ios,
                   size: 16,
-                  color: Colors.white.withOpacity(0.5),
+                  color: const Color(0x7FFFFFFF),
                 ),
               ],
             ),

@@ -10,12 +10,12 @@ class MoonPhaseWidget extends StatelessWidget {
   final bool leftToRight;
 
   const MoonPhaseWidget({
-    Key? key,
+    super.key,
     required this.percentage,
     this.size = 44,
     this.imageAssetPath = 'public/resources/luna_image.jpg',
     this.leftToRight = true,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

@@ -5,7 +5,7 @@ class PhaseLunarDetailedHeader extends StatelessWidget {
   final dynamic phase; // LunarPhase, using dynamic here to avoid import cycles if any
   final double size;
 
-  const PhaseLunarDetailedHeader({Key? key, required this.phase, this.size = 220}) : super(key: key);
+  const PhaseLunarDetailedHeader({super.key, required this.phase, this.size = 220});
 
   @override
   Widget build(BuildContext context) {

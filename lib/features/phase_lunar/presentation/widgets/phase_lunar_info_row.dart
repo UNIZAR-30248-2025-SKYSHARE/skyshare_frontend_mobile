@@ -5,7 +5,7 @@ class PhaseLunarInfoRow extends StatelessWidget {
   final String set;
   final String illumination;
 
-  const PhaseLunarInfoRow({Key? key, required this.rise, required this.set, required this.illumination}) : super(key: key);
+  const PhaseLunarInfoRow({super.key, required this.rise, required this.set, required this.illumination});
 
   @override
   Widget build(BuildContext context) {

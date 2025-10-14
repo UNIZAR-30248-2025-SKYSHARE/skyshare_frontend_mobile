@@ -4,7 +4,7 @@ class PhaseLunarMoreInfo extends StatelessWidget {
   final double distance = 384.400 ;
   final String description;
 
-  const PhaseLunarMoreInfo({Key? key, required this.description}) : super(key: key);
+  const PhaseLunarMoreInfo({super.key, required this.description});
 
   @override
   Widget build(BuildContext context) {

@@ -22,6 +22,7 @@ class _PhaseLunarScreenState extends State<PhaseLunarScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
       final provider = Provider.of<LunarPhaseProvider>(context, listen: false);
       provider.loadNext7Days(_locationId);
     });
@@ -44,6 +45,8 @@ class _PhaseLunarScreenState extends State<PhaseLunarScreen> {
     );
 
     Future.delayed(const Duration(milliseconds: 50), () {
+      if (!mounted) return;
+
       Navigator.of(context).push(
         MaterialPageRoute(
           builder: (context) {
