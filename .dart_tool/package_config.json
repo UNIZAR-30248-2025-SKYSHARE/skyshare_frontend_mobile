@@ -308,6 +308,12 @@
       "languageVersion": "3.2"
     },
     {
+      "name": "mocktail",
+      "rootUri": "file:///home/marcos/.pub-cache/hosted/pub.dev/mocktail-1.0.4",
+      "packageUri": "lib/",
+      "languageVersion": "2.12"
+    },
+    {
       "name": "nested",
       "rootUri": "file:///home/marcos/.pub-cache/hosted/pub.dev/nested-1.0.0",
       "packageUri": "lib/",
