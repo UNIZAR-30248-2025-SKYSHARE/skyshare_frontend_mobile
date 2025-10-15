@@ -13,7 +13,7 @@ void main() {
         ),
       );
 
-      expect(find.text('Sky Quality Index'), findsOneWidget);
+      expect(find.text('Puntuación del Cielo'), findsOneWidget);
     });
 
     testWidgets('muestra el valor formateado correctamente', (WidgetTester tester) async {

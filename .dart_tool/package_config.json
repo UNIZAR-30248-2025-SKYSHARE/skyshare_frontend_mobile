@@ -122,6 +122,12 @@
       "languageVersion": "3.0"
     },
     {
+      "name": "cli_util",
+      "rootUri": "file:///home/marcos/.pub-cache/hosted/pub.dev/cli_util-0.4.2",
+      "packageUri": "lib/",
+      "languageVersion": "3.4"
+    },
+    {
       "name": "clock",
       "rootUri": "file:///home/marcos/.pub-cache/hosted/pub.dev/clock-1.1.2",
       "packageUri": "lib/",
@@ -330,6 +336,12 @@
       "rootUri": "file:///home/marcos/.pub-cache/hosted/pub.dev/graphs-2.3.2",
       "packageUri": "lib/",
       "languageVersion": "3.4"
+    },
+    {
+      "name": "grinder",
+      "rootUri": "file:///home/marcos/.pub-cache/hosted/pub.dev/grinder-0.9.5",
+      "packageUri": "lib/",
+      "languageVersion": "3.0"
     },
     {
       "name": "gsettings",
