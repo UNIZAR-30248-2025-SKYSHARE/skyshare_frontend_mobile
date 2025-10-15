@@ -44,6 +44,13 @@ class MapWidget extends StatelessWidget {
         maxZoom: 18.0,
         onTap: onTap,
         onLongPress: onLongPress,
+        interactionOptions: const InteractionOptions(
+          flags: InteractiveFlag.drag |
+                 InteractiveFlag.flingAnimation |
+                 InteractiveFlag.pinchMove |
+                 InteractiveFlag.pinchZoom |
+                 InteractiveFlag.doubleTapZoom,
+        ),
       ),
       children: [
         TileLayer(

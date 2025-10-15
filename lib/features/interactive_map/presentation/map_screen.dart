@@ -8,7 +8,7 @@ import './widgets/loading_overlay.dart';
 import './widgets/error_banner.dart';
 import './widgets/zoom_controls.dart';
 import './widgets/location_button.dart';
-import './widgets/filter_widget.dart'; // Esto incluye FilterType
+import './widgets/filter_widget.dart';
 import './widgets/create_spot.dart';
 import '../data/models/spot_model.dart';
 
@@ -200,7 +200,7 @@ class _MapScreenState extends State<MapScreen> {
                               vertical: 4,
                             ),
                             decoration: BoxDecoration(
-                              color: color.withOpacity(0.2),
+                              color: Colors.yellow, 
                               borderRadius: BorderRadius.circular(12),
                             ),
                             child: Row(
@@ -248,7 +248,7 @@ class _MapScreenState extends State<MapScreen> {
                   child: Container(
                     padding: const EdgeInsets.symmetric(horizontal: 2),
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: Colors.yellow, 
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Text(

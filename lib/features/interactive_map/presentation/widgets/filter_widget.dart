@@ -20,10 +20,12 @@ class _FilterWidgetState extends State<FilterWidget> {
   final TextEditingController _controller = TextEditingController();
   bool _isExpanded = false;
   int _selectedStars = 0;
+  final FocusNode _focusNode = FocusNode();
 
   @override
   void dispose() {
     _controller.dispose();
+    _focusNode.dispose();
     super.dispose();
   }
 
@@ -33,6 +35,7 @@ class _FilterWidgetState extends State<FilterWidget> {
       if (!_isExpanded) {
         _controller.clear();
         _selectedStars = 0;
+        _focusNode.unfocus(); 
         widget.onClear();
       }
     });
@@ -48,6 +51,10 @@ class _FilterWidgetState extends State<FilterWidget> {
         widget.onFilterChanged(FilterType.valoracion, stars.toString());
       }
     });
+  }
+
+  void _onTextFieldTap() {
+    _focusNode.requestFocus();
   }
 
   @override
@@ -79,38 +86,52 @@ class _FilterWidgetState extends State<FilterWidget> {
                 padding: const EdgeInsets.symmetric(horizontal: 4),
                 child: Row(
                   children: [
-                    IconButton(
-                      icon: const Icon(Icons.close, size: 20),
-                      onPressed: _toggleFilter,
-                      tooltip: 'Cerrar filtros',
-                      padding: const EdgeInsets.all(8),
-                      constraints: const BoxConstraints(minWidth: 40, minHeight: 40),
+
+                    Container(
+                      width: 40,
+                      height: 40,
+                      decoration: BoxDecoration(
+                        color: Color(0xFF161426),
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: IconButton(
+                        icon: const Icon(Icons.close, size: 20, color: Colors.white),
+                        onPressed: _toggleFilter,
+                        tooltip: 'Cerrar filtros',
+                        padding: EdgeInsets.zero,
+                        constraints: const BoxConstraints(minWidth: 40, minHeight: 40),
+                      ),
                     ),
-                    // Mitad izquierda: búsqueda por nombre
+                    const SizedBox(width: 4),
+
                     Expanded(
                       flex: 1,
                       child: Container(
                         padding: const EdgeInsets.symmetric(horizontal: 8),
                         child: Row(
                           children: [
-                            const Icon(Icons.text_fields, size: 16),
+                            const Icon(Icons.text_fields, size: 16, color: Colors.grey),
                             const SizedBox(width: 4),
                             Expanded(
-                              child: TextField(
-                                controller: _controller,
-                                autofocus: true,
-                                decoration: const InputDecoration(
-                                  hintText: 'Nombre...',
-                                  border: InputBorder.none,
-                                  contentPadding: EdgeInsets.symmetric(horizontal: 4),
-                                  isDense: true,
+                              child: GestureDetector(
+                                onTap: _onTextFieldTap,
+                                child: TextField(
+                                  controller: _controller,
+                                  focusNode: _focusNode,
+                                  autofocus: false, 
+                                  decoration: const InputDecoration(
+                                    hintText: 'Nombre...',
+                                    border: InputBorder.none,
+                                    contentPadding: EdgeInsets.symmetric(horizontal: 4),
+                                    isDense: true,
+                                  ),
+                                  onChanged: (value) {
+                                    if (value.isNotEmpty) {
+                                      setState(() => _selectedStars = 0);
+                                    }
+                                    widget.onFilterChanged(FilterType.nombre, value);
+                                  },
                                 ),
-                                onChanged: (value) {
-                                  if (value.isNotEmpty) {
-                                    setState(() => _selectedStars = 0);
-                                  }
-                                  widget.onFilterChanged(FilterType.nombre, value);
-                                },
                               ),
                             ),
                             if (_controller.text.isNotEmpty)
@@ -127,13 +148,13 @@ class _FilterWidgetState extends State<FilterWidget> {
                         ),
                       ),
                     ),
-                    // Divisor vertical
+
                     Container(
                       width: 1,
                       height: 32,
                       color: Colors.grey[300],
                     ),
-                    // Mitad derecha: estrellas
+
                     Expanded(
                       flex: 1,
                       child: Row(
@@ -164,9 +185,16 @@ class _FilterWidgetState extends State<FilterWidget> {
                   ],
                 ),
               )
-            : Center(
+            : 
+            Container(
+                width: 48,
+                height: 48,
+                decoration: BoxDecoration(
+                  color: Color(0xFF161426),
+                  borderRadius: BorderRadius.circular(24),
+                ),
                 child: IconButton(
-                  icon: const Icon(Icons.filter_list),
+                  icon: const Icon(Icons.filter_list, color: Colors.white),
                   onPressed: _toggleFilter,
                   tooltip: 'Filtrar spots',
                 ),

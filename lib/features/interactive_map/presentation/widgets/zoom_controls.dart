@@ -22,6 +22,8 @@ class ZoomControls extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 FloatingActionButton(
+                  backgroundColor: Color(0xFF161426),
+                  foregroundColor: Colors.white,
                   heroTag: 'zoomIn',
                   mini: true,
                   onPressed: onZoomIn,
@@ -29,6 +31,8 @@ class ZoomControls extends StatelessWidget {
                 ),
                 const SizedBox(height: 8),
                 FloatingActionButton(
+                  backgroundColor: Color(0xFF161426),
+                  foregroundColor: Colors.white,
                   heroTag: 'zoomOut',
                   mini: true,
                   onPressed: onZoomOut,
