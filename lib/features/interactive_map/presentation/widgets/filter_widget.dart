@@ -75,7 +75,7 @@ class _FilterWidgetState extends State<FilterWidget> {
           borderRadius: BorderRadius.circular(24),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.2),
+              color: const Color.fromRGBO(0, 0, 0, 0.2),
               blurRadius: 8,
               offset: const Offset(0, 2),
             ),
