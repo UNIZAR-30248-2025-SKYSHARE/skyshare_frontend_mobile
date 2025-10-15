@@ -1555,7 +1555,14 @@
           "type": "string"
         }
       },
-      "type": "object"
+      "type": "object",
+      "example": {
+        "id_spot": 1,
+        "id_usuario_creador": 10,
+        "id_ubicacion": 3,
+        "nombre": "Mirador del Teide",
+        "descripcion": "High-altitude viewpoint on Tenerife (approx. 2,300 m). Very low light pollution and excellent horizon visibility. Ideal for astrophotography."
+      }
     },
     "fase_lunar": {
       "required": [
