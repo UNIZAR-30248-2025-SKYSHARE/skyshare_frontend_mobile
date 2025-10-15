@@ -125,4 +125,197 @@ void main() {
 
     expect(find.byIcon(Icons.location_on), findsWidgets);
   });
+
+  testWidgets('debería mostrar y expandir el FilterWidget', (tester) async {
+    when(() => mockLocationRepository.getCurrentLatLng())
+        .thenAnswer((_) async => LatLng(40.4168, -3.7038));
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: ChangeNotifierProvider<InteractiveMapProvider>(
+          create: (_) => mapProvider,
+          child: MapScreen(tileProvider: TestTileProvider()),
+        ),
+      ),
+    );
+
+    await tester.pumpAndSettle();
+
+    expect(find.byIcon(Icons.filter_list), findsOneWidget);
+
+    await tester.tap(find.byIcon(Icons.filter_list));
+    await tester.pumpAndSettle();
+
+    expect(find.byType(TextField), findsOneWidget);
+    expect(find.byIcon(Icons.star_border), findsNWidgets(5));
+  });
+
+  testWidgets('debería filtrar spots por nombre', (tester) async {
+    when(() => mockLocationRepository.getCurrentLatLng())
+        .thenAnswer((_) async => LatLng(40.4168, -3.7038));
+
+    final spots = [
+      Spot(
+        id: 1,
+        ubicacionId: 1,
+        creadorId: 1,
+        nombre: 'Mirador Norte',
+        lat: 40.4168,
+        lng: -3.7038,
+        valoracionMedia: 4.5,
+        totalValoraciones: 10,
+      ),
+      Spot(
+        id: 2,
+        ubicacionId: 2,
+        creadorId: 1,
+        nombre: 'Pico Sur',
+        lat: 40.4178,
+        lng: -3.7048,
+        valoracionMedia: 3.2,
+        totalValoraciones: 5,
+      ),
+    ];
+
+    when(() => mockLocationRepository.fetchSpots(limit: any(named: 'limit')))
+        .thenAnswer((_) async => spots);
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: ChangeNotifierProvider<InteractiveMapProvider>(
+          create: (_) => mapProvider,
+          child: MapScreen(tileProvider: TestTileProvider()),
+        ),
+      ),
+    );
+
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byIcon(Icons.filter_list));
+    await tester.pumpAndSettle();
+
+    await tester.enterText(find.byType(TextField), 'norte');
+    await tester.pump();
+
+    expect(find.text('norte'), findsOneWidget);
+  });
+
+  testWidgets('debería filtrar spots por valoración', (tester) async {
+    when(() => mockLocationRepository.getCurrentLatLng())
+        .thenAnswer((_) async => LatLng(40.4168, -3.7038));
+
+    final spots = [
+      Spot(
+        id: 1,
+        ubicacionId: 1,
+        creadorId: 1,
+        nombre: 'Mirador Norte',
+        lat: 40.4168,
+        lng: -3.7038,
+        valoracionMedia: 4.5,
+        totalValoraciones: 10,
+      ),
+      Spot(
+        id: 2,
+        ubicacionId: 2,
+        creadorId: 1,
+        nombre: 'Pico Sur',
+        lat: 40.4178,
+        lng: -3.7048,
+        valoracionMedia: 3.2,
+        totalValoraciones: 5,
+      ),
+    ];
+
+    when(() => mockLocationRepository.fetchSpots(limit: any(named: 'limit')))
+        .thenAnswer((_) async => spots);
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: ChangeNotifierProvider<InteractiveMapProvider>(
+          create: (_) => mapProvider,
+          child: MapScreen(tileProvider: TestTileProvider()),
+        ),
+      ),
+    );
+
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byIcon(Icons.filter_list));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byIcon(Icons.star_border).at(3));
+    await tester.pump();
+
+    expect(find.textContaining('spot'), findsOneWidget);
+  });
+
+  testWidgets('debería mostrar contador de spots filtrados', (tester) async {
+    when(() => mockLocationRepository.getCurrentLatLng())
+        .thenAnswer((_) async => LatLng(40.4168, -3.7038));
+
+    final spots = [
+      Spot(
+        id: 1,
+        ubicacionId: 1,
+        creadorId: 1,
+        nombre: 'Mirador Norte',
+        lat: 40.4168,
+        lng: -3.7038,
+        valoracionMedia: 4.5,
+        totalValoraciones: 10,
+      ),
+    ];
+
+    when(() => mockLocationRepository.fetchSpots(limit: any(named: 'limit')))
+        .thenAnswer((_) async => spots);
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: ChangeNotifierProvider<InteractiveMapProvider>(
+          create: (_) => mapProvider,
+          child: MapScreen(tileProvider: TestTileProvider()),
+        ),
+      ),
+    );
+
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byIcon(Icons.filter_list));
+    await tester.pumpAndSettle();
+
+    await tester.enterText(find.byType(TextField), 'mirador');
+    await tester.pump();
+
+    expect(find.text('1 spot'), findsOneWidget);
+  });
+
+  testWidgets('debería limpiar filtro correctamente', (tester) async {
+    when(() => mockLocationRepository.getCurrentLatLng())
+        .thenAnswer((_) async => LatLng(40.4168, -3.7038));
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: ChangeNotifierProvider<InteractiveMapProvider>(
+          create: (_) => mapProvider,
+          child: MapScreen(tileProvider: TestTileProvider()),
+        ),
+      ),
+    );
+
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byIcon(Icons.filter_list));
+    await tester.pumpAndSettle();
+
+    await tester.enterText(find.byType(TextField), 'test');
+    await tester.pump();
+
+    expect(find.text('test'), findsOneWidget);
+
+    await tester.tap(find.byIcon(Icons.clear));
+    await tester.pump();
+
+    expect(find.text('test'), findsNothing);
+  });
 }

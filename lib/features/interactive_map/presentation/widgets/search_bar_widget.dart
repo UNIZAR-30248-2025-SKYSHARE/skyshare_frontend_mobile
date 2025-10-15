@@ -19,7 +19,19 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
   bool _isExpanded = false;
 
   @override
+  void initState() {
+    super.initState();
+    _controller.addListener(_onTextChanged);
+  }
+
+  void _onTextChanged() {
+    widget.onSearchChanged(_controller.text);
+    setState(() {});
+  }
+
+  @override
   void dispose() {
+    _controller.removeListener(_onTextChanged);
     _controller.dispose();
     super.dispose();
   }
@@ -72,7 +84,6 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
                     border: InputBorder.none,
                     contentPadding: EdgeInsets.symmetric(horizontal: 8),
                   ),
-                  onChanged: widget.onSearchChanged,
                 ),
               ),
             if (_isExpanded && _controller.text.isNotEmpty)
