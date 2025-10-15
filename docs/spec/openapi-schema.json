@@ -41,6 +41,8 @@
     },
     "/spot": {
       "get": {
+        "summary": "Retrieve stargazing spots",
+        "description": "Returns a list of stargazing spots with optional filters.",
         "parameters": [
           {
             "$ref": "#/parameters/rowFilter.spot.id_spot"
@@ -89,29 +91,111 @@
               "type": "array"
             },
             "examples": {
-              "application/json": [
-                {
-                  "id_spot": 1,
-                  "id_usuario_creador": 10,
-                  "id_ubicacion": 3,
-                  "nombre": "Mirador del Teide",
-                  "descripcion": "High-altitude viewpoint on Tenerife (approx. 2,300 m). Very low light pollution and excellent horizon visibility. Ideal for astrophotography; dress warmly at night."
-                },
-                {
-                  "id_spot": 2,
-                  "id_usuario_creador": 11,
-                  "id_ubicacion": 12,
-                  "nombre": "Montsec Astronomical Park",
-                  "descripcion": "Certified Starlight Reserve with an observatory and public viewing areas. Outstanding sky quality, especially in winter and summer evenings."
-                },
-                {
-                  "id_spot": 3,
-                  "id_usuario_creador": 12,
-                  "id_ubicacion": 21,
-                  "nombre": "Cabo de Gata - Playa de los Genoveses",
-                  "descripcion": "Coastal dark-sky beach with a wide southern horizon; good for summer stargazing. Limited facilities and seasonal access restrictions may apply."
-                }
-              ]
+              "application/json": {
+                "all_spots": [
+                  {
+                    "id_spot": 1,
+                    "id_usuario_creador": 10,
+                    "id_ubicacion": 3,
+                    "nombre": "Mirador del Teide",
+                    "descripcion": "High-altitude viewpoint on Tenerife (approx. 2,300 m). Very low light pollution and excellent horizon visibility. Ideal for astrophotography; dress warmly at night."
+                  },
+                  {
+                    "id_spot": 2,
+                    "id_usuario_creador": 11,
+                    "id_ubicacion": 12,
+                    "nombre": "Montsec Astronomical Park",
+                    "descripcion": "Certified Starlight Reserve with an observatory and public viewing areas. Outstanding sky quality, especially in winter and summer evenings."
+                  }
+                ]
+              }
+            },
+            "x-examples": {
+              "buscar_por_nombre": {
+                "summary": "Buscar spots por nombre",
+                "description": "Obtener spots que contengan 'Teide' en el nombre",
+                "dart_code": "final response = await supabase\n  .from('spot')\n  .select()\n  .ilike('nombre', '%Teide%');",
+                "response": [
+                  {
+                    "id_spot": 1,
+                    "nombre": "Mirador del Teide",
+                    "descripcion": "High-altitude viewpoint..."
+                  }
+                ]
+              },
+              "filtrar_por_valoracion": {
+                "summary": "Filtrar spots con 3+ estrellas",
+                "description": "Obtener spots con valoración promedio >= 3 (requiere vista o cálculo)",
+                "dart_code": "final response = await supabase\n  .from('spot')\n  .select('*, valoracion(puntuacion)')\n  .gte('valoracion_promedio', 3);",
+                "note": "Requiere una vista 'spot_con_valoracion' o cálculo agregado",
+                "response": [
+                  {
+                    "id_spot": 1,
+                    "nombre": "Mirador del Teide",
+                    "valoracion_promedio": 4.5
+                  }
+                ]
+              },
+              "filtrar_por_ubicacion": {
+                "summary": "Filtrar spots en una ubicación específica",
+                "description": "Obtener spots de una ubicación concreta",
+                "dart_code": "final response = await supabase\n  .from('spot')\n  .select()\n  .eq('id_ubicacion', 3);",
+                "response": [
+                  {
+                    "id_spot": 1,
+                    "id_ubicacion": 3,
+                    "nombre": "Mirador del Teide"
+                  }
+                ]
+              },
+              "spots_cercanos_radio": {
+                "summary": "Spots dentro de un radio (búsqueda geográfica)",
+                "description": "Obtener spots en un radio de 50km desde coordenadas",
+                "dart_code": "final response = await supabase\n  .rpc('spots_cerca', params: {\n    'lat': 40.416775,\n    'lon': -3.70379,\n    'radio_km': 50\n  });",
+                "note": "Requiere función RPC 'spots_cerca' en la base de datos",
+                "response": [
+                  {
+                    "id_spot": 5,
+                    "nombre": "Sierra de Guadarrama",
+                    "distancia_km": 35.2
+                  }
+                ]
+              },
+              "ordenar_por_nombre": {
+                "summary": "Ordenar spots alfabéticamente",
+                "description": "Obtener todos los spots ordenados por nombre",
+                "dart_code": "final response = await supabase\n  .from('spot')\n  .select()\n  .order('nombre', ascending: true);",
+                "response": [
+                  {
+                    "id_spot": 3,
+                    "nombre": "Cabo de Gata - Playa de los Genoveses"
+                  },
+                  {
+                    "id_spot": 1,
+                    "nombre": "Mirador del Teide"
+                  }
+                ]
+              },
+              "limitar_resultados": {
+                "summary": "Limitar número de resultados",
+                "description": "Obtener solo los primeros 10 spots",
+                "dart_code": "final response = await supabase\n  .from('spot')\n  .select()\n  .limit(10);",
+                "response": [
+                  {"id_spot": 1, "nombre": "Mirador del Teide"},
+                  {"id_spot": 2, "nombre": "Montsec Astronomical Park"}
+                ]
+              },
+              "filtros_combinados": {
+                "summary": "Combinar múltiples filtros",
+                "description": "Buscar por nombre y ordenar resultados",
+                "dart_code": "final response = await supabase\n  .from('spot')\n  .select()\n  .ilike('nombre', '%Sierra%')\n  .order('nombre', ascending: true)\n  .limit(5);",
+                "response": [
+                  {
+                    "id_spot": 15,
+                    "nombre": "Sierra de Guadarrama - Mirador"
+                  }
+                ]
+              }
             }
           },
           "206": {
@@ -147,6 +231,12 @@
                 "id_ubicacion": 45,
                 "nombre": "Sierra de Guadarrama - Mirador",
                 "descripcion": "Mountain viewpoint (~1,800 m) with wide horizons; popular for winter constellation observing and meteor showers. Access by car; check snow conditions in winter."
+              }
+            },
+            "x-examples": {
+              "crear_spot": {
+                "summary": "Crear un nuevo spot",
+                "dart_code": "final response = await supabase\n  .from('spot')\n  .insert({\n    'id_usuario_creador': 10,\n    'id_ubicacion': 45,\n    'nombre': 'Sierra de Guadarrama - Mirador',\n    'descripcion': 'Mountain viewpoint...'\n  })\n  .select()\n  .single();"
               }
             }
           }
@@ -193,6 +283,12 @@
                 "nombre": "Mirador del Teide",
                 "descripcion": "High-altitude viewpoint on Tenerife. Updated visitor facilities and improved signage as of 2025; continue to follow local access rules."
               }
+            },
+            "x-examples": {
+              "actualizar_spot": {
+                "summary": "Actualizar un spot existente",
+                "dart_code": "final response = await supabase\n  .from('spot')\n  .update({\n    'descripcion': 'Nueva descripción actualizada'\n  })\n  .eq('id_spot', 1)\n  .select()\n  .single();"
+              }
             }
           },
           "204": {
@@ -226,7 +322,13 @@
         ],
         "responses": {
           "204": {
-            "description": "No Content. Spot deleted."
+            "description": "No Content. Spot deleted.",
+            "x-examples": {
+              "eliminar_spot": {
+                "summary": "Eliminar un spot",
+                "dart_code": "await supabase\n  .from('spot')\n  .delete()\n  .eq('id_spot', 1);"
+              }
+            }
           }
         },
         "tags": [
