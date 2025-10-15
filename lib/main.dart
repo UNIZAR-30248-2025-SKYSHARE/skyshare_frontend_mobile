@@ -1,12 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:skyshare_frontend_mobile/features/phase_lunar/presentation/phase_lunar_screen.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'features/dashboard/providers/dashboard_provider.dart';
 import 'features/dashboard/presentation/dashboard_screen.dart';
 import 'features/dashboard/data/repositories/weather_repository.dart';
 import 'features/dashboard/data/repositories/visible_sky_repository.dart';
-import 'features/dashboard/data/repositories/location_repository.dart';
+import 'features/dashboard/data/repositories/location_repository.dart' as location_repository_dashboard;
+import 'features/phase_lunar/data/repositories/lunar_phase_repository.dart';
+import 'features/phase_lunar/data/repositories/location_repository.dart' as location_repository_lunar;
+import 'features/phase_lunar/providers/lunar_phase_provider.dart';
 import 'core/services/supabase_service.dart';
 import 'core/widgets/app_navigation.dart';
 
@@ -34,15 +38,26 @@ class MyApp extends StatelessWidget {
         Provider<VisibleSkyRepository>(
           create: (ctx) => VisibleSkyRepository(client: ctx.read<SupabaseClient>()),
         ),
-
-        Provider<LocationRepository>(
-          create: (ctx) => LocationRepository(client: ctx.read<SupabaseClient>()),
+        Provider<location_repository_dashboard.LocationRepository>(
+          create: (ctx) => location_repository_dashboard.LocationRepository(client: ctx.read<SupabaseClient>()),
+        ),
+        Provider<location_repository_lunar.LocationRepository>(
+          create: (ctx) => location_repository_lunar.LocationRepository(client: ctx.read<SupabaseClient>()),
+        ),
+        Provider<LunarPhaseRepository>(
+          create: (ctx) => LunarPhaseRepository(client: ctx.read<SupabaseClient>()),
+        ),
+        ChangeNotifierProvider<LunarPhaseProvider>(
+          create: (ctx) => LunarPhaseProvider(
+            lunarPhaseRepo: ctx.read<LunarPhaseRepository>(),
+            locationRepo: ctx.read<location_repository_lunar.LocationRepository>(),
+          ),
         ),
         ChangeNotifierProvider<DashboardProvider>(
           create: (ctx) => DashboardProvider(
             weatherRepository: ctx.read<WeatherRepository>(),
             visibleSkyRepository: ctx.read<VisibleSkyRepository>(),
-            locationRepository: ctx.read<LocationRepository>(),
+            locationRepository: ctx.read<location_repository_dashboard.LocationRepository>(),
           ),
         ),
       ],
@@ -102,7 +117,7 @@ class _RootAppState extends State<RootApp> {
     final locationCount = provider.savedLocations.length;
     final pages = <Widget>[
       const DashboardScreen(),                   
-      const Center(child: Text('Luna - placeholder')),
+      const PhaseLunarScreen(),
       const Center(child: Text('Mapa - placeholder')), 
       const Center(child: Text('Perfil - placeholder')), 
     ];
