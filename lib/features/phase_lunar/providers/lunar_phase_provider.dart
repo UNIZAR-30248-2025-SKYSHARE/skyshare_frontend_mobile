@@ -24,14 +24,12 @@ class LunarPhaseProvider extends ChangeNotifier {
 
     try {
       currentLocationId = await locationRepo.getCurrentLocationId(1);
-      print('Current location ID: $currentLocationId');
       if (currentLocationId == null) {
         throw Exception('No location found for user');
       }
 
       final fetched = await lunarPhaseRepo.fetchNext7DaysSimple(currentLocationId!);
 
-      print('Fetched lunar phases: $fetched');
       phases = fetched.map((d) {
         return LunarPhase(
           idLuna: d.idLuna,

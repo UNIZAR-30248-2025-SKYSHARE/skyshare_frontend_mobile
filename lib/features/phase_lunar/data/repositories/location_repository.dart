@@ -16,7 +16,6 @@ class LocationRepository {
         .limit(1)
         .maybeSingle();
 
-    print('Response from getCurrentLocationId: $resp');
     if (resp == null) return null;
 
     final nested = (resp)['id_ubicacion'];

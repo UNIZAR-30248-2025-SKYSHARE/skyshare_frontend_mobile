@@ -11,8 +11,11 @@ import 'features/dashboard/data/repositories/location_repository.dart' as locati
 import 'features/phase_lunar/data/repositories/lunar_phase_repository.dart';
 import 'features/phase_lunar/data/repositories/location_repository.dart' as location_repository_lunar;
 import 'features/phase_lunar/providers/lunar_phase_provider.dart';
+import 'features/interactive_map/data/repositories/location_repository.dart' as location_repository_map;
 import 'core/services/supabase_service.dart';
 import 'core/widgets/app_navigation.dart';
+import 'features/interactive_map/presentation/map_screen.dart';
+import 'package:skyshare_frontend_mobile/features/interactive_map/providers/interactive_map_provider.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -52,6 +55,14 @@ class MyApp extends StatelessWidget {
             lunarPhaseRepo: ctx.read<LunarPhaseRepository>(),
             locationRepo: ctx.read<location_repository_lunar.LocationRepository>(),
           ),
+        ),
+        Provider<location_repository_map.LocationRepository>(
+          create: (ctx) => location_repository_map.LocationRepository(),
+        ),
+        ChangeNotifierProvider(
+          create: (ctx) => InteractiveMapProvider(
+            locationRepository: ctx.read<location_repository_map.LocationRepository>()
+          )
         ),
         ChangeNotifierProvider<DashboardProvider>(
           create: (ctx) => DashboardProvider(
@@ -107,9 +118,7 @@ class _RootAppState extends State<RootApp> {
     });
   }
 
-  void _onAddLocation() {
-    // flujo para añadir ubicación (temporal: no-op)
-  }
+  void _onAddLocation() {}
 
   @override
   Widget build(BuildContext context) {
@@ -118,8 +127,8 @@ class _RootAppState extends State<RootApp> {
     final pages = <Widget>[
       const DashboardScreen(),                   
       const PhaseLunarScreen(),
-      const Center(child: Text('Mapa - placeholder')), 
-      const Center(child: Text('Perfil - placeholder')), 
+      const MapScreen(),
+      const Center(child: Text('Perfil - placeholder')),
     ];
 
     return Scaffold(

@@ -144,7 +144,7 @@ class _PhaseLunarScreenState extends State<PhaseLunarScreen> {
                     child: ListView.separated(
                       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                       itemCount: phases.length,
-                      separatorBuilder: (_, __) => const SizedBox(height: 8),
+                      separatorBuilder: (_, _) => const SizedBox(height: 8),
                       itemBuilder: (context, i) {
                         final p = phases[i];
                         final date = p.fecha;

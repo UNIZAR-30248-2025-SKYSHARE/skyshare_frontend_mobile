@@ -43,6 +43,10 @@ dependencies:
   geolocator: ^14.0.2
   geocoding: ^4.0.0
   test: ^1.25.15
+  flutter_map: ^6.0.0
+  latlong2: ^0.9.0
+  image_picker: ^1.0.4
+  shared_preferences: ^2.5.3
 
 dev_dependencies:
   flutter_lints: ^6.0.0
@@ -52,7 +56,6 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   grinder: ^0.9.5
-
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is
@@ -74,6 +77,7 @@ flutter:
   assets:
     - .env
     - public/resources/
+    - ./test/assets/test_tile.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

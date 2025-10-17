@@ -21,8 +21,6 @@ class LunarPhaseRepository {
         .lte('fecha', endDate.toIso8601String().split('T')[0])
         .order('fecha', ascending: true);
 
-    print('LunarPhaseRepository.fetchNext7DaysSimple response: $resp');
-
     final rows = (resp as List)
         .map((e) => Map<String, dynamic>.from(e as Map))
         .toList();
