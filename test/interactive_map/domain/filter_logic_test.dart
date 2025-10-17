@@ -7,7 +7,7 @@ void main() {
       Spot(
         id: 1,
         ubicacionId: 1,
-        creadorId: 1,
+        creadorId: "1",
         nombre: 'Mirador Excelente',
         lat: 40.4168,
         lng: -3.7038,
@@ -17,7 +17,7 @@ void main() {
       Spot(
         id: 2,
         ubicacionId: 2,
-        creadorId: 1,
+        creadorId: "1",
         nombre: 'Pico Bueno',
         lat: 40.4178,
         lng: -3.7048,
@@ -27,7 +27,7 @@ void main() {
       Spot(
         id: 3,
         ubicacionId: 3,
-        creadorId: 1,
+        creadorId: "1",
         nombre: 'Llanura Regular',
         lat: 40.4158,
         lng: -3.7028,
@@ -37,7 +37,7 @@ void main() {
       Spot(
         id: 4,
         ubicacionId: 4,
-        creadorId: 1,
+        creadorId: "1",
         nombre: 'Sin Valorar',
         lat: 40.4198,
         lng: -3.7068,

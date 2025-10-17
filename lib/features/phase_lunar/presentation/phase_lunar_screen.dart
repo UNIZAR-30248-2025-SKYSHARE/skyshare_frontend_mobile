@@ -31,7 +31,7 @@ class _PhaseLunarScreenState extends State<PhaseLunarScreen> {
   Future<void> _loadLocationName() async {
     try {
       final provider = Provider.of<LunarPhaseProvider>(context, listen: false);
-      final locations = await provider.locationRepo.getSavedLocations(1);
+      final locations = await provider.locationRepo.getSavedLocations();
       if (locations.isNotEmpty) {
         setState(() {
           _locationName = locations.first['nombre'] as String? ?? 'Unknown location';

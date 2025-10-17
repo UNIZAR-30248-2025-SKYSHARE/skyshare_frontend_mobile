@@ -63,7 +63,8 @@ void main() {
   }
 
   testWidgets('muestra loader inicialmente y luego "No lunar phases available" si lista vacía', (tester) async {
-    when(() => mockLocationRepo.getCurrentLocationId(1)).thenAnswer((_) async => 10);
+    when(() => mockLocationRepo.getCurrentLocationId()).thenAnswer((_) async => 10);
+
     final completer = Completer<List<LunarPhase>>();
     when(() => mockLunarRepo.fetchNext7DaysSimple(10)).thenAnswer((_) => completer.future);
 
@@ -80,7 +81,7 @@ void main() {
   });
 
   testWidgets('muestra mensaje de error cuando el repo lanza', (tester) async {
-    when(() => mockLocationRepo.getCurrentLocationId(1)).thenThrow(Exception('DB error'));
+    when(() => mockLocationRepo.getCurrentLocationId()).thenThrow(Exception('DB error'));
 
     await pumpWithProviders(tester, const PhaseLunarScreen());
     await tester.pumpAndSettle();
@@ -89,8 +90,8 @@ void main() {
   });
 
   testWidgets('muestra la lista de fases cuando hay datos y permite navegación al detalle', (tester) async {
-    when(() => mockLocationRepo.getCurrentLocationId(1)).thenAnswer((_) async => 10);
-    when(() => mockLocationRepo.getSavedLocations(1)).thenAnswer((_) async => [
+    when(() => mockLocationRepo.getCurrentLocationId()).thenAnswer((_) async => 10);
+    when(() => mockLocationRepo.getSavedLocations()).thenAnswer((_) async => [
       {'id_ubicacion': 10, 'nombre': 'Zaragoza', 'latitud': 41.6488, 'longitud': -0.8891}
     ]);
 

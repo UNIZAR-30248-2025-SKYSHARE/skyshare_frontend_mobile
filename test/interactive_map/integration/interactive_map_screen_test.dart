@@ -102,7 +102,7 @@ void main() {
     final spot = Spot(
       id: 1,
       ubicacionId: 2,
-      creadorId: 3,
+      creadorId: "3",
       nombre: 'Spot de prueba',
       lat: 40.417,
       lng: -3.704,
@@ -158,7 +158,7 @@ void main() {
       Spot(
         id: 1,
         ubicacionId: 1,
-        creadorId: 1,
+        creadorId: "1",
         nombre: 'Mirador Norte',
         lat: 40.4168,
         lng: -3.7038,
@@ -168,7 +168,7 @@ void main() {
       Spot(
         id: 2,
         ubicacionId: 2,
-        creadorId: 1,
+        creadorId: "1",
         nombre: 'Pico Sur',
         lat: 40.4178,
         lng: -3.7048,
@@ -208,7 +208,7 @@ void main() {
       Spot(
         id: 1,
         ubicacionId: 1,
-        creadorId: 1,
+        creadorId: "1",
         nombre: 'Mirador Norte',
         lat: 40.4168,
         lng: -3.7038,
@@ -218,7 +218,7 @@ void main() {
       Spot(
         id: 2,
         ubicacionId: 2,
-        creadorId: 1,
+        creadorId: "1",
         nombre: 'Pico Sur',
         lat: 40.4178,
         lng: -3.7048,
@@ -258,7 +258,7 @@ void main() {
       Spot(
         id: 1,
         ubicacionId: 1,
-        creadorId: 1,
+        creadorId: "1",
         nombre: 'Mirador Norte',
         lat: 40.4168,
         lng: -3.7038,

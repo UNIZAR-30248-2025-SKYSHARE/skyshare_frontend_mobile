@@ -28,7 +28,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   Future<void> _initializeData() async {
     final provider = Provider.of<DashboardProvider>(context, listen: false);
-    await provider.detectAndSyncLocation(userId: 1);
+    await provider.detectAndSyncLocation();
     setState(() {
       _initialLoadCompleted = true;
     });

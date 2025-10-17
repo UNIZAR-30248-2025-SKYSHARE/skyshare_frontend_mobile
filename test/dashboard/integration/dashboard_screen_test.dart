@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:provider/provider.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:skyshare_frontend_mobile/core/models/location_model.dart';
 import 'package:skyshare_frontend_mobile/features/dashboard/data/models/visible_sky_model.dart';
 import 'package:skyshare_frontend_mobile/features/dashboard/data/models/weather_model.dart';
@@ -17,6 +18,9 @@ class MockWeatherRepository extends Mock implements WeatherRepository {}
 class MockVisibleSkyRepository extends Mock implements VisibleSkyRepository {}
 class MockLocationRepository extends Mock implements LocationRepository {}
 class MockLocationService extends Mock implements LocationService {}
+class MockSupabaseClient extends Mock implements SupabaseClient {}
+class MockGoTrueClient extends Mock implements GoTrueClient {}
+class MockUser extends Mock implements User {}
 
 class TestDashboardProvider extends DashboardProvider {
   bool _testLoading = false;
@@ -24,7 +28,7 @@ class TestDashboardProvider extends DashboardProvider {
   List<VisibleSkyItem> _testConstellations = [];
   SkyIndicator? _testSkyIndicator;
   String? _testErrorMessage;
-  Future<void> Function(int userId)? detectCallback;
+  Future<void> Function()? detectCallback;
   Future<void> Function({Location? location})? loadCallback;
 
   TestDashboardProvider({
@@ -74,9 +78,9 @@ class TestDashboardProvider extends DashboardProvider {
   }
 
   @override
-  Future<void> detectAndSyncLocation({required int userId}) async {
+  Future<void> detectAndSyncLocation({String? userId}) async {
     if (detectCallback != null) {
-      await detectCallback!(userId);
+      await detectCallback!();
     }
   }
 
@@ -270,6 +274,9 @@ void main() {
     late MockWeatherRepository mockWeatherRepo;
     late MockVisibleSkyRepository mockSkyRepo;
     late MockLocationRepository mockLocationRepo;
+    late MockSupabaseClient mockSupabaseClient;
+    late MockGoTrueClient mockAuthClient;
+    late MockUser mockUser;
 
     final mockLocation = const Location(
       id: 1,
@@ -303,6 +310,15 @@ void main() {
       mockWeatherRepo = MockWeatherRepository();
       mockSkyRepo = MockVisibleSkyRepository();
       mockLocationRepo = MockLocationRepository();
+      mockSupabaseClient = MockSupabaseClient();
+      mockAuthClient = MockGoTrueClient();
+      mockUser = MockUser();
+
+      // Configura el mock de Supabase
+      when(() => mockLocationRepo.client).thenReturn(mockSupabaseClient);
+      when(() => mockSupabaseClient.auth).thenReturn(mockAuthClient);
+      when(() => mockAuthClient.currentUser).thenReturn(mockUser);
+      when(() => mockUser.id).thenReturn('test-user-id-123');
 
       provider = TestDashboardProvider(
         weatherRepository: mockWeatherRepo,
@@ -322,7 +338,7 @@ void main() {
     }
 
     testWidgets('muestra loading inicial', (WidgetTester tester) async {
-      provider.detectCallback = (int userId) async {
+      provider.detectCallback = () async {
         await Future<void>.delayed(const Duration(milliseconds: 200));
       };
       await pump(tester);
@@ -332,7 +348,7 @@ void main() {
     });
 
     testWidgets('muestra skeleton loading después de detectar ubicación', (WidgetTester tester) async {
-      provider.detectCallback = (int userId) async {
+      provider.detectCallback = () async {
         provider.setSelectedLocation(mockLocation);
         provider.setTestLoading(true);
         provider.notifyListeners();
@@ -358,7 +374,7 @@ void main() {
     });
 
     testWidgets('muestra error cuando falla la detección de ubicación', (WidgetTester tester) async {
-      provider.detectCallback = (int userId) async {
+      provider.detectCallback = () async {
         provider.setTestError('Error de ubicación');
         provider.notifyListeners();
       };
@@ -407,7 +423,7 @@ void main() {
     });
 
     testWidgets('maneja correctamente el cambio entre estados', (WidgetTester tester) async {
-      provider.detectCallback = (int userId) async {
+      provider.detectCallback = () async {
         await Future<void>.delayed(const Duration(milliseconds: 200));
       };
       await pump(tester);
@@ -422,7 +438,7 @@ void main() {
 
     testWidgets('botón reintentar funciona correctamente', (WidgetTester tester) async {
       var retryCount = 0;
-      provider.detectCallback = (int userId) async {
+      provider.detectCallback = () async {
         retryCount++;
         if (retryCount == 1) {
           provider.setTestError('Error inicial');

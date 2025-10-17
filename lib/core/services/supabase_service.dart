@@ -4,6 +4,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 class SupabaseService {
   SupabaseService._();
   static final SupabaseService instance = SupabaseService._();
+  
   bool _initialized = false;
 
   SupabaseClient get client => Supabase.instance.client;
@@ -17,3 +18,8 @@ class SupabaseService {
     _initialized = true;
   }
 }
+
+extension SupabaseClientX on SupabaseClient {
+  String? get currentUserId => auth.currentUser?.id;
+}
+

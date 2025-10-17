@@ -1,7 +1,7 @@
 class Spot {
   final int id;
   final int ubicacionId;
-  final int creadorId;
+  final String? creadorId;
   final String nombre;
   final String? descripcion;
   final double lat;
@@ -54,9 +54,7 @@ class Spot {
       ubicacionId: (map['id_ubicacion'] is int) 
         ? map['id_ubicacion'] as int 
         : int.parse(map['id_ubicacion'].toString()),
-      creadorId: (map['id_usuario_creador'] is int) 
-        ? map['id_usuario_creador'] as int 
-        : int.parse(map['id_usuario_creador'].toString()),
+      creadorId: map['id_usuario_creador']?.toString() ?? '',
       nombre: map['nombre']?.toString() ?? '',
       descripcion: map['descripcion']?.toString(),
       lat: (ubicacion['latitud'] is double) 

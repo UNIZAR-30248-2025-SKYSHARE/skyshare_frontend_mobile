@@ -40,18 +40,26 @@ class DashboardProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> detectAndSyncLocation({required int userId}) async {
+  Future<void> detectAndSyncLocation({String? userId}) async {
     try {
+
+      final uid = userId ?? locationRepository.client.auth.currentUser?.id;
+      if (uid == null) {
+        _errorMessage = 'Usuario no autenticado';
+        notifyListeners();
+        return;
+      }
+
       final lr = await LocationService.instance.getCurrentLocation();
       final currentCity = lr.city;
       final currentCountry = lr.country;
-      final existing = await locationRepository.fetchUserCurrentLocation(userId);
+      final existing = await locationRepository.fetchUserCurrentLocation(uid);
       if (existing != null && existing.name.toLowerCase() == currentCity.toLowerCase()) {
         setSelectedLocation(existing);
         await loadDashboardData(location: existing);
         return;
       }
-      await locationRepository.deleteUserLocationAssociations(userId);
+      await locationRepository.deleteUserLocationAssociations(uid);
       final created = await locationRepository.createLocation(
         latitude: lr.latitude,
         longitude: lr.longitude,
@@ -63,7 +71,7 @@ class DashboardProvider extends ChangeNotifier {
         notifyListeners();
         return;
       }
-      final ok = await locationRepository.createUserLocationAssociation(userId: userId, locationId: created.id);
+      final ok = await locationRepository.createUserLocationAssociation(userId: uid, locationId: created.id);
       if (!ok) {
         _errorMessage = 'No se pudo asociar la ubicación al usuario';
         notifyListeners();

@@ -7,11 +7,14 @@ class LocationRepository {
   LocationRepository({SupabaseClient? client})
       : client = client ?? SupabaseService.instance.client;
 
-  Future<int?> getCurrentLocationId(int userId) async {
+  Future<int?> getCurrentLocationId({String? userId}) async {
+    final uid = userId ?? client.auth.currentUser?.id;
+    if (uid == null) return null;
+
     final resp = await client
         .from('usuarioubicacion')
         .select('id_ubicacion(id_ubicacion)')
-        .eq('id_usuario', userId)
+        .eq('id_usuario', uid)
         .order('fecha_registro', ascending: false)
         .limit(1)
         .maybeSingle();
@@ -28,11 +31,14 @@ class LocationRepository {
     return null;
   }
 
-  Future<List<Map<String, dynamic>>> getSavedLocations(int userId) async {
+  Future<List<Map<String, dynamic>>> getSavedLocations({String? userId}) async {
+    final uid = userId ?? client.auth.currentUser?.id;
+    if (uid == null) return [];
+
     final resp = await client
         .from('usuarioubicacion')
         .select('id_ubicacion(id_ubicacion, nombre, latitud, longitud), fecha_registro')
-        .eq('id_usuario', userId)
+        .eq('id_usuario', uid)
         .order('fecha_registro', ascending: false);
 
     final list = (resp as List).cast<Map<String, dynamic>>();

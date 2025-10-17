@@ -23,7 +23,7 @@ class LunarPhaseProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      currentLocationId = await locationRepo.getCurrentLocationId(1);
+      currentLocationId = await locationRepo.getCurrentLocationId();
       if (currentLocationId == null) {
         throw Exception('No location found for user');
       }

@@ -7,11 +7,15 @@ class LocationRepository {
 
   LocationRepository({SupabaseClient? client}) : client = client ?? SupabaseService.instance.client;
 
-  Future<Location?> fetchUserCurrentLocation(int userId) async {
+  Future<Location?> fetchUserCurrentLocation(String? userId) async {
+
+    final uid = userId ?? client.auth.currentUser?.id;
+    if (uid == null) return null;
+
     final resp = await client
         .from('usuarioubicacion')
         .select('id_ubicacion,fecha_registro,ubicacion(*)')
-        .eq('id_usuario', userId)
+        .eq('id_usuario', uid)
         .order('fecha_registro', ascending: false)
         .limit(1)
         .maybeSingle();
@@ -36,20 +40,26 @@ class LocationRepository {
   }
 
   Future<bool> createUserLocationAssociation({
-    required int userId,
+    required String? userId,
     required int locationId,
   }) async {
-    final now = DateTime.now().toIso8601String();
+    final uid = userId ?? client.auth.currentUser?.id;
+    if (uid == null) return false;
+
+    final now = DateTime.now().toIso8601String().split('T').first;
     
     final resp = await client.from('usuarioubicacion').insert([
-      {'id_usuario': userId, 'id_ubicacion': locationId, 'fecha_registro': now}
+      {'id_usuario': uid, 'id_ubicacion': locationId, 'fecha_registro': now}
     ]).select().maybeSingle();
 
     return resp != null;
   }
 
-  Future<bool> deleteUserLocationAssociations(int userId) async {
-    final resp = await client.from('usuarioubicacion').delete().eq('id_usuario', userId);
+  Future<bool> deleteUserLocationAssociations(String? userId) async {
+    final uid = userId ?? client.auth.currentUser?.id;
+    if (uid == null) return false;
+
+    final resp = await client.from('usuarioubicacion').delete().eq('id_usuario', uid);
     return resp != null;
   }
 }
