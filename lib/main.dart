@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -22,6 +23,31 @@ Future<void> main() async {
   await dotenv.load();
   await SupabaseService.instance.init();
   final supabase = SupabaseService.instance.client;
+
+  if (kDebugMode) {
+    final devEmail = dotenv.env['DEV_EMAIL'];
+    final devPassword = dotenv.env['DEV_PASSWORD'];
+    if (devEmail != null && devPassword != null && devEmail.isNotEmpty && devPassword.isNotEmpty) {
+      try {
+        final response = await supabase.auth.signInWithPassword(
+          email: devEmail,
+          password: devPassword,
+        );
+
+        if (response.user != null) {
+          print('[DEBUG] Usuario dev autenticado: ${response.user!.id}');
+        } else {
+          print('[DEBUG] No se pudo autenticar el usuario dev (respuesta sin user).');
+        }
+      } catch (e, st) {
+        print('[DEBUG] Error al iniciar sesión en Supabase: $e\n$st');
+      }
+    } else {
+      print('[DEBUG] DEV_EMAIL o DEV_PASSWORD no están definidas en el .env. Comprueba el fichero .env');
+    }
+  }
+
+  
   runApp(MyApp(supabase: supabase));
 }
 
