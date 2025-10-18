@@ -2,6 +2,9 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:skyshare_frontend_mobile/features/auth/data/repositories/auth_repository.dart';
+import 'package:skyshare_frontend_mobile/features/auth/presentation/auth_screen.dart';
+import 'package:skyshare_frontend_mobile/features/auth/providers/auth_provider.dart';
 import 'package:skyshare_frontend_mobile/features/phase_lunar/presentation/phase_lunar_screen.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'features/dashboard/providers/dashboard_provider.dart';
@@ -46,7 +49,6 @@ Future<void> main() async {
       print('[DEBUG] DEV_EMAIL o DEV_PASSWORD no están definidas en el .env. Comprueba el fichero .env');
     }
   }
-
   
   runApp(MyApp(supabase: supabase));
 }
@@ -85,6 +87,12 @@ class MyApp extends StatelessWidget {
         Provider<location_repository_map.LocationRepository>(
           create: (ctx) => location_repository_map.LocationRepository(),
         ),
+        Provider<AuthRepository>(
+          create: (ctx) => AuthRepository(client: ctx.read<SupabaseClient>()),
+        ),
+        ChangeNotifierProvider<AuthProvider>(
+          create: (ctx) => AuthProvider(authRepo: ctx.read<AuthRepository>()),
+        ),
         ChangeNotifierProvider(
           create: (ctx) => InteractiveMapProvider(
             locationRepository: ctx.read<location_repository_map.LocationRepository>()
@@ -109,11 +117,27 @@ class MyApp extends StatelessWidget {
           useMaterial3: true,
           scaffoldBackgroundColor: const Color(0xFF0A0E27),
         ),
-        home: const RootApp(),
+        home: const AuthWrapper(),
       ),
     );
   }
 }
+
+class AuthWrapper extends StatelessWidget {
+  const AuthWrapper({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final authProvider = context.watch<AuthProvider>();
+    if (authProvider.isLoggedIn) {
+      return const RootApp();
+    } 
+    else {
+      return const AuthScreen();
+    }
+  }
+}
+
 
 class RootApp extends StatefulWidget {
   const RootApp({super.key});
