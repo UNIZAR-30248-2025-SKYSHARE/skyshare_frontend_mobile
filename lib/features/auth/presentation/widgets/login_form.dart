@@ -51,32 +51,6 @@ class _LoginFormState extends State<LoginForm> {
     }
   }
 
-  Future<void> _resetPassword() async {
-    if (_emailController.text.isEmpty) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Please enter your email address')),
-        );
-      }
-      return;
-    }
-
-    try {
-      await Provider.of<AuthProvider>(context, listen: false).resetPassword(_emailController.text.trim());
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Password reset email sent')),
-        );
-      }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: ${e.toString()}')),
-        );
-      }
-    }
-  }
-
   Future<void> _signInWithGoogle() async {
     try {
       await Provider.of<AuthProvider>(context, listen: false).signInWithGoogle();
@@ -102,17 +76,10 @@ class _LoginFormState extends State<LoginForm> {
             key: _formKey,
             child: Column(
               children: [
-                _buildInput(_emailController, 'Email', TextInputType.emailAddress),
+                _buildEmailInput(),
                 const SizedBox(height: 14),
-                _buildInput(_passwordController, 'Password', TextInputType.visiblePassword, obscure: true),
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: TextButton(
-                    onPressed: _isLoading ? null : _resetPassword,
-                    child: const Text('Forgot password?', style: TextStyle(color: Colors.white70)),
-                  ),
-                ),
-                const SizedBox(height: 6),
+                _buildPasswordInput(),
+                const SizedBox(height: 20),
                 PrimaryButton(
                   label: 'Login',
                   onPressed: _isLoading ? null : _submit,
@@ -148,15 +115,14 @@ class _LoginFormState extends State<LoginForm> {
     );
   }
 
-  Widget _buildInput(TextEditingController controller, String hint, TextInputType type, {bool obscure = false}) {
+  Widget _buildEmailInput() {
     return TextFormField(
-      controller: controller,
-      keyboardType: type,
-      obscureText: obscure,
+      controller: _emailController,
+      keyboardType: TextInputType.emailAddress,
       enabled: !_isLoading,
       style: const TextStyle(color: Colors.white),
       decoration: InputDecoration(
-        hintText: hint,
+        hintText: 'Email',
         hintStyle: const TextStyle(color: Colors.white54),
         filled: true,
         fillColor: Colors.white.withAlpha((0.03 * 255).round()),
@@ -168,9 +134,67 @@ class _LoginFormState extends State<LoginForm> {
           borderRadius: BorderRadius.circular(10), 
           borderSide: const BorderSide(color: Colors.white54)
         ),
+        errorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+          borderSide: const BorderSide(color: Colors.red),
+        ),
+        focusedErrorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+          borderSide: const BorderSide(color: Colors.red),
+        ),
         contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 14),
       ),
-      validator: (v) => (v == null || v.isEmpty) ? 'Required' : null,
+      validator: (value) {
+        if (value == null || value.isEmpty) {
+          return 'Email is required';
+        }
+        final emailRegex = RegExp(r'^[^@]+@[^@]+\.[^@]+');
+        if (!emailRegex.hasMatch(value)) {
+          return 'Please enter a valid email';
+        }
+        return null;
+      },
+    );
+  }
+
+  Widget _buildPasswordInput() {
+    return TextFormField(
+      controller: _passwordController,
+      obscureText: true,
+      enabled: !_isLoading,
+      style: const TextStyle(color: Colors.white),
+      decoration: InputDecoration(
+        hintText: 'Password',
+        hintStyle: const TextStyle(color: Colors.white54),
+        filled: true,
+        fillColor: Colors.white.withAlpha((0.03 * 255).round()),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10), 
+          borderSide: const BorderSide(color: Colors.white24)
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10), 
+          borderSide: const BorderSide(color: Colors.white54)
+        ),
+        errorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+          borderSide: const BorderSide(color: Colors.red),
+        ),
+        focusedErrorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+          borderSide: const BorderSide(color: Colors.red),
+        ),
+        contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 14),
+      ),
+      validator: (value) {
+        if (value == null || value.isEmpty) {
+          return 'Password is required';
+        }
+        if (value.length < 6) {
+          return 'Password must be at least 6 characters';
+        }
+        return null;
+      },
     );
   }
 }

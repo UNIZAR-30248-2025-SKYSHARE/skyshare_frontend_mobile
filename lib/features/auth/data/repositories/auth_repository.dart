@@ -72,17 +72,12 @@ class AuthRepository {
     );
   }
 
-  Future<void> resetPassword(String email) async {
-    await _client.auth.resetPasswordForEmail(email);
-  }
-
   Stream<AuthState> get authStateChanges => _client.auth.onAuthStateChange;
 
   void _startAuthListener() {
     _authSub = _client.auth.onAuthStateChange.listen((event) async {
       final e = event.event;
       final session = event.session;
-      // FIX: Removed string comparison, only use enum
       if (e == AuthChangeEvent.signedIn && _expectingOAuthSignIn) {
         final user = session?.user;
         if (user != null) {

@@ -79,11 +79,11 @@ class _RegisterFormState extends State<RegisterForm> {
             key: _formKey,
             child: Column(
               children: [
-                _buildInput(_nameController, 'Name', TextInputType.name),
+                _buildNameInput(),
                 const SizedBox(height: 12),
-                _buildInput(_emailController, 'Email', TextInputType.emailAddress),
+                _buildEmailInput(),
                 const SizedBox(height: 12),
-                _buildInput(_passwordController, 'Password', TextInputType.visiblePassword, obscure: true),
+                _buildPasswordInput(),
                 const SizedBox(height: 16),
                 PrimaryButton(
                   label: 'Register',
@@ -119,15 +119,14 @@ class _RegisterFormState extends State<RegisterForm> {
     );
   }
 
-  Widget _buildInput(TextEditingController controller, String hint, TextInputType type, {bool obscure = false}) {
+  Widget _buildNameInput() {
     return TextFormField(
-      controller: controller,
-      keyboardType: type,
-      obscureText: obscure,
+      controller: _nameController,
+      keyboardType: TextInputType.name,
       enabled: !_isLoading,
       style: const TextStyle(color: Colors.white),
       decoration: InputDecoration(
-        hintText: hint,
+        hintText: 'Name',
         hintStyle: const TextStyle(color: Colors.white54),
         filled: true,
         fillColor: Colors.white.withAlpha((0.03 * 255).round()),
@@ -139,9 +138,114 @@ class _RegisterFormState extends State<RegisterForm> {
           borderRadius: BorderRadius.circular(10), 
           borderSide: const BorderSide(color: Colors.white54)
         ),
+        errorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+          borderSide: const BorderSide(color: Colors.red),
+        ),
+        focusedErrorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+          borderSide: const BorderSide(color: Colors.red),
+        ),
         contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 14),
       ),
-      validator: (v) => (v == null || v.isEmpty) ? 'Required' : null,
+      validator: (value) {
+        if (value == null || value.isEmpty) {
+          return 'Name is required';
+        }
+        if (value.length < 2) {
+          return 'Name must be at least 2 characters';
+        }
+        if (value.length > 50) {
+          return 'Name must be less than 50 characters';
+        }
+        return null;
+      },
+    );
+  }
+
+  Widget _buildEmailInput() {
+    return TextFormField(
+      controller: _emailController,
+      keyboardType: TextInputType.emailAddress,
+      enabled: !_isLoading,
+      style: const TextStyle(color: Colors.white),
+      decoration: InputDecoration(
+        hintText: 'Email',
+        hintStyle: const TextStyle(color: Colors.white54),
+        filled: true,
+        fillColor: Colors.white.withAlpha((0.03 * 255).round()),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10), 
+          borderSide: const BorderSide(color: Colors.white24)
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10), 
+          borderSide: const BorderSide(color: Colors.white54)
+        ),
+        errorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+          borderSide: const BorderSide(color: Colors.red),
+        ),
+        focusedErrorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+          borderSide: const BorderSide(color: Colors.red),
+        ),
+        contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 14),
+      ),
+      validator: (value) {
+        if (value == null || value.isEmpty) {
+          return 'Email is required';
+        }
+        final emailRegex = RegExp(r'^[^@]+@[^@]+\.[^@]+');
+        if (!emailRegex.hasMatch(value)) {
+          return 'Please enter a valid email';
+        }
+        return null;
+      },
+    );
+  }
+
+  Widget _buildPasswordInput() {
+    return TextFormField(
+      controller: _passwordController,
+      obscureText: true,
+      enabled: !_isLoading,
+      style: const TextStyle(color: Colors.white),
+      decoration: InputDecoration(
+        hintText: 'Password',
+        hintStyle: const TextStyle(color: Colors.white54),
+        filled: true,
+        fillColor: Colors.white.withAlpha((0.03 * 255).round()),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10), 
+          borderSide: const BorderSide(color: Colors.white24)
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10), 
+          borderSide: const BorderSide(color: Colors.white54)
+        ),
+        errorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+          borderSide: const BorderSide(color: Colors.red),
+        ),
+        focusedErrorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+          borderSide: const BorderSide(color: Colors.red),
+        ),
+        contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 14),
+      ),
+      validator: (value) {
+        if (value == null || value.isEmpty) {
+          return 'Password is required';
+        }
+        if (value.length < 6) {
+          return 'Password must be at least 6 characters';
+        }
+        if (value.length > 128) {
+          return 'Password must be less than 128 characters';
+        }
+        return null;
+      },
     );
   }
 }

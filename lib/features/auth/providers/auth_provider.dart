@@ -49,10 +49,6 @@ class AuthProvider with ChangeNotifier {
     await _authRepo.signInWithGoogle();
   }
 
-  Future<void> resetPassword(String email) async {
-    await _authRepo.resetPassword(email);
-  }
-
   @override
   void dispose() {
     _authRepo.dispose();
