@@ -1,0 +1,68 @@
+name: CI — build, tests & coverage
+
+on:
+  push:
+    branches: ['develop']
+  pull_request:
+    branches: ['develop']
+  workflow_dispatch: {}
+
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Cache pub/Gradle
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.pub-cache
+            ~/.gradle/caches
+          key: ${{ runner.os }}-pub-${{ hashFiles('**/pubspec.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-pub-
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: 'stable'
+
+      - name: Flutter pub get
+        run: flutter pub get
+
+      - name: Build app (release)
+        run: flutter build apk --release
+
+      - name: Install lcov
+        run: sudo apt-get update && sudo apt-get install -y lcov
+
+      - name: Run tests and generate lcov
+        run: flutter test --coverage
+
+      - name: Generate HTML coverage report
+        run: |
+          if [ -f coverage/lcov.info ]; then
+            genhtml coverage/lcov.info -o coverage/html || true
+          else
+            echo "coverage/lcov.info no encontrado"
+            exit 1
+          fi
+
+      - name: List coverage files
+        run: |
+          ls -la coverage || true
+          ls -la coverage/html || true
+
+      - name: Upload lcov.info artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-lcov
+          path: coverage/lcov.info
+
+      - name: Upload HTML coverage artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-html
+          path: coverage/html
