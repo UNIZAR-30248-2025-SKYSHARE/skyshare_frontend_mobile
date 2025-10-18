@@ -2,7 +2,7 @@
 import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import '../repositories/notification_repository.dart';
+import '../data/repositories/notification_repository.dart';
 
 class OneSignalService {
   static final OneSignalService _instance = OneSignalService._internal();

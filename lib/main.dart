@@ -6,7 +6,7 @@ import 'package:skyshare_frontend_mobile/features/auth/data/repositories/auth_re
 import 'package:skyshare_frontend_mobile/features/auth/presentation/auth_screen.dart';
 import 'package:skyshare_frontend_mobile/features/auth/providers/auth_provider.dart';
 import 'package:skyshare_frontend_mobile/features/phase_lunar/presentation/phase_lunar_screen.dart';
-import 'package:skyshare_frontend_mobile/features/push_notifications/data/services/one_signal_service.dart';
+import 'package:skyshare_frontend_mobile/features/push_notifications/services/one_signal_service.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'features/dashboard/providers/dashboard_provider.dart';
 import 'features/dashboard/presentation/dashboard_screen.dart';
