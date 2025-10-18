@@ -42,3 +42,12 @@ android {
 flutter {
     source = "../.."
 }
+
+// Apply Google Services only when google-services.json is present to avoid build failures.
+val googleServicesJson = file("google-services.json")
+if (googleServicesJson.exists()) {
+    apply(plugin = "com.google.gms.google-services")
+    println("[Gradle] Google Services plugin applied: google-services.json found in android/app")
+} else {
+    println("[Gradle] WARNING: google-services.json not found in android/app. FCM/OneSignal push won't register a token; playerId will be null.")
+}

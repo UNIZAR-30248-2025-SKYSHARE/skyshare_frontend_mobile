@@ -1,4 +1,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     
@@ -40,6 +42,15 @@
         <meta-data
             android:name="flutterEmbedding"
             android:value="2" />
+        
+        <!-- OneSignal App ID -->
+        <meta-data
+            android:name="onesignal_app_id"
+            android:value="15a2d5e7-2d6c-4526-b666-6a2a00f2117b" />
+        <!-- OneSignal Google Project Number (REMOTE = use FCM configured in OneSignal Dashboard) -->
+        <meta-data
+            android:name="onesignal_google_project_number"
+            android:value="REMOTE" />
     </application>
     <!-- Required to query activities that can process text, see:
          https://developer.android.com/training/package-visibility and
