@@ -36,9 +36,11 @@ class _LoginFormState extends State<LoginForm> {
           password: _passwordController.text,
         );
       } catch (e) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: ${e.toString()}')),
-        );
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Error: ${e.toString()}')),
+          );
+        }
       } finally {
         if (mounted) {
           setState(() {
@@ -51,21 +53,27 @@ class _LoginFormState extends State<LoginForm> {
 
   Future<void> _resetPassword() async {
     if (_emailController.text.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please enter your email address')),
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Please enter your email address')),
+        );
+      }
       return;
     }
 
     try {
       await Provider.of<AuthProvider>(context, listen: false).resetPassword(_emailController.text.trim());
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Password reset email sent')),
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Password reset email sent')),
+        );
+      }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error: ${e.toString()}')),
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error: ${e.toString()}')),
+        );
+      }
     }
   }
 
@@ -73,9 +81,11 @@ class _LoginFormState extends State<LoginForm> {
     try {
       await Provider.of<AuthProvider>(context, listen: false).signInWithGoogle();
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error: ${e.toString()}')),
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error: ${e.toString()}')),
+        );
+      }
     }
   }
 
@@ -149,9 +159,15 @@ class _LoginFormState extends State<LoginForm> {
         hintText: hint,
         hintStyle: const TextStyle(color: Colors.white54),
         filled: true,
-        fillColor: Colors.white.withOpacity(0.03),
-        enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide(color: Colors.white24)),
-        focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide(color: Colors.white54)),
+        fillColor: Colors.white.withAlpha((0.03 * 255).round()),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10), 
+          borderSide: const BorderSide(color: Colors.white24)
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10), 
+          borderSide: const BorderSide(color: Colors.white54)
+        ),
         contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 14),
       ),
       validator: (v) => (v == null || v.isEmpty) ? 'Required' : null,

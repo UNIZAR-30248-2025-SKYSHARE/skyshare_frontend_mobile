@@ -34,12 +34,12 @@ class SunMoonHeader extends StatelessWidget {
                     ),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.amber.withOpacity(0.22),
+                        color: Colors.amber.withAlpha((0.22 * 255).round()),
                         blurRadius: glow,
                         spreadRadius: glow * 0.25,
                       ),
                       BoxShadow(
-                        color: Colors.orange.withOpacity(0.07),
+                        color: Colors.orange.withAlpha((0.07 * 255).round()),
                         blurRadius: glow * 4,
                         spreadRadius: glow,
                       ),
@@ -56,7 +56,7 @@ class SunMoonHeader extends StatelessWidget {
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 gradient: RadialGradient(
-                  colors: [Colors.amber.withOpacity(0.12), Colors.transparent],
+                  colors: [Colors.amber.withAlpha((0.12 * 255).round()), Colors.transparent],
                   stops: const [0.0, 1.0],
                 ),
               ),
@@ -73,7 +73,7 @@ class SunMoonHeader extends StatelessWidget {
                   color: Colors.black,
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.yellow.shade700.withOpacity(0.9 - (page * 0.7)),
+                      color: Colors.yellow.shade700.withAlpha(((0.9 - (page * 0.7)) * 255).round()),
                       blurRadius: 8,
                       spreadRadius: 1,
                     ),
@@ -99,7 +99,7 @@ class _MoonRimPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     final rimPaint = Paint()
       ..shader = RadialGradient(
-        colors: [Colors.yellow.shade100.withOpacity(0.9 * (1 - progress)), Colors.transparent],
+        colors: [Colors.yellow.shade100.withAlpha(((0.9 * (1 - progress)) * 255).round()), Colors.transparent],
         stops: const [0.0, 1.0],
       ).createShader(Rect.fromCircle(center: Offset(size.width * 0.1, size.height * 0.5), radius: size.width * 0.7));
 

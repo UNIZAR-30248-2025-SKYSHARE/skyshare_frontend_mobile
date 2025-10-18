@@ -82,7 +82,8 @@ class AuthRepository {
     _authSub = _client.auth.onAuthStateChange.listen((event) async {
       final e = event.event;
       final session = event.session;
-      if ((e == AuthChangeEvent.signedIn || e == 'SIGNED_IN') && _expectingOAuthSignIn) {
+      // FIX: Removed string comparison, only use enum
+      if (e == AuthChangeEvent.signedIn && _expectingOAuthSignIn) {
         final user = session?.user;
         if (user != null) {
           await _ensureUserInDb(user);

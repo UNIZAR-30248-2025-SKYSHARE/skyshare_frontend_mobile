@@ -39,9 +39,11 @@ class _RegisterFormState extends State<RegisterForm> {
           username: _nameController.text.trim(),
         );
       } catch (e) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: ${e.toString()}')),
-        );
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Error: ${e.toString()}')),
+          );
+        }
       } finally {
         if (mounted) {
           setState(() {
@@ -56,9 +58,11 @@ class _RegisterFormState extends State<RegisterForm> {
     try {
       await Provider.of<AuthProvider>(context, listen: false).signInWithGoogle();
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error: ${e.toString()}')),
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error: ${e.toString()}')),
+        );
+      }
     }
   }
 
@@ -126,9 +130,15 @@ class _RegisterFormState extends State<RegisterForm> {
         hintText: hint,
         hintStyle: const TextStyle(color: Colors.white54),
         filled: true,
-        fillColor: Colors.white.withOpacity(0.03),
-        enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide(color: Colors.white24)),
-        focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide(color: Colors.white54)),
+        fillColor: Colors.white.withAlpha((0.03 * 255).round()),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10), 
+          borderSide: const BorderSide(color: Colors.white24)
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10), 
+          borderSide: const BorderSide(color: Colors.white54)
+        ),
         contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 14),
       ),
       validator: (v) => (v == null || v.isEmpty) ? 'Required' : null,
