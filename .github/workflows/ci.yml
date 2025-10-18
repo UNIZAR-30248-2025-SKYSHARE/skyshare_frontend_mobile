@@ -2,9 +2,9 @@ name: CI — build, tests & coverage
 
 on:
   push:
-    branches: ['develop', 'ci/integration']
+    branches: ['develop']
   pull_request:
-    branches: ['develop', 'ci/integration']
+    branches: ['develop']
   workflow_dispatch: {}
 
 jobs:
