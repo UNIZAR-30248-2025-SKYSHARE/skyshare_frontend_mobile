@@ -75,6 +75,7 @@ class LocationRepository {
             id_ubicacion, 
             nombre, 
             descripcion, 
+            url_imagen,      
             ubicacion(*),
             valoracion(puntuacion)
           ''')

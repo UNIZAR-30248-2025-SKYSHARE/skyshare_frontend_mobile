@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:skyshare_frontend_mobile/features/auth/data/repositories/auth_repository.dart';
@@ -26,6 +27,8 @@ Future<void> main() async {
   await dotenv.load();
   await SupabaseService.instance.init();
   final supabase = SupabaseService.instance.client;
+
+  SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
 
   if (kDebugMode) {
     final devEmail = dotenv.env['DEV_EMAIL'];
