@@ -16,40 +16,93 @@ class LunarPhaseProvider extends ChangeNotifier {
   bool isLoading = false;
   String? error;
   int? currentLocationId;
+  int _retryCount = 0;
+  static const int _maxRetries = 5;
+  bool _dataLoaded = false;
 
   Future<void> loadNext7Days() async {
     isLoading = true;
     error = null;
+    _retryCount = 0;
+    _dataLoaded = false;
     notifyListeners();
 
     try {
       currentLocationId = await locationRepo.getCurrentLocationId();
       if (currentLocationId == null) {
-        throw Exception('No location found for user');
+        await _waitForLocation();
+        currentLocationId = await locationRepo.getCurrentLocationId();
+        
+        if (currentLocationId == null) {
+          throw Exception('No location found for user');
+        }
       }
 
-      final fetched = await lunarPhaseRepo.fetchNext7DaysSimple(currentLocationId!);
+      await _loadLunarDataWithRetry();
 
-      phases = fetched.map((d) {
-        return LunarPhase(
-          idLuna: d.idLuna,
-          idUbicacion: d.idUbicacion,
-          fase: (d.fase.isNotEmpty) ? d.fase : 'Unknown phase',
-          fecha: d.fecha,
-          porcentajeIluminacion: (d.porcentajeIluminacion ?? 0).toDouble(),
-          edadLunar: d.edadLunar,
-          horaSalida: d.horaSalida,
-          horaPuesta: d.horaPuesta,
-          altitudActual: d.altitudActual,
-          proximaFase: d.proximaFase,
-        );
-      }).toList();
     } catch (e) {
       phases = [];
       error = e.toString();
-    } finally {
       isLoading = false;
       notifyListeners();
+    }
+  }
+
+  Future<void> _loadLunarDataWithRetry() async {
+    while (_retryCount < _maxRetries) {
+      try {
+        final fetched = await lunarPhaseRepo.fetchNext7DaysSimple(currentLocationId!);
+
+        if (fetched.isNotEmpty) {
+          phases = fetched.map((d) {
+            return LunarPhase(
+              idLuna: d.idLuna,
+              idUbicacion: d.idUbicacion,
+              fase: (d.fase.isNotEmpty) ? d.fase : 'Unknown phase',
+              fecha: d.fecha,
+              porcentajeIluminacion: (d.porcentajeIluminacion ?? 0).toDouble(),
+              edadLunar: d.edadLunar,
+              horaSalida: d.horaSalida,
+              horaPuesta: d.horaPuesta,
+              altitudActual: d.altitudActual,
+              proximaFase: d.proximaFase,
+            );
+          }).toList();
+          _dataLoaded = true;
+          isLoading = false;
+          notifyListeners();
+          return;
+        }
+
+        _retryCount++;
+        if (_retryCount < _maxRetries) {
+          final delay = Duration(seconds: 2 * (1 << (_retryCount - 1)));
+          await Future.delayed(delay);
+        }
+      } catch (e) {
+        _retryCount++;
+        if (_retryCount >= _maxRetries) {
+          phases = [];
+          error = 'No se pudieron cargar las fases lunares después de $_maxRetries intentos';
+          isLoading = false;
+          notifyListeners();
+          return;
+        }
+        final delay = Duration(seconds: 2 * (1 << (_retryCount - 1)));
+        await Future.delayed(delay);
+      }
+    }
+    
+    isLoading = false;
+    notifyListeners();
+  }
+
+  Future<void> _waitForLocation() async {
+    int attempts = 0;
+    while (currentLocationId == null && attempts < 10) {
+      await Future.delayed(const Duration(milliseconds: 500));
+      currentLocationId = await locationRepo.getCurrentLocationId();
+      attempts++;
     }
   }
 
@@ -69,6 +122,8 @@ class LunarPhaseProvider extends ChangeNotifier {
     error = null;
     isLoading = false;
     currentLocationId = null;
+    _retryCount = 0;
+    _dataLoaded = false;
     notifyListeners();
   }
 
@@ -76,5 +131,9 @@ class LunarPhaseProvider extends ChangeNotifier {
     if (currentLocationId != null) {
       await loadNext7Days();
     }
+  }
+
+  bool get shouldShowRetry {
+    return !isLoading && currentLocationId != null && !_dataLoaded && _retryCount >= _maxRetries;
   }
 }

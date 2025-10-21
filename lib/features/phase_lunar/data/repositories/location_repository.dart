@@ -13,7 +13,7 @@ class LocationRepository {
 
     final resp = await client
         .from('usuarioubicacion')
-        .select('id_ubicacion(id_ubicacion)')
+        .select('id_ubicacion, fecha_registro')
         .eq('id_usuario', uid)
         .order('fecha_registro', ascending: false)
         .limit(1)
@@ -21,13 +21,12 @@ class LocationRepository {
 
     if (resp == null) return null;
 
-    final nested = (resp)['id_ubicacion'];
-    if (nested == null) return null;
-
-    final id = nested['id_ubicacion'];
-    if (id is int) return id;
-    if (id is String) return int.tryParse(id);
-    if (id is num) return id.toInt();
+    final map = Map<String, dynamic>.from(resp as Map);
+    final idField = map['id_ubicacion'];
+    if (idField == null) return null;
+    if (idField is int) return idField;
+    if (idField is String) return int.tryParse(idField);
+    if (idField is num) return idField.toInt();
     return null;
   }
 
@@ -37,32 +36,38 @@ class LocationRepository {
 
     final resp = await client
         .from('usuarioubicacion')
-        .select('id_ubicacion(id_ubicacion, nombre, latitud, longitud), fecha_registro')
+        .select('''
+          id_ubicacion,
+          ubicacion:id_ubicacion(id_ubicacion, nombre, latitud, longitud, pais)
+        ''')
         .eq('id_usuario', uid)
         .order('fecha_registro', ascending: false);
 
     final list = (resp as List).cast<Map<String, dynamic>>();
 
     final normalized = list.map((row) {
-      final ubic = (row['id_ubicacion'] as Map).cast<String, dynamic>();
-      final id = ubic['id_ubicacion'];
+      final ubicacionData = row['ubicacion'] as Map<String, dynamic>?;
+      if (ubicacionData == null) return null;
+      
+      final id = ubicacionData['id_ubicacion'];
       int? idInt;
       if (id is int) {
         idInt = id;
       } else if (id is String) {
         idInt = int.tryParse(id);
-      }
-      else if (id is num) {
+      } else if (id is num) {
         idInt = id.toInt();
       }
+      
       return {
         'id_ubicacion': idInt,
-        'nombre': ubic['nombre'],
-        'latitud': ubic['latitud'],
-        'longitud': ubic['longitud'],
+        'nombre': ubicacionData['nombre'],
+        'latitud': ubicacionData['latitud'],
+        'longitud': ubicacionData['longitud'],
+        'pais': ubicacionData['pais'],
         'fecha_registro': row['fecha_registro'],
       };
-    }).toList();
+    }).where((item) => item != null).cast<Map<String, dynamic>>().toList();
 
     return normalized;
   }
