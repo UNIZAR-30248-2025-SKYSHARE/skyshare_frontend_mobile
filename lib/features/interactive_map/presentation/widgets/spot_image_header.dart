@@ -17,7 +17,7 @@ class SpotImageHeader extends StatelessWidget {
       leading: Padding(
         padding: const EdgeInsets.only(left: 8),
         child: CircleAvatar(
-          backgroundColor: Colors.black.withOpacity(0.5),
+          backgroundColor: Colors.black.withValues(alpha: 0.5),
           child: IconButton(
             icon: const Icon(Icons.arrow_back, color: Colors.white),
             onPressed: () => Navigator.pop(context),
@@ -46,7 +46,8 @@ class SpotImageHeader extends StatelessWidget {
                         ),
                       );
                     },
-                    errorBuilder: (_, __, ___) => _buildPlaceholderImage(),
+                    errorBuilder: (context, error, stackTrace) =>
+                        _buildPlaceholderImage(),
                   )
                 : _buildPlaceholderImage(),
           ),
@@ -61,8 +62,9 @@ class SpotImageHeader extends StatelessWidget {
                   begin: Alignment.bottomCenter,
                   end: Alignment.topCenter,
                   colors: [
-                    const Color(0xFF13121A).withOpacity(0.9),
-                    const Color(0xFF13121A).withOpacity(0.1),
+                    // aquí también reemplazamos withOpacity
+                    const Color(0xFF13121A).withValues(alpha: 0.9),
+                    const Color(0xFF13121A).withValues(alpha: 0.1),
                     Colors.transparent,
                   ],
                 ),

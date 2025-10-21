@@ -176,7 +176,7 @@ class SpotContent extends StatelessWidget {
             author: c['author']!,
             time: c['time']!,
           );
-        }).toList(),
+        }),
       ],
     );
   }
