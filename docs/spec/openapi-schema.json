@@ -1455,6 +1455,124 @@
         },
         "tags": ["cielo_visible"]
       },
+      "/alerta": {
+        "get": {
+          "parameters": [
+            { "$ref": "#/parameters/rowFilter.alerta.id_alerta" },
+            { "$ref": "#/parameters/rowFilter.alerta.id_usuario" },
+            { "$ref": "#/parameters/rowFilter.alerta.id_ubicacion" },
+            { "$ref": "#/parameters/rowFilter.alerta.tipo_alerta" },
+            { "$ref": "#/parameters/rowFilter.alerta.tipo_repeticion" },
+            { "$ref": "#/parameters/rowFilter.alerta.activa" },
+            { "$ref": "#/parameters/select" },
+            { "$ref": "#/parameters/order" },
+            { "$ref": "#/parameters/range" },
+            { "$ref": "#/parameters/rangeUnit" },
+            { "$ref": "#/parameters/offset" },
+            { "$ref": "#/parameters/limit" },
+            { "$ref": "#/parameters/preferCount" }
+          ],
+          "responses": {
+            "200": {
+              "description": "OK. Returns a list of alerts for the user.",
+              "schema": { "type": "array", "items": { "$ref": "#/definitions/alerta" } },
+              "examples": {
+                "application/json": [
+                  {
+                    "id_alerta": 2,
+                    "id_usuario": "da8ceff9-3860-483d-ba99-4e8c8b8669d4",
+                    "id_ubicacion": 57,
+                    "tipo_alerta": "FASE_LUNAR",
+                    "parametro_objetivo": "Waxing Crescent",
+                    "tipo_repeticion": "UNICA",
+                    "fecha_objetivo": null,
+                    "hora_objetivo": null,
+                    "valor_minimo": null,
+                    "valor_maximo": null,
+                    "activa": true,
+                    "fecha_creacion": "2025-10-21T20:23:57",
+                    "ultima_notificacion": null
+                  }
+                ]
+              }
+            }
+          },
+          "tags": ["alerta"]
+        },
+        "post": {
+          "parameters": [
+            { "$ref": "#/parameters/body.alerta" },
+            { "$ref": "#/parameters/select" },
+            { "$ref": "#/parameters/preferPost" }
+          ],
+          "responses": {
+            "201": {
+              "description": "Created. Returns the created alert.",
+              "schema": { "$ref": "#/definitions/alerta" },
+              "examples": {
+                "application/json": {
+                  "id_alerta": 3,
+                  "id_usuario": "da8ceff9-3860-483d-ba99-4e8c8b8669d4",
+                  "id_ubicacion": 57,
+                  "tipo_alerta": "CONSTELACIONES",
+                  "parametro_objetivo": "Orion",
+                  "tipo_repeticion": "SEMANAL",
+                  "fecha_objetivo": null,
+                  "hora_objetivo": "00:00:00",
+                  "valor_minimo": null,
+                  "valor_maximo": null,
+                  "activa": true,
+                  "fecha_creacion": "2025-10-22T09:00:00",
+                  "ultima_notificacion": null
+                }
+              }
+            }
+          },
+          "tags": ["alerta"]
+        },
+        "patch": {
+          "parameters": [
+            { "$ref": "#/parameters/rowFilter.alerta.id_alerta" },
+            { "$ref": "#/parameters/body.alerta" },
+            { "$ref": "#/parameters/preferReturn" }
+          ],
+          "responses": {
+            "204": { "description": "No Content. Update accepted." },
+            "200": {
+              "description": "Optional: returns updated resource when `Prefer: return=representation` is used.",
+              "schema": { "$ref": "#/definitions/alerta" },
+              "examples": {
+                "application/json": {
+                  "id_alerta": 2,
+                  "id_usuario": "da8ceff9-3860-483d-ba99-4e8c8b8669d4",
+                  "id_ubicacion": 57,
+                  "tipo_alerta": "FASE_LUNAR",
+                  "parametro_objetivo": "Waxing Crescent",
+                  "tipo_repeticion": "UNICA",
+                  "fecha_objetivo": "2025-10-24",
+                  "hora_objetivo": "08:00:00",
+                  "valor_minimo": null,
+                  "valor_maximo": null,
+                  "activa": true,
+                  "fecha_creacion": "2025-10-21T20:23:57",
+                  "ultima_notificacion": null
+                }
+              }
+            }
+          },
+          "tags": ["alerta"]
+        },
+        "delete": {
+          "parameters": [
+            { "$ref": "#/parameters/rowFilter.alerta.id_alerta" },
+            { "$ref": "#/parameters/preferReturn" }
+          ],
+          "responses": {
+            "204": { "description": "No Content. Alert deleted." }
+          },
+          "tags": ["alerta"]
+        }
+      },
       "post": {
         "parameters": [
           {
@@ -1930,6 +2048,95 @@
         "nombre": "Jupiter",
         "descripcion": "Visible in the east just after sunset.",
         "ultima_actualizacion": "2025-10-08T21:30:00Z"
+      }
+    }
+    ,
+    "alerta": {
+      "required": ["id_alerta","id_usuario","tipo_alerta"],
+      "properties": {
+        "id_alerta": {
+          "description": "Primary key for the alerta record.",
+          "format": "integer",
+          "type": "integer"
+        },
+        "id_usuario": {
+          "description": "Foreign key to usuario.id_usuario (UUID).",
+          "format": "uuid",
+          "type": "string"
+        },
+        "id_ubicacion": {
+          "description": "Foreign key to ubicacion.id_ubicacion.",
+          "format": "integer",
+          "type": "integer"
+        },
+        "tipo_alerta": {
+          "description": "Type of alert. Example values: FASE_LUNAR, CONSTELACIONES, EVENTO, PERSONALIZADA.",
+          "type": "string",
+          "maxLength": 50
+        },
+        "parametro_objetivo": {
+          "description": "Optional parameter for target matching, e.g. 'Waxing Crescent' for lunar phase or a constellation name.",
+          "type": "string",
+          "maxLength": 100
+        },
+        "tipo_repeticion": {
+          "description": "Repetition type: UNICA, SEMANAL, MENSUAL.",
+          "type": "string",
+          "maxLength": 20,
+          "default": "UNICA",
+          "enum": ["UNICA","SEMANAL","MENSUAL"]
+        },
+        "fecha_objetivo": {
+          "description": "Target date for one-time alerts (ISO date yyyy-mm-dd).",
+          "format": "date",
+          "type": "string"
+        },
+        "hora_objetivo": {
+          "description": "Target time for the alert (HH:MM:SS).",
+          "format": "time",
+          "type": "string"
+        },
+        "valor_minimo": {
+          "description": "Optional numeric lower bound (example: magnitude).",
+          "format": "numeric",
+          "type": "number"
+        },
+        "valor_maximo": {
+          "description": "Optional numeric upper bound.",
+          "format": "numeric",
+          "type": "number"
+        },
+        "activa": {
+          "description": "Whether the alert is active.",
+          "type": "boolean",
+          "default": true
+        },
+        "fecha_creacion": {
+          "description": "Creation timestamp.",
+          "format": "date-time",
+          "type": "string"
+        },
+        "ultima_notificacion": {
+          "description": "Timestamp of the last notification sent for this alert.",
+          "format": "date-time",
+          "type": "string"
+        }
+      },
+      "type": "object",
+      "example": {
+        "id_alerta": 2,
+        "id_usuario": "da8ceff9-3860-483d-ba99-4e8c8b8669d4",
+        "id_ubicacion": 57,
+        "tipo_alerta": "FASE_LUNAR",
+        "parametro_objetivo": "Waxing Crescent",
+        "tipo_repeticion": "UNICA",
+        "fecha_objetivo": null,
+        "hora_objetivo": null,
+        "valor_minimo": null,
+        "valor_maximo": null,
+        "activa": true,
+        "fecha_creacion": "2025-10-21T20:23:57",
+        "ultima_notificacion": null
       }
     }
   },
@@ -2480,6 +2687,52 @@
     },
     "rowFilter.cielo_visible.ultima_actualizacion": {
       "name": "ultima_actualizacion",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    }
+    ,
+    "body.alerta": {
+      "name": "alerta",
+      "description": "alerta",
+      "required": false,
+      "in": "body",
+      "schema": {
+        "$ref": "#/definitions/alerta"
+      }
+    },
+    "rowFilter.alerta.id_alerta": {
+      "name": "id_alerta",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.alerta.id_usuario": {
+      "name": "id_usuario",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.alerta.id_ubicacion": {
+      "name": "id_ubicacion",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.alerta.tipo_alerta": {
+      "name": "tipo_alerta",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.alerta.tipo_repeticion": {
+      "name": "tipo_repeticion",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.alerta.activa": {
+      "name": "activa",
       "required": false,
       "in": "query",
       "type": "string"
