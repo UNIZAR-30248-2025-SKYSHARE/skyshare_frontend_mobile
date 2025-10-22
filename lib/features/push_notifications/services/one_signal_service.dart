@@ -1,18 +1,21 @@
-// lib/features/push_notifications/data/services/one_signal_service.dart
 import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../data/repositories/notification_repository.dart';
+import 'one_signal_wrapper.dart';
 
 class OneSignalService {
   static final OneSignalService _instance = OneSignalService._internal();
-  factory OneSignalService() => _instance;
+  factory OneSignalService({IOneSignalWrapper? wrapper}) {
+    _instance._wrapper = wrapper ?? OneSignalWrapper();
+    return _instance;
+  }
 
   OneSignalService._internal();
 
+  late IOneSignalWrapper _wrapper;
   bool _initialized = false;
 
-  /// Inicializa el SDK de OneSignal (SDK 5.x)
   Future<void> init() async {
     if (_initialized) return;
 
@@ -24,17 +27,11 @@ class OneSignalService {
 
     try {
       print('[OneSignal] Initializing SDK with appId=$appId');
-      
-      // Nivel de logs (opcional)
-      OneSignal.Debug.setLogLevel(OSLogLevel.verbose);
-      
-      // Inicializa OneSignal (v5)
-      OneSignal.initialize(appId);
-      
+      _wrapper.setLogLevel(OSLogLevel.verbose);
+      _wrapper.initialize(appId);
       print('[OneSignal] Initialized OK');
 
-      // Observer v5: escuchar cambios en la suscripción push (playerId/token/optedIn)
-      OneSignal.User.pushSubscription.addObserver((OSPushSubscriptionChangedState state) {
+      _wrapper.addPushSubscriptionObserver((OSPushSubscriptionChangedState state) {
         try {
           final current = state.current;
           final previous = state.previous;
@@ -56,7 +53,7 @@ class OneSignalService {
           print('[OneSignal] pushSubscription observer ERROR: $e\n$st');
         }
       });
-      
+
       _initialized = true;
     } catch (e, st) {
       print('[OneSignal] Initialize ERROR: $e\n$st');
@@ -64,21 +61,19 @@ class OneSignalService {
     }
   }
 
-  /// Pide permiso al usuario para recibir notificaciones (opcional en Android)
   Future<void> requestPermission() async {
     try {
       print('[OneSignal] Requesting push permission...');
-      final accepted = await OneSignal.Notifications.requestPermission(true);
+      final accepted = await _wrapper.requestPermission();
       print('[OneSignal] Permission granted? $accepted');
     } catch (e, st) {
       print('[OneSignal] Request permission ERROR: $e\n$st');
     }
   }
 
-  /// Devuelve el playerId del dispositivo
   Future<String?> getPlayerId() async {
     try {
-      final id = OneSignal.User.pushSubscription.id;
+      final id = _wrapper.getPlayerId();
       print('[OneSignal] Current playerId: $id');
       return id;
     } catch (e, st) {
@@ -87,7 +82,6 @@ class OneSignalService {
     }
   }
 
-  /// Envía el playerId a Supabase
   Future<void> sendPlayerId(SupabaseClient client, String userId) async {
     try {
       final playerId = await getPlayerId();
@@ -95,6 +89,7 @@ class OneSignalService {
         print('[OneSignal] sendPlayerId skipped: playerId is null/empty');
         return;
       }
+
       print('[OneSignal] Sending playerId to Supabase. userId=$userId, playerId=$playerId');
       await NotificationRepository(client: client).updatePlayerId(
         userId: userId,
