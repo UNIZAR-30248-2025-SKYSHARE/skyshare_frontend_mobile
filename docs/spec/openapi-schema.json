@@ -95,104 +95,17 @@
                 "all_spots": [
                   {
                     "id_spot": 1,
-                    "id_usuario_creador": 10,
+                    "id_usuario_creador": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
                     "id_ubicacion": 3,
                     "nombre": "Mirador del Teide",
                     "descripcion": "High-altitude viewpoint on Tenerife (approx. 2,300 m). Very low light pollution and excellent horizon visibility. Ideal for astrophotography; dress warmly at night."
                   },
                   {
                     "id_spot": 2,
-                    "id_usuario_creador": 11,
+                    "id_usuario_creador": "b2c3d4e5-f6g7-8901-bcde-f23456789012",
                     "id_ubicacion": 12,
                     "nombre": "Montsec Astronomical Park",
                     "descripcion": "Certified Starlight Reserve with an observatory and public viewing areas. Outstanding sky quality, especially in winter and summer evenings."
-                  }
-                ]
-              }
-            },
-            "x-examples": {
-              "buscar_por_nombre": {
-                "summary": "Buscar spots por nombre",
-                "description": "Obtener spots que contengan 'Teide' en el nombre",
-                "dart_code": "final response = await supabase\n  .from('spot')\n  .select()\n  .ilike('nombre', '%Teide%');",
-                "response": [
-                  {
-                    "id_spot": 1,
-                    "nombre": "Mirador del Teide",
-                    "descripcion": "High-altitude viewpoint..."
-                  }
-                ]
-              },
-              "filtrar_por_valoracion": {
-                "summary": "Filtrar spots con 3+ estrellas",
-                "description": "Obtener spots con valoración promedio >= 3 (requiere vista o cálculo)",
-                "dart_code": "final response = await supabase\n  .from('spot')\n  .select('*, valoracion(puntuacion)')\n  .gte('valoracion_promedio', 3);",
-                "note": "Requiere una vista 'spot_con_valoracion' o cálculo agregado",
-                "response": [
-                  {
-                    "id_spot": 1,
-                    "nombre": "Mirador del Teide",
-                    "valoracion_promedio": 4.5
-                  }
-                ]
-              },
-              "filtrar_por_ubicacion": {
-                "summary": "Filtrar spots en una ubicación específica",
-                "description": "Obtener spots de una ubicación concreta",
-                "dart_code": "final response = await supabase\n  .from('spot')\n  .select()\n  .eq('id_ubicacion', 3);",
-                "response": [
-                  {
-                    "id_spot": 1,
-                    "id_ubicacion": 3,
-                    "nombre": "Mirador del Teide"
-                  }
-                ]
-              },
-              "spots_cercanos_radio": {
-                "summary": "Spots dentro de un radio (búsqueda geográfica)",
-                "description": "Obtener spots en un radio de 50km desde coordenadas",
-                "dart_code": "final response = await supabase\n  .rpc('spots_cerca', params: {\n    'lat': 40.416775,\n    'lon': -3.70379,\n    'radio_km': 50\n  });",
-                "note": "Requiere función RPC 'spots_cerca' en la base de datos",
-                "response": [
-                  {
-                    "id_spot": 5,
-                    "nombre": "Sierra de Guadarrama",
-                    "distancia_km": 35.2
-                  }
-                ]
-              },
-              "ordenar_por_nombre": {
-                "summary": "Ordenar spots alfabéticamente",
-                "description": "Obtener todos los spots ordenados por nombre",
-                "dart_code": "final response = await supabase\n  .from('spot')\n  .select()\n  .order('nombre', ascending: true);",
-                "response": [
-                  {
-                    "id_spot": 3,
-                    "nombre": "Cabo de Gata - Playa de los Genoveses"
-                  },
-                  {
-                    "id_spot": 1,
-                    "nombre": "Mirador del Teide"
-                  }
-                ]
-              },
-              "limitar_resultados": {
-                "summary": "Limitar número de resultados",
-                "description": "Obtener solo los primeros 10 spots",
-                "dart_code": "final response = await supabase\n  .from('spot')\n  .select()\n  .limit(10);",
-                "response": [
-                  {"id_spot": 1, "nombre": "Mirador del Teide"},
-                  {"id_spot": 2, "nombre": "Montsec Astronomical Park"}
-                ]
-              },
-              "filtros_combinados": {
-                "summary": "Combinar múltiples filtros",
-                "description": "Buscar por nombre y ordenar resultados",
-                "dart_code": "final response = await supabase\n  .from('spot')\n  .select()\n  .ilike('nombre', '%Sierra%')\n  .order('nombre', ascending: true)\n  .limit(5);",
-                "response": [
-                  {
-                    "id_spot": 15,
-                    "nombre": "Sierra de Guadarrama - Mirador"
                   }
                 ]
               }
@@ -227,16 +140,10 @@
             "examples": {
               "application/json": {
                 "id_spot": 15,
-                "id_usuario_creador": 10,
+                "id_usuario_creador": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
                 "id_ubicacion": 45,
                 "nombre": "Sierra de Guadarrama - Mirador",
                 "descripcion": "Mountain viewpoint (~1,800 m) with wide horizons; popular for winter constellation observing and meteor showers. Access by car; check snow conditions in winter."
-              }
-            },
-            "x-examples": {
-              "crear_spot": {
-                "summary": "Crear un nuevo spot",
-                "dart_code": "final response = await supabase\n  .from('spot')\n  .insert({\n    'id_usuario_creador': 10,\n    'id_ubicacion': 45,\n    'nombre': 'Sierra de Guadarrama - Mirador',\n    'descripcion': 'Mountain viewpoint...'\n  })\n  .select()\n  .single();"
               }
             }
           }
@@ -278,16 +185,10 @@
             "examples": {
               "application/json": {
                 "id_spot": 1,
-                "id_usuario_creador": 10,
+                "id_usuario_creador": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
                 "id_ubicacion": 3,
                 "nombre": "Mirador del Teide",
                 "descripcion": "High-altitude viewpoint on Tenerife. Updated visitor facilities and improved signage as of 2025; continue to follow local access rules."
-              }
-            },
-            "x-examples": {
-              "actualizar_spot": {
-                "summary": "Actualizar un spot existente",
-                "dart_code": "final response = await supabase\n  .from('spot')\n  .update({\n    'descripcion': 'Nueva descripción actualizada'\n  })\n  .eq('id_spot', 1)\n  .select()\n  .single();"
               }
             }
           },
@@ -322,13 +223,7 @@
         ],
         "responses": {
           "204": {
-            "description": "No Content. Spot deleted.",
-            "x-examples": {
-              "eliminar_spot": {
-                "summary": "Eliminar un spot",
-                "dart_code": "await supabase\n  .from('spot')\n  .delete()\n  .eq('id_spot', 1);"
-              }
-            }
+            "description": "No Content. Spot deleted."
           }
         },
         "tags": [
@@ -350,6 +245,27 @@
           },
           {
             "$ref": "#/parameters/rowFilter.fase_lunar.porcentaje_iluminacion"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.fase_lunar.edad_lunar"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.fase_lunar.hora_salida"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.fase_lunar.azimut_salida"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.fase_lunar.hora_puesta"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.fase_lunar.azimut_puesta"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.fase_lunar.altitud_actual"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.fase_lunar.proxima_fase"
           },
           {
             "$ref": "#/parameters/rowFilter.fase_lunar.fecha"
@@ -383,24 +299,7 @@
               "type": "array",
               "items": {
                 "$ref": "#/definitions/fase_lunar"
-              },
-              "example": [
-                {
-                  "id_luna": 1,
-                  "id_ubicacion": 1,
-                  "fase": "Luna llena",
-                  "porcentaje_iluminacion": 100,
-                  "edad_lunar": 15,
-                  "hora_salida": "18:45:00",
-                  "azimut_salida": 96.32,
-                  "hora_puesta": "06:55:00",
-                  "azimut_puesta": 263.47,
-                  "altitud_actual": 65.2,
-                  "proxima_fase": "Cuarto menguante",
-                  "fecha_proxima_fase": "2025-10-24",
-                  "fecha": "2025-10-17"
-                }
-              ]
+              }
             }
           },
           "206": {
@@ -425,23 +324,7 @@
         ],
         "responses": {
           "201": {
-            "description": "Created",
-            "examples": {
-              "application/json": {
-                "id_ubicacion": 1,
-                "fase": "Luna nueva",
-                "porcentaje_iluminacion": 0,
-                "edad_lunar": 0,
-                "hora_salida": "07:46:00",
-                "azimut_salida": 90.25,
-                "hora_puesta": "19:34:00",
-                "azimut_puesta": 270.4,
-                "altitud_actual": 0,
-                "proxima_fase": "Cuarto creciente",
-                "fecha_proxima_fase": "2025-10-09",
-                "fecha": "2025-10-02"
-              }
-            }
+            "description": "Created"
           }
         },
         "tags": [
@@ -463,6 +346,27 @@
             "$ref": "#/parameters/rowFilter.fase_lunar.porcentaje_iluminacion"
           },
           {
+            "$ref": "#/parameters/rowFilter.fase_lunar.edad_lunar"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.fase_lunar.hora_salida"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.fase_lunar.azimut_salida"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.fase_lunar.hora_puesta"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.fase_lunar.azimut_puesta"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.fase_lunar.altitud_actual"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.fase_lunar.proxima_fase"
+          },
+          {
             "$ref": "#/parameters/rowFilter.fase_lunar.fecha"
           },
           {
@@ -471,12 +375,7 @@
         ],
         "responses": {
           "204": {
-            "description": "No Content",
-            "examples": {
-              "application/json": {
-                "message": "Fase lunar eliminada correctamente"
-              }
-            }
+            "description": "No Content"
           }
         },
         "tags": [
@@ -498,6 +397,27 @@
             "$ref": "#/parameters/rowFilter.fase_lunar.porcentaje_iluminacion"
           },
           {
+            "$ref": "#/parameters/rowFilter.fase_lunar.edad_lunar"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.fase_lunar.hora_salida"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.fase_lunar.azimut_salida"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.fase_lunar.hora_puesta"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.fase_lunar.azimut_puesta"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.fase_lunar.altitud_actual"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.fase_lunar.proxima_fase"
+          },
+          {
             "$ref": "#/parameters/rowFilter.fase_lunar.fecha"
           },
           {
@@ -509,13 +429,7 @@
         ],
         "responses": {
           "204": {
-            "description": "No Content",
-            "examples": {
-              "application/json": {
-                "porcentaje_iluminacion": 99.85,
-                "mensaje": "Actualización correcta"
-              }
-            }
+            "description": "No Content"
           }
         },
         "tags": [
@@ -699,29 +613,6 @@
               "items": {
                 "$ref": "#/definitions/usuarioubicacion"
               }
-            },
-            "examples": {
-              "application/json": [
-                {
-                  "id_usuario": 42,
-                  "id_ubicacion": 1,
-                  "fecha_registro": "2025-10-08"
-                }
-              ]
-            },
-            "x-examples": {
-              "sampleAssociations": [
-                {
-                  "id_usuario": 42,
-                  "id_ubicacion": 1,
-                  "fecha_registro": "2025-10-08"
-                },
-                {
-                  "id_usuario": 43,
-                  "id_ubicacion": 10,
-                  "fecha_registro": "2025-09-01"
-                }
-              ]
             }
           }
         },
@@ -738,20 +629,6 @@
             "required": true,
             "schema": {
               "$ref": "#/definitions/usuarioubicacion"
-            },
-            "examples": {
-              "application/json": {
-                "id_usuario": 42,
-                "id_ubicacion": 1,
-                "fecha_registro": "2025-10-08"
-              }
-            },
-            "x-examples": {
-              "linkUserToPlace": {
-                "id_usuario": 42,
-                "id_ubicacion": 1,
-                "fecha_registro": "2025-10-08"
-              }
             }
           },
           {
@@ -766,13 +643,6 @@
             "description": "Created. Returns the created association.",
             "schema": {
               "$ref": "#/definitions/usuarioubicacion"
-            },
-            "examples": {
-              "application/json": {
-                "id_usuario": 42,
-                "id_ubicacion": 1,
-                "fecha_registro": "2025-10-08"
-              }
             }
           }
         },
@@ -795,16 +665,6 @@
             "required": true,
             "schema": {
               "$ref": "#/definitions/usuarioubicacion"
-            },
-            "examples": {
-              "application/json": {
-                "fecha_registro": "2025-10-09"
-              }
-            },
-            "x-examples": {
-              "updateDate": {
-                "fecha_registro": "2025-10-09"
-              }
             }
           },
           {
@@ -896,42 +756,6 @@
               "items": {
                 "$ref": "#/definitions/ubicacion"
               }
-            },
-            "examples": {
-              "application/json": [
-                {
-                  "id_ubicacion": 1,
-                  "latitud": 40.416775,
-                  "longitud": -3.70379,
-                  "nombre": "Retiro Park",
-                  "pais": "Spain"
-                },
-                {
-                  "id_ubicacion": 10,
-                  "latitud": 41,
-                  "longitud": 0,
-                  "nombre": "Zaragoza",
-                  "pais": "Spain"
-                }
-              ]
-            },
-            "x-examples": {
-              "sampleList": [
-                {
-                  "id_ubicacion": 1,
-                  "latitud": 40.416775,
-                  "longitud": -3.70379,
-                  "nombre": "Retiro Park",
-                  "pais": "Spain"
-                },
-                {
-                  "id_ubicacion": 10,
-                  "latitud": 41,
-                  "longitud": 0,
-                  "nombre": "Zaragoza",
-                  "pais": "Spain"
-                }
-              ]
             }
           }
         },
@@ -948,28 +772,6 @@
             "required": true,
             "schema": {
               "$ref": "#/definitions/ubicacion"
-            },
-            "examples": {
-              "application/json": {
-                "latitud": 40.416775,
-                "longitud": -3.70379,
-                "nombre": "New Spot",
-                "pais": "Spain"
-              }
-            },
-            "x-examples": {
-              "createMinimal": {
-                "latitud": 40.416775,
-                "longitud": -3.70379,
-                "nombre": "New Spot",
-                "pais": "Spain"
-              },
-              "createAtSea": {
-                "latitud": 36,
-                "longitud": -5,
-                "nombre": "Coastal View",
-                "pais": "Spain"
-              }
             }
           },
           {
@@ -984,24 +786,6 @@
             "description": "Created. Returns the created location.",
             "schema": {
               "$ref": "#/definitions/ubicacion"
-            },
-            "examples": {
-              "application/json": {
-                "id_ubicacion": 123,
-                "latitud": 40.416775,
-                "longitud": -3.70379,
-                "nombre": "New Spot",
-                "pais": "Spain"
-              }
-            },
-            "x-examples": {
-              "createdExample": {
-                "id_ubicacion": 123,
-                "latitud": 40.416775,
-                "longitud": -3.70379,
-                "nombre": "New Spot",
-                "pais": "Spain"
-              }
             }
           }
         },
@@ -1021,21 +805,6 @@
             "required": true,
             "schema": {
               "$ref": "#/definitions/ubicacion"
-            },
-            "examples": {
-              "application/json": {
-                "nombre": "Retiro Park - East",
-                "pais": "Spain"
-              }
-            },
-            "x-examples": {
-              "rename": {
-                "nombre": "Retiro Park - East"
-              },
-              "move": {
-                "latitud": 40.417,
-                "longitud": -3.704
-              }
             }
           },
           {
@@ -1047,15 +816,6 @@
             "description": "Optional: returns updated resource when `Prefer: return=representation` is used.",
             "schema": {
               "$ref": "#/definitions/ubicacion"
-            },
-            "examples": {
-              "application/json": {
-                "id_ubicacion": 1,
-                "latitud": 40.417,
-                "longitud": -3.704,
-                "nombre": "Retiro Park - East",
-                "pais": "Spain"
-              }
             }
           },
           "204": {
@@ -1080,15 +840,6 @@
             "description": "Optional: returns deleted resource when `Prefer: return=representation` is used.",
             "schema": {
               "$ref": "#/definitions/ubicacion"
-            },
-            "examples": {
-              "application/json": {
-                "id_ubicacion": 10,
-                "latitud": 41,
-                "longitud": 0,
-                "nombre": "Alagón",
-                "pais": "Spain"
-              }
             }
           },
           "204": {
@@ -1506,10 +1257,13 @@
             "$ref": "#/parameters/rowFilter.usuario.email"
           },
           {
-            "$ref": "#/parameters/rowFilter.usuario.contrasenia_hash"
+            "$ref": "#/parameters/rowFilter.usuario.url_foto"
           },
           {
-            "$ref": "#/parameters/rowFilter.usuario.url_foto"
+            "$ref": "#/parameters/rowFilter.usuario.created_at"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.usuario.player_id"
           },
           {
             "$ref": "#/parameters/select"
@@ -1584,10 +1338,13 @@
             "$ref": "#/parameters/rowFilter.usuario.email"
           },
           {
-            "$ref": "#/parameters/rowFilter.usuario.contrasenia_hash"
+            "$ref": "#/parameters/rowFilter.usuario.url_foto"
           },
           {
-            "$ref": "#/parameters/rowFilter.usuario.url_foto"
+            "$ref": "#/parameters/rowFilter.usuario.created_at"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.usuario.player_id"
           },
           {
             "$ref": "#/parameters/preferReturn"
@@ -1614,10 +1371,13 @@
             "$ref": "#/parameters/rowFilter.usuario.email"
           },
           {
-            "$ref": "#/parameters/rowFilter.usuario.contrasenia_hash"
+            "$ref": "#/parameters/rowFilter.usuario.url_foto"
           },
           {
-            "$ref": "#/parameters/rowFilter.usuario.url_foto"
+            "$ref": "#/parameters/rowFilter.usuario.created_at"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.usuario.player_id"
           },
           {
             "$ref": "#/parameters/body.usuario"
@@ -1696,47 +1456,6 @@
               "items": {
                 "$ref": "#/definitions/informacion_meteorologica"
               }
-            },
-            "examples": {
-              "application/json": [
-                {
-                  "id_info_meteorologica": 5,
-                  "id_ubicacion": 1,
-                  "temperatura": 12.3,
-                  "humedad": 68,
-                  "viento": 3.4,
-                  "nubosidad": 20,
-                  "contaminacion_luminica": 18.5,
-                  "indicador_general_sobre_el_cielo": 7.8,
-                  "ultima_actualizacion": "2025-10-08T21:30:00Z"
-                }
-              ]
-            },
-            "x-examples": {
-              "recentReadings": [
-                {
-                  "id_info_meteorologica": 5,
-                  "id_ubicacion": 1,
-                  "temperatura": 12.3,
-                  "humedad": 68,
-                  "viento": 3.4,
-                  "nubosidad": 20,
-                  "contaminacion_luminica": 18.5,
-                  "indicador_general_sobre_el_cielo": 7.8,
-                  "ultima_actualizacion": "2025-10-08T21:30:00Z"
-                },
-                {
-                  "id_info_meteorologica": 6,
-                  "id_ubicacion": 2,
-                  "temperatura": 7,
-                  "humedad": 82,
-                  "viento": 1.2,
-                  "nubosidad": 10,
-                  "contaminacion_luminica": 20,
-                  "indicador_general_sobre_el_cielo": 8.2,
-                  "ultima_actualizacion": "2025-10-08T20:00:00Z"
-                }
-              ]
             }
           }
         },
@@ -1753,37 +1472,6 @@
             "required": true,
             "schema": {
               "$ref": "#/definitions/informacion_meteorologica"
-            },
-            "examples": {
-              "application/json": {
-                "id_ubicacion": 1,
-                "temperatura": 10.5,
-                "humedad": 75,
-                "viento": 2.1,
-                "nubosidad": 15,
-                "contaminacion_luminica": 17,
-                "indicador_general_sobre_el_cielo": 8
-              }
-            },
-            "x-examples": {
-              "typicalReading": {
-                "id_ubicacion": 1,
-                "temperatura": 10.5,
-                "humedad": 75,
-                "viento": 2.1,
-                "nubosidad": 15,
-                "contaminacion_luminica": 17,
-                "indicador_general_sobre_el_cielo": 8
-              },
-              "nightReading": {
-                "id_ubicacion": 1,
-                "temperatura": 6.2,
-                "humedad": 90,
-                "viento": 0.5,
-                "nubosidad": 5,
-                "contaminacion_luminica": 18.2,
-                "indicador_general_sobre_el_cielo": 9
-              }
             }
           },
           {
@@ -1798,19 +1486,6 @@
             "description": "Created. Returns created weather info.",
             "schema": {
               "$ref": "#/definitions/informacion_meteorologica"
-            },
-            "examples": {
-              "application/json": {
-                "id_info_meteorologica": 77,
-                "id_ubicacion": 1,
-                "temperatura": 10.5,
-                "humedad": 75,
-                "viento": 2.1,
-                "nubosidad": 15,
-                "contaminacion_luminica": 17,
-                "indicador_general_sobre_el_cielo": 8,
-                "ultima_actualizacion": "2025-10-08T21:35:00Z"
-              }
             }
           }
         },
@@ -1830,21 +1505,6 @@
             "required": true,
             "schema": {
               "$ref": "#/definitions/informacion_meteorologica"
-            },
-            "examples": {
-              "application/json": {
-                "temperatura": 11,
-                "humedad": 70
-              }
-            },
-            "x-examples": {
-              "updateTemp": {
-                "temperatura": 11
-              },
-              "updateWindClouds": {
-                "viento": 4.2,
-                "nubosidad": 30
-              }
             }
           },
           {
@@ -1856,18 +1516,6 @@
             "description": "Optional: returns updated resource when `Prefer: return=representation` is used.",
             "schema": {
               "$ref": "#/definitions/informacion_meteorologica"
-            },
-            "examples": {
-              "application/json": {
-                "id_info_meteorologica": 77,
-                "id_ubicacion": 1,
-                "temperatura": 11,
-                "humedad": 70,
-                "viento": 2.1,
-                "nubosidad": 15,
-                "contaminacion_luminica": 17,
-                "indicador_general_sobre_el_cielo": 8
-              }
             }
           },
           "204": {
@@ -2094,44 +1742,130 @@
               "items": {
                 "$ref": "#/definitions/cielo_visible"
               }
-            },
-            "examples": {
-              "application/json": [
-                {
-                  "id_cielo_visible": 7,
-                  "id_ubicacion": 1,
-                  "tipo": "planet",
-                  "nombre": "Jupiter",
-                  "descripcion": "Visible after sunset",
-                  "ultima_actualizacion": "2025-10-08T21:30:00Z"
-                }
-              ]
-            },
-            "x-examples": {
-              "sightings": [
-                {
-                  "id_cielo_visible": 7,
-                  "id_ubicacion": 1,
-                  "tipo": "planet",
-                  "nombre": "Jupiter",
-                  "descripcion": "Visible after sunset",
-                  "ultima_actualizacion": "2025-10-08T21:30:00Z"
-                },
-                {
-                  "id_cielo_visible": 8,
-                  "id_ubicacion": 2,
-                  "tipo": "constellation",
-                  "nombre": "Orion",
-                  "descripcion": "High in the sky in winter",
-                  "ultima_actualizacion": "2025-10-08T00:00:00Z"
-                }
-              ]
             }
           }
         },
         "tags": [
           "cielo_visible"
         ]
+      },
+      "/alerta": {
+        "get": {
+          "parameters": [
+            { "$ref": "#/parameters/rowFilter.alerta.id_alerta" },
+            { "$ref": "#/parameters/rowFilter.alerta.id_usuario" },
+            { "$ref": "#/parameters/rowFilter.alerta.id_ubicacion" },
+            { "$ref": "#/parameters/rowFilter.alerta.tipo_alerta" },
+            { "$ref": "#/parameters/rowFilter.alerta.tipo_repeticion" },
+            { "$ref": "#/parameters/rowFilter.alerta.activa" },
+            { "$ref": "#/parameters/select" },
+            { "$ref": "#/parameters/order" },
+            { "$ref": "#/parameters/range" },
+            { "$ref": "#/parameters/rangeUnit" },
+            { "$ref": "#/parameters/offset" },
+            { "$ref": "#/parameters/limit" },
+            { "$ref": "#/parameters/preferCount" }
+          ],
+          "responses": {
+            "200": {
+              "description": "OK. Returns a list of alerts for the user.",
+              "schema": { "type": "array", "items": { "$ref": "#/definitions/alerta" } },
+              "examples": {
+                "application/json": [
+                  {
+                    "id_alerta": 2,
+                    "id_usuario": "da8ceff9-3860-483d-ba99-4e8c8b8669d4",
+                    "id_ubicacion": 57,
+                    "tipo_alerta": "FASE_LUNAR",
+                    "parametro_objetivo": "Waxing Crescent",
+                    "tipo_repeticion": "UNICA",
+                    "fecha_objetivo": null,
+                    "hora_objetivo": null,
+                    "valor_minimo": null,
+                    "valor_maximo": null,
+                    "activa": true,
+                    "fecha_creacion": "2025-10-21T20:23:57",
+                    "ultima_notificacion": null
+                  }
+                ]
+              }
+            }
+          },
+          "tags": ["alerta"]
+        },
+        "post": {
+          "parameters": [
+            { "$ref": "#/parameters/body.alerta" },
+            { "$ref": "#/parameters/select" },
+            { "$ref": "#/parameters/preferPost" }
+          ],
+          "responses": {
+            "201": {
+              "description": "Created. Returns the created alert.",
+              "schema": { "$ref": "#/definitions/alerta" },
+              "examples": {
+                "application/json": {
+                  "id_alerta": 3,
+                  "id_usuario": "da8ceff9-3860-483d-ba99-4e8c8b8669d4",
+                  "id_ubicacion": 57,
+                  "tipo_alerta": "CONSTELACIONES",
+                  "parametro_objetivo": "Orion",
+                  "tipo_repeticion": "SEMANAL",
+                  "fecha_objetivo": null,
+                  "hora_objetivo": "00:00:00",
+                  "valor_minimo": null,
+                  "valor_maximo": null,
+                  "activa": true,
+                  "fecha_creacion": "2025-10-22T09:00:00",
+                  "ultima_notificacion": null
+                }
+              }
+            }
+          },
+          "tags": ["alerta"]
+        },
+        "patch": {
+          "parameters": [
+            { "$ref": "#/parameters/rowFilter.alerta.id_alerta" },
+            { "$ref": "#/parameters/body.alerta" },
+            { "$ref": "#/parameters/preferReturn" }
+          ],
+          "responses": {
+            "204": { "description": "No Content. Update accepted." },
+            "200": {
+              "description": "Optional: returns updated resource when `Prefer: return=representation` is used.",
+              "schema": { "$ref": "#/definitions/alerta" },
+              "examples": {
+                "application/json": {
+                  "id_alerta": 2,
+                  "id_usuario": "da8ceff9-3860-483d-ba99-4e8c8b8669d4",
+                  "id_ubicacion": 57,
+                  "tipo_alerta": "FASE_LUNAR",
+                  "parametro_objetivo": "Waxing Crescent",
+                  "tipo_repeticion": "UNICA",
+                  "fecha_objetivo": "2025-10-24",
+                  "hora_objetivo": "08:00:00",
+                  "valor_minimo": null,
+                  "valor_maximo": null,
+                  "activa": true,
+                  "fecha_creacion": "2025-10-21T20:23:57",
+                  "ultima_notificacion": null
+                }
+              }
+            }
+          },
+          "tags": ["alerta"]
+        },
+        "delete": {
+          "parameters": [
+            { "$ref": "#/parameters/rowFilter.alerta.id_alerta" },
+            { "$ref": "#/parameters/preferReturn" }
+          ],
+          "responses": {
+            "204": { "description": "No Content. Alert deleted." }
+          },
+          "tags": ["alerta"]
+        }
       },
       "post": {
         "parameters": [
@@ -2142,28 +1876,6 @@
             "required": true,
             "schema": {
               "$ref": "#/definitions/cielo_visible"
-            },
-            "examples": {
-              "application/json": {
-                "id_ubicacion": 1,
-                "tipo": "planet",
-                "nombre": "Jupiter",
-                "descripcion": "Visible in the east just after sunset"
-              }
-            },
-            "x-examples": {
-              "planetSighting": {
-                "id_ubicacion": 1,
-                "tipo": "planet",
-                "nombre": "Jupiter",
-                "descripcion": "Visible in the east just after sunset"
-              },
-              "meteorShower": {
-                "id_ubicacion": 1,
-                "tipo": "phenomenon",
-                "nombre": "Perseids",
-                "descripcion": "Peak visibility around August 12"
-              }
             }
           },
           {
@@ -2178,16 +1890,6 @@
             "description": "Created. Returns created visible-sky object.",
             "schema": {
               "$ref": "#/definitions/cielo_visible"
-            },
-            "examples": {
-              "application/json": {
-                "id_cielo_visible": 99,
-                "id_ubicacion": 1,
-                "tipo": "planet",
-                "nombre": "Jupiter",
-                "descripcion": "Visible in the east just after sunset",
-                "ultima_actualizacion": "2025-10-08T21:40:00Z"
-              }
             }
           }
         },
@@ -2207,20 +1909,6 @@
             "required": true,
             "schema": {
               "$ref": "#/definitions/cielo_visible"
-            },
-            "examples": {
-              "application/json": {
-                "descripcion": "Now visible at low altitude"
-              }
-            },
-            "x-examples": {
-              "updateDescription": {
-                "descripcion": "Now visible at low altitude"
-              },
-              "changeType": {
-                "tipo": "satellite",
-                "nombre": "ISS"
-              }
             }
           },
           {
@@ -2278,8 +1966,8 @@
         },
         "id_usuario_creador": {
           "description": "Note:\nThis is a Foreign Key to `usuario.id_usuario`.<fk table='usuario' column='id_usuario'/>",
-          "format": "integer",
-          "type": "integer"
+          "format": "uuid",
+          "type": "string"
         },
         "id_ubicacion": {
           "description": "Note:\nThis is a Foreign Key to `ubicacion.id_ubicacion`.<fk table='ubicacion' column='id_ubicacion'/>",
@@ -2330,6 +2018,34 @@
           "format": "numeric",
           "type": "number"
         },
+        "edad_lunar": {
+          "format": "numeric",
+          "type": "number"
+        },
+        "hora_salida": {
+          "format": "time",
+          "type": "string"
+        },
+        "azimut_salida": {
+          "format": "numeric",
+          "type": "number"
+        },
+        "hora_puesta": {
+          "format": "time",
+          "type": "string"
+        },
+        "azimut_puesta": {
+          "format": "numeric",
+          "type": "number"
+        },
+        "altitud_actual": {
+          "format": "numeric",
+          "type": "number"
+        },
+        "proxima_fase": {
+          "format": "character varying",
+          "type": "string"
+        },
         "fecha": {
           "format": "date",
           "type": "string"
@@ -2345,8 +2061,8 @@
       "properties": {
         "id_usuario": {
           "description": "Note:\nThis is a Primary Key.<pk/>\nThis is a Foreign Key to `usuario.id_usuario`.<fk table='usuario' column='id_usuario'/>",
-          "format": "integer",
-          "type": "integer"
+          "format": "uuid",
+          "type": "string"
         },
         "id_spot": {
           "description": "Note:\nThis is a Primary Key.<pk/>\nThis is a Foreign Key to `spot.id_spot`.<fk table='spot' column='id_spot'/>",
@@ -2372,8 +2088,8 @@
       "properties": {
         "id_usuario": {
           "description": "Foreign key to usuario.id_usuario.",
-          "format": "integer",
-          "type": "integer"
+          "format": "uuid",
+          "type": "string"
         },
         "id_ubicacion": {
           "description": "Foreign key to ubicacion.id_ubicacion.",
@@ -2386,12 +2102,7 @@
           "type": "string"
         }
       },
-      "type": "object",
-      "example": {
-        "id_usuario": 42,
-        "id_ubicacion": 1,
-        "fecha_registro": "2025-10-08"
-      }
+      "type": "object"
     },
     "ubicacion": {
       "required": [
@@ -2426,13 +2137,7 @@
           "type": "string"
         }
       },
-      "type": "object",
-      "example": {
-        "latitud": 40.416775,
-        "longitud": -3.70379,
-        "nombre": "Retiro Park",
-        "pais": "Spain"
-      }
+      "type": "object"
     },
     "usuariogrupo": {
       "required": [
@@ -2442,8 +2147,8 @@
       "properties": {
         "id_usuario": {
           "description": "Note:\nThis is a Primary Key.<pk/>\nThis is a Foreign Key to `usuario.id_usuario`.<fk table='usuario' column='id_usuario'/>",
-          "format": "integer",
-          "type": "integer"
+          "format": "uuid",
+          "type": "string"
         },
         "id_grupo": {
           "description": "Note:\nThis is a Primary Key.<pk/>\nThis is a Foreign Key to `grupoobservacion.id_grupo`.<fk table='grupoobservacion' column='id_grupo'/>",
@@ -2497,13 +2202,13 @@
       "properties": {
         "id_seguidor": {
           "description": "Note:\nThis is a Primary Key.<pk/>\nThis is a Foreign Key to `usuario.id_usuario`.<fk table='usuario' column='id_usuario'/>",
-          "format": "integer",
-          "type": "integer"
+          "format": "uuid",
+          "type": "string"
         },
         "id_seguido": {
           "description": "Note:\nThis is a Primary Key.<pk/>\nThis is a Foreign Key to `usuario.id_usuario`.<fk table='usuario' column='id_usuario'/>",
-          "format": "integer",
-          "type": "integer"
+          "format": "uuid",
+          "type": "string"
         },
         "fecha_seguimiento": {
           "format": "date",
@@ -2516,14 +2221,13 @@
       "required": [
         "id_usuario",
         "nombre_usuario",
-        "email",
-        "contrasenia_hash"
+        "email"
       ],
       "properties": {
         "id_usuario": {
           "description": "Note:\nThis is a Primary Key.<pk/>",
-          "format": "integer",
-          "type": "integer"
+          "format": "uuid",
+          "type": "string"
         },
         "nombre_usuario": {
           "format": "character varying",
@@ -2533,12 +2237,16 @@
           "format": "character varying",
           "type": "string"
         },
-        "contrasenia_hash": {
-          "format": "character varying",
+        "url_foto": {
+          "format": "text",
           "type": "string"
         },
-        "url_foto": {
-          "format": "character varying",
+        "created_at": {
+          "format": "timestamp with time zone",
+          "type": "string"
+        },
+        "player_id": {
+          "format": "text",
           "type": "string"
         }
       },
@@ -2597,16 +2305,7 @@
           "type": "string"
         }
       },
-      "type": "object",
-      "example": {
-        "id_ubicacion": 1,
-        "temperatura": 12.3,
-        "humedad": 68,
-        "viento": 3.4,
-        "nubosidad": 20,
-        "contaminacion_luminica": 18.5,
-        "indicador_general_sobre_el_cielo": 7.8
-      }
+      "type": "object"
     },
     "comentario": {
       "required": [
@@ -2623,8 +2322,8 @@
         },
         "id_usuario": {
           "description": "Note:\nThis is a Foreign Key to `usuario.id_usuario`.<fk table='usuario' column='id_usuario'/>",
-          "format": "integer",
-          "type": "integer"
+          "format": "uuid",
+          "type": "string"
         },
         "id_spot": {
           "description": "Note:\nThis is a Foreign Key to `spot.id_spot`.<fk table='spot' column='id_spot'/>",
@@ -2662,14 +2361,7 @@
         },
         "tipo": {
           "description": "Type of visible object. Example values: 'star','planet','constellation','phenomenon','satellite'.",
-          "type": "string",
-          "enum": [
-            "star",
-            "planet",
-            "constellation",
-            "phenomenon",
-            "satellite"
-          ]
+          "type": "string"
         },
         "nombre": {
           "description": "Name or identifier of the object (e.g. 'Jupiter', 'Orion').",
@@ -2686,13 +2378,95 @@
           "type": "string"
         }
       },
+      "type": "object"
+    }
+    ,
+    "alerta": {
+      "required": ["id_alerta","id_usuario","tipo_alerta"],
+      "properties": {
+        "id_alerta": {
+          "description": "Primary key for the alerta record.",
+          "format": "integer",
+          "type": "integer"
+        },
+        "id_usuario": {
+          "description": "Foreign key to usuario.id_usuario (UUID).",
+          "format": "uuid",
+          "type": "string"
+        },
+        "id_ubicacion": {
+          "description": "Foreign key to ubicacion.id_ubicacion.",
+          "format": "integer",
+          "type": "integer"
+        },
+        "tipo_alerta": {
+          "description": "Type of alert. Example values: FASE_LUNAR, CONSTELACIONES, EVENTO, PERSONALIZADA.",
+          "type": "string",
+          "maxLength": 50
+        },
+        "parametro_objetivo": {
+          "description": "Optional parameter for target matching, e.g. 'Waxing Crescent' for lunar phase or a constellation name.",
+          "type": "string",
+          "maxLength": 100
+        },
+        "tipo_repeticion": {
+          "description": "Repetition type: UNICA, SEMANAL, MENSUAL.",
+          "type": "string",
+          "maxLength": 20,
+          "default": "UNICA",
+          "enum": ["UNICA","SEMANAL","MENSUAL"]
+        },
+        "fecha_objetivo": {
+          "description": "Target date for one-time alerts (ISO date yyyy-mm-dd).",
+          "format": "date",
+          "type": "string"
+        },
+        "hora_objetivo": {
+          "description": "Target time for the alert (HH:MM:SS).",
+          "format": "time",
+          "type": "string"
+        },
+        "valor_minimo": {
+          "description": "Optional numeric lower bound (example: magnitude).",
+          "format": "numeric",
+          "type": "number"
+        },
+        "valor_maximo": {
+          "description": "Optional numeric upper bound.",
+          "format": "numeric",
+          "type": "number"
+        },
+        "activa": {
+          "description": "Whether the alert is active.",
+          "type": "boolean",
+          "default": true
+        },
+        "fecha_creacion": {
+          "description": "Creation timestamp.",
+          "format": "date-time",
+          "type": "string"
+        },
+        "ultima_notificacion": {
+          "description": "Timestamp of the last notification sent for this alert.",
+          "format": "date-time",
+          "type": "string"
+        }
+      },
       "type": "object",
       "example": {
-        "id_ubicacion": 1,
-        "tipo": "planet",
-        "nombre": "Jupiter",
-        "descripcion": "Visible in the east just after sunset.",
-        "ultima_actualizacion": "2025-10-08T21:30:00Z"
+        "id_alerta": 2,
+        "id_usuario": "da8ceff9-3860-483d-ba99-4e8c8b8669d4",
+        "id_ubicacion": 57,
+        "tipo_alerta": "FASE_LUNAR",
+        "parametro_objetivo": "Waxing Crescent",
+        "tipo_repeticion": "UNICA",
+        "fecha_objetivo": null,
+        "hora_objetivo": null,
+        "valor_minimo": null,
+        "valor_maximo": null,
+        "activa": true,
+        "fecha_creacion": "2025-10-21T20:23:57",
+        "ultima_notificacion": null
       }
     }
   },
@@ -2859,6 +2633,48 @@
     },
     "rowFilter.fase_lunar.porcentaje_iluminacion": {
       "name": "porcentaje_iluminacion",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.fase_lunar.edad_lunar": {
+      "name": "edad_lunar",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.fase_lunar.hora_salida": {
+      "name": "hora_salida",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.fase_lunar.azimut_salida": {
+      "name": "azimut_salida",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.fase_lunar.hora_puesta": {
+      "name": "hora_puesta",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.fase_lunar.azimut_puesta": {
+      "name": "azimut_puesta",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.fase_lunar.altitud_actual": {
+      "name": "altitud_actual",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.fase_lunar.proxima_fase": {
+      "name": "proxima_fase",
       "required": false,
       "in": "query",
       "type": "string"
@@ -3088,14 +2904,20 @@
       "in": "query",
       "type": "string"
     },
-    "rowFilter.usuario.contrasenia_hash": {
-      "name": "contrasenia_hash",
+    "rowFilter.usuario.url_foto": {
+      "name": "url_foto",
       "required": false,
       "in": "query",
       "type": "string"
     },
-    "rowFilter.usuario.url_foto": {
-      "name": "url_foto",
+    "rowFilter.usuario.created_at": {
+      "name": "created_at",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.usuario.player_id": {
+      "name": "player_id",
       "required": false,
       "in": "query",
       "type": "string"
@@ -3243,6 +3065,52 @@
     },
     "rowFilter.cielo_visible.ultima_actualizacion": {
       "name": "ultima_actualizacion",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    }
+    ,
+    "body.alerta": {
+      "name": "alerta",
+      "description": "alerta",
+      "required": false,
+      "in": "body",
+      "schema": {
+        "$ref": "#/definitions/alerta"
+      }
+    },
+    "rowFilter.alerta.id_alerta": {
+      "name": "id_alerta",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.alerta.id_usuario": {
+      "name": "id_usuario",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.alerta.id_ubicacion": {
+      "name": "id_ubicacion",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.alerta.tipo_alerta": {
+      "name": "tipo_alerta",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.alerta.tipo_repeticion": {
+      "name": "tipo_repeticion",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.alerta.activa": {
+      "name": "activa",
       "required": false,
       "in": "query",
       "type": "string"

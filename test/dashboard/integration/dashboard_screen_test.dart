@@ -52,6 +52,16 @@ class TestDashboardProvider extends DashboardProvider {
   @override
   String? get errorMessage => _testErrorMessage;
 
+  bool _testLocationSyncCompleted = false;
+
+  @override
+  bool get locationSyncCompleted => _testLocationSyncCompleted;
+
+  void setTestLocationSyncCompleted(bool v) {
+    _testLocationSyncCompleted = v;
+    notifyListeners();
+  }
+
   void setTestLoading(bool v) {
     _testLoading = v;
     notifyListeners();
@@ -351,7 +361,7 @@ void main() {
       provider.detectCallback = () async {
         provider.setSelectedLocation(mockLocation);
         provider.setTestLoading(true);
-        provider.notifyListeners();
+        provider.setTestLocationSyncCompleted(true); 
       };
       await pump(tester);
       await tester.pump(const Duration(milliseconds: 100));

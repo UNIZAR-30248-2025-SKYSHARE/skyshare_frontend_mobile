@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:skyshare_frontend_mobile/features/phase_lunar/providers/lunar_phase_provider.dart';
 import 'package:skyshare_frontend_mobile/features/phase_lunar/data/models/lunar_phase_model.dart';
+import 'package:skyshare_frontend_mobile/features/dashboard/providers/dashboard_provider.dart';
 import 'widgets/moon_phase_widget.dart';
 import 'widgets/lunar_phase_item.dart';
 import '../../../core/widgets/star_background.dart';
@@ -15,33 +16,14 @@ class PhaseLunarScreen extends StatefulWidget {
 }
 
 class _PhaseLunarScreenState extends State<PhaseLunarScreen> {
-  String _locationName = 'Loading...';
-
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
       final provider = Provider.of<LunarPhaseProvider>(context, listen: false);
-      _loadLocationName();
       provider.loadNext7Days();
     });
-  }
-
-  Future<void> _loadLocationName() async {
-    try {
-      final provider = Provider.of<LunarPhaseProvider>(context, listen: false);
-      final locations = await provider.locationRepo.getSavedLocations();
-      if (locations.isNotEmpty) {
-        setState(() {
-          _locationName = locations.first['nombre'] as String? ?? 'Unknown location';
-        });
-      }
-    } catch (e) {
-      setState(() {
-        _locationName = 'Unknown location';
-      });
-    }
   }
 
   String _formatDate(DateTime d) =>
@@ -82,18 +64,83 @@ class _PhaseLunarScreenState extends State<PhaseLunarScreen> {
       child: Scaffold(
         backgroundColor: Colors.transparent,
         body: SafeArea(
-          child: Consumer<LunarPhaseProvider>(
-            builder: (context, provider, _) {
-              if (provider.isLoading) {
+          child: Consumer2<LunarPhaseProvider, DashboardProvider>(
+            builder: (context, lunarProvider, dashboardProvider, _) {
+              final locationName = dashboardProvider.selectedLocation?.name ?? 'Unknown location';
+
+              if (lunarProvider.isLoading) {
                 return const Center(child: CircularProgressIndicator());
               }
-              if (provider.error != null) {
-                return Center(child: Text('Error: ${provider.error}'));
+
+              if (lunarProvider.error != null) {
+                return Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Icon(Icons.error_outline, color: Colors.red, size: 48),
+                      const SizedBox(height: 16),
+                      Text(
+                        'Error: ${lunarProvider.error}',
+                        style: const TextStyle(color: Colors.white),
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 16),
+                      ElevatedButton(
+                        onPressed: () {
+                          lunarProvider.loadNext7Days();
+                        },
+                        child: const Text('Reintentar'),
+                      ),
+                    ],
+                  ),
+                );
               }
 
-              final phases = provider.phases;
-              if (phases.isEmpty) {
-                return const Center(child: Text('No lunar phases available'));
+              if (lunarProvider.shouldShowRetry) {
+                return Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Icon(Icons.nightlight_round, color: Colors.orange, size: 48),
+                      const SizedBox(height: 16),
+                      const Text(
+                        'Las fases lunares están tardando en cargar',
+                        style: TextStyle(color: Colors.white70),
+                      ),
+                      const SizedBox(height: 16),
+                      ElevatedButton(
+                        onPressed: () {
+                          lunarProvider.loadNext7Days();
+                        },
+                        child: const Text('Reintentar'),
+                      ),
+                    ],
+                  ),
+                );
+              }
+
+              final phases = lunarProvider.phases;
+              if (phases.isEmpty && !lunarProvider.isLoading) {
+                return Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Icon(Icons.nightlight_round, color: Colors.grey, size: 48),
+                      const SizedBox(height: 16),
+                      const Text(
+                        'No hay datos de fases lunares disponibles',
+                        style: TextStyle(color: Colors.white70),
+                      ),
+                      const SizedBox(height: 16),
+                      ElevatedButton(
+                        onPressed: () {
+                          lunarProvider.loadNext7Days();
+                        },
+                        child: const Text('Reintentar'),
+                      ),
+                    ],
+                  ),
+                );
               }
 
               final todayPhase = phases.first;
@@ -128,7 +175,7 @@ class _PhaseLunarScreenState extends State<PhaseLunarScreen> {
                             ),
                             const SizedBox(width: 4),
                             Text(
-                              _locationName,
+                              locationName,
                               style: const TextStyle(
                                 fontSize: 14,
                                 color: Colors.white70,

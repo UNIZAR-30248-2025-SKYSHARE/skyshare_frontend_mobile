@@ -8,7 +8,6 @@ class LocationRepository {
   LocationRepository({SupabaseClient? client}) : client = client ?? SupabaseService.instance.client;
 
   Future<Location?> fetchUserCurrentLocation(String? userId) async {
-
     final uid = userId ?? client.auth.currentUser?.id;
     if (uid == null) return null;
 
@@ -24,6 +23,19 @@ class LocationRepository {
     final ubicacionMap = map['ubicacion'] as Map<String, dynamic>?;
     if (ubicacionMap == null) return null;
     return Location.fromMap(ubicacionMap);
+  }
+
+  Future<Location?> findLocationByName(String name, String country) async {
+    final resp = await client
+        .from('ubicacion')
+        .select()
+        .eq('nombre', name)
+        .eq('pais', country)
+        .limit(1)
+        .maybeSingle();
+    
+    if (resp == null) return null;
+    return Location.fromMap(Map<String, dynamic>.from(resp as Map));
   }
 
   Future<Location?> createLocation({

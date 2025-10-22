@@ -36,7 +36,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   Future<void> _loadData() async {
     final provider = Provider.of<DashboardProvider>(context, listen: false);
-    await provider.loadDashboardData();
+    if (provider.selectedLocation != null) {
+      await provider.loadDashboardData();
+    } else {
+      await provider.detectAndSyncLocation();
+    }
   }
 
   @override
@@ -60,9 +64,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     const SizedBox(height: 16),
                     ElevatedButton(
                       onPressed: () {
-                        setState(() {
-                          _initialLoadCompleted = false;
-                        });
+                        provider.clearError();
                         _initializeData();
                       },
                       child: const Text('Reintentar'),
@@ -72,8 +74,35 @@ class _DashboardScreenState extends State<DashboardScreen> {
               );
             }
 
-            // Estado de carga inicial
-            if (!_initialLoadCompleted || (provider.isLoading && provider.selectedLocation == null)) {
+            if (provider.shouldShowRetry) {
+              return Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(Icons.cloud_off, color: Colors.orange, size: 48),
+                    const SizedBox(height: 16),
+                    const Text(
+                      'Los datos están tardando más de lo esperado',
+                      style: TextStyle(color: Colors.white70),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 8),
+                    const Text(
+                      'Esto es normal cuando se detecta una nueva ubicación',
+                      style: TextStyle(color: Colors.white54, fontSize: 12),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 16),
+                    ElevatedButton(
+                      onPressed: _initializeData,
+                      child: const Text('Reintentar carga'),
+                    ),
+                  ],
+                ),
+              );
+            }
+
+            if (!_initialLoadCompleted || (provider.isLoading && !provider.locationSyncCompleted)) {
               return const Center(
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
@@ -89,12 +118,31 @@ class _DashboardScreenState extends State<DashboardScreen> {
               );
             }
 
-            // Estado de carga de datos después de tener ubicación
+            if (provider.selectedLocation == null) {
+              return Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(Icons.location_off, color: Colors.white70, size: 48),
+                    const SizedBox(height: 16),
+                    const Text(
+                      'No se pudo detectar la ubicación',
+                      style: TextStyle(color: Colors.white70),
+                    ),
+                    const SizedBox(height: 16),
+                    ElevatedButton(
+                      onPressed: _initializeData,
+                      child: const Text('Intentar nuevamente'),
+                    ),
+                  ],
+                ),
+              );
+            }
+
             if (provider.isLoading && provider.selectedLocation != null) {
               return _buildContentSkeleton(provider);
             }
 
-            // Contenido principal
             return _buildMainContent(provider);
           },
         ),
@@ -143,27 +191,23 @@ class _DashboardScreenState extends State<DashboardScreen> {
           LocationHeader(cityName: locName, countryName: country),
           const SizedBox(height: 24),
           
-          // Weather Card
           provider.weather != null 
               ? WeatherCard(weather: provider.weather!)
               : _buildNoDataCard('Datos meteorológicos no disponibles'),
           
           const SizedBox(height: 24),
           
-          // Light Pollution Bar
           if (provider.weather?.lightPollution != null) 
             LightPollutionBar(value: provider.weather!.lightPollution!.toDouble()),
           
           const SizedBox(height: 24),
           
-          // Visible Sky Section
           provider.constellations.isNotEmpty 
               ? VisibleSkySection(constellations: provider.constellations)
               : _buildNoDataCard('No hay datos de constelaciones visibles'),
           
           const SizedBox(height: 24),
           
-          // Sky Indicator
           if (provider.skyIndicator != null) 
             SkyIndicator(value: provider.skyIndicator!.value),
         ].where((widget) => widget != const SizedBox(height: 0)).toList(),
