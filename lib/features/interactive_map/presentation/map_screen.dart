@@ -69,6 +69,17 @@ class _MapScreenState extends State<MapScreen> {
     super.dispose();
   }
 
+  // --- NUEVA FUNCIÓN DE RECARGA CENTRALIZADA ---
+  void _reloadSpots() {
+    final mapProvider = Provider.of<InteractiveMapProvider>(
+      context,
+      listen: false,
+    );
+    // Llama al método del proveedor para recargar los spots de la base de datos
+    mapProvider.fetchSpots();
+  }
+  // ---------------------------------------------
+
   void _handleTap(TapPosition tapPosition, LatLng position) {
     if (_selectedSpot != null) {
       setState(() {
@@ -131,6 +142,7 @@ class _MapScreenState extends State<MapScreen> {
     );
   }
 
+  // --- MODIFICACIÓN CLAVE: RECARGAR SPOTS TRAS LA CREACIÓN ---
   void _navigateToCreateSpot(LatLng position) async {
     final result = await Navigator.push<Map<String, dynamic>>(
       context,
@@ -141,6 +153,7 @@ class _MapScreenState extends State<MapScreen> {
 
     if (result != null && mounted) {
       setState(() {
+        // Agregamos el marcador de prueba (si aún lo usas)
         _createdMarkers.add(
           Marker(
             point: position,
@@ -161,13 +174,11 @@ class _MapScreenState extends State<MapScreen> {
         ),
       );
 
-      final mapProvider = Provider.of<InteractiveMapProvider>(
-        context,
-        listen: false,
-      );
-      await mapProvider.fetchSpots();
+      // LLAMADA CLAVE: Recargar los spots para que el nuevo aparezca
+      _reloadSpots(); 
     }
   }
+  // -----------------------------------------------------------
 
   void _zoomIn() {
     final zoom = _mapController.camera.zoom + 1;
@@ -413,12 +424,14 @@ class _MapScreenState extends State<MapScreen> {
           spot: spot,
           width: popupWidth,
           height: popupHeight,
+          // Cierra el popup
           onClose: () {
             setState(() {
               _selectedSpot = null;
               _selectedSpotLatLng = null;
             });
           },
+          // Navega a detalles
           onViewDetails: () {
             setState(() {
               _selectedSpot = null;
@@ -431,7 +444,13 @@ class _MapScreenState extends State<MapScreen> {
               ),
             );
           },
-          
+          onSpotUpdated: () {
+            _reloadSpots(); // Recarga los datos
+            setState(() {
+              _selectedSpot = null; // Cierra el popup para evitar errores de estado
+              _selectedSpotLatLng = null;
+            });
+          },
           backgroundColor: const Color(0xFF0F0E14),
         ),
       ),

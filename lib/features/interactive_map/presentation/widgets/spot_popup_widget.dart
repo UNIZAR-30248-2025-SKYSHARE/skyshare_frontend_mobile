@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+// Asegúrate de que esta importación sea correcta
 import '../../../interactive_map/data/models/spot_model.dart';
+// Asegúrate de que estas importaciones sean correctas
 import '../../../interactive_map/data/models/comment_model.dart';
 import '../../../interactive_map/data/models/rating_model.dart';
 import '../../../interactive_map/data/repositories/comment_repository.dart';
@@ -13,6 +15,8 @@ class SpotPopupWidget extends StatelessWidget {
   final VoidCallback onClose;
   final VoidCallback onViewDetails;
   final Color backgroundColor;
+  // <--- NUEVA PROPIEDAD: Callback para notificar a MapScreen que recargue los datos
+  final VoidCallback? onSpotUpdated; 
 
   SpotPopupWidget({
     super.key,
@@ -22,6 +26,7 @@ class SpotPopupWidget extends StatelessWidget {
     required this.onClose,
     required this.onViewDetails,
     required this.backgroundColor,
+    this.onSpotUpdated, // Incluido en el constructor
   });
 
   final ComentarioRepository _comentarioRepo = ComentarioRepository();
@@ -30,10 +35,11 @@ class SpotPopupWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     const triangleHeight = 12.0;
-    return IntrinsicHeight(
-      child: SizedBox(
+    const borderRadius = 12.0;
+
+    return SizedBox(
       width: width,
-      height: height+ triangleHeight,
+      height: height + triangleHeight,
       child: Stack(
         alignment: Alignment.topCenter,
         children: [
@@ -42,130 +48,152 @@ class SpotPopupWidget extends StatelessWidget {
             right: 0,
             top: 20,
             height: height,
-
-            child: CustomPaint(
-              painter: _PopupPainter(
+            child: ClipPath(
+              clipper: _PopupClipper(
+                  radius: borderRadius, triangleHeight: triangleHeight),
+              child: Container(
+                // LOGICA DE IMAGEN DE FONDO
+                decoration: BoxDecoration(
                   color: backgroundColor,
-                  radius: 12.0,
-                  triangleHeight: triangleHeight),
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(12, 10, 12, 10 + triangleHeight),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Text(
-                            spot.nombre,
-                            style: const TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
+                  image: spot.urlImagen != null && spot.urlImagen!.isNotEmpty
+                      ? DecorationImage(
+                          image: NetworkImage(spot.urlImagen!), 
+                          fit: BoxFit.cover,
+                          colorFilter: ColorFilter.mode(
+                            Colors.black.withOpacity(0.5), 
+                            BlendMode.darken,
                           ),
-                        ),
-                        if (spot.valoracionMedia != null)
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 6, vertical: 4),
-                            decoration: BoxDecoration(
-                              color: Colors.yellow,
-                              borderRadius: BorderRadius.circular(8),
+                        )
+                      : null,
+                ),
+                // Contenido de la burbuja (superpuesto a la imagen)
+                child: Padding(
+                  padding:
+                      const EdgeInsets.fromLTRB(12, 10, 12, 10 + triangleHeight),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Encabezado (Título y Rating)
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              spot.nombre,
+                              style: const TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
                             ),
+                          ),
+                          if (spot.valoracionMedia != null)
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 6, vertical: 4),
+                              decoration: BoxDecoration(
+                                color: Colors.yellow,
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Row(
+                                children: [
+                                  Icon(Icons.star,
+                                      size: 14, color: _ratingColor(spot)),
+                                  const SizedBox(width: 4),
+                                  Text(
+                                    spot.valoracionMedia!.toStringAsFixed(1),
+                                    style: TextStyle(
+                                        color: _ratingColor(spot),
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                                ],
+                              ),
+                            ),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                      // Descripción / Texto corto
+                      Expanded(
+                        child: Text(
+                          spot.descripcion ?? 'Muy chulo',
+                          style: const TextStyle(
+                              color: Colors.white70, fontSize: 13),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+                      // Botones de acción
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // Fila 1: Comentar y Ver detalles
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              ElevatedButton(
+                                onPressed: () {
+                                  _showCommentDialog(context);
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: const Color(0xFF334155),
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 10, vertical: 8),
+                                ),
+                                child: const Text('Comentar'),
+                              ),
+                              const SizedBox(width: 6),
+                              ElevatedButton(
+                                onPressed: onViewDetails,
+                                style: ElevatedButton.styleFrom(
+                                    backgroundColor: const Color(0xFF1E293B),
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 10, vertical: 8)),
+                                child: const Text('Ver detalles'),
+                              ),
+                            ],
+                          ),
+
+                          const SizedBox(height: 6),
+                          // Fila 2: Cerrar y Puntuar
+                          Align(
+                            alignment: Alignment.centerRight,
                             child: Row(
+                              mainAxisSize: MainAxisSize.min,
                               children: [
-                                Icon(Icons.star,
-                                    size: 14, color: _ratingColor(spot)),
-                                const SizedBox(width: 4),
-                                Text(
-                                  spot.valoracionMedia!.toStringAsFixed(1),
-                                  style: TextStyle(
-                                      color: _ratingColor(spot),
-                                      fontWeight: FontWeight.bold),
+                                TextButton(
+                                  onPressed: onClose,
+                                  child: const Text('Cerrar',
+                                      style:
+                                          TextStyle(color: Colors.white70)),
+                                ),
+                                const SizedBox(width: 8),
+                                ElevatedButton(
+                                  onPressed: () => _showRatingDialog(context),
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: const Color(0xFF334155),
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 10, vertical: 8),
+                                  ),
+                                  child: const Text('Puntuar'),
                                 ),
                               ],
                             ),
                           ),
-                      ],
-                    ),
-                    const SizedBox(height: 8),
-                    Expanded(
-                      child: Text(
-                      //Text(
-                        spot.descripcion ?? '',
-                        style: const TextStyle(
-                            color: Colors.white70, fontSize: 13),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
+                        ],
                       ),
-                    ),
-                    const SizedBox(height: 6),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          children: [
-                            ElevatedButton(
-                              onPressed: () {
-                                _showCommentDialog(context);
-                              },
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: const Color(0xFF334155),
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 10, vertical: 8),
-                              ),
-                              child: const Text('Comentar'),
-                            ),
-                            const SizedBox(width: 6),
-                            ElevatedButton(
-                              onPressed: onViewDetails,
-                              style: ElevatedButton.styleFrom(
-                                  backgroundColor: const Color(0xFF1E293B),
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 10, vertical: 8)),
-                              child: const Text('Ver detalles'),
-                            ),
-                          ],
-                        ),
-
-                        const SizedBox(height: 6),
-                        Align(
-                          alignment: Alignment.centerRight,
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              TextButton(
-                                onPressed: onClose,
-                                child: const Text('Cerrar',
-                                    style: TextStyle(color: Colors.white70)),
-                              ),
-                              const SizedBox(width: 8),
-                              ElevatedButton(
-                                onPressed: () => _showRatingDialog(context),
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: const Color(0xFF334155),
-                                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-                                ),
-                                child: const Text('Puntuar'),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ),
           ),
         ],
       ),
-      ),
     );
   }
+
+  // --- MÉTODOS AUXILIARES Y DIÁLOGOS ---
 
   Color _ratingColor(Spot s) {
     if (s.valoracionMedia == null) return Colors.grey;
@@ -218,15 +246,19 @@ class SpotPopupWidget extends StatelessWidget {
                     return;
                   }
                   final comentario = Comment(
-                    id: 0, // Si es autoincrement en DB, se puede dejar 0
+                    id: 0,
                     spotId: spot.id,
-                    userId: 1, //userId: user.id,
+                    userId: 1, // Reemplazar con user.id si es compatible con el tipo
                     text: content,
                     createdAt: DateTime.now(),
                   );
                   final success =
                       await _comentarioRepo.insertComentario(comentario);
+                      
                   if (success) {
+                    // <--- LLAMADA DE RECARGA AÑADIDA
+                    if (onSpotUpdated != null) onSpotUpdated!(); 
+
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
                         content: Text('Comentario enviado correctamente!'),
@@ -325,7 +357,11 @@ class SpotPopupWidget extends StatelessWidget {
 
                   // Insertar en la base de datos usando tu repositorio
                   final success = await _ratingRepo.insertRating(valoracion);
+                  
                   if (success) {
+                    // <--- LLAMADA DE RECARGA AÑADIDA
+                    if (onSpotUpdated != null) onSpotUpdated!(); 
+                    
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
                         content: Text('Valoración enviada correctamente!'),
@@ -353,35 +389,35 @@ class SpotPopupWidget extends StatelessWidget {
   }
 }
 
-class _PopupPainter extends CustomPainter {
-  final Color color;
+// --- CLIPPER PARA LA FORMA DE BURBUJA ---
+
+class _PopupClipper extends CustomClipper<Path> {
   final double radius;
   final double triangleHeight;
 
-  _PopupPainter(
-      {required this.color, required this.radius, required this.triangleHeight});
+  _PopupClipper({required this.radius, required this.triangleHeight});
 
   @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()..color = color;
+  Path getClip(Size size) {
+    // Área del cuerpo rectangular redondeado
     final rect =
         Rect.fromLTWH(0, 0, size.width, size.height - triangleHeight);
     final rrect = RRect.fromRectAndRadius(rect, Radius.circular(radius));
 
     final path = Path()..addRRect(rrect);
 
+    // Dibuja el triángulo (el 'pico') centrado
     final triangleWidth = triangleHeight * 2;
     final tx = (size.width - triangleWidth) / 2;
 
     path.moveTo(tx, size.height - triangleHeight);
-    path.relativeLineTo(triangleWidth / 2, triangleHeight);
-    path.relativeLineTo(triangleWidth / 2, -triangleHeight);
+    path.relativeLineTo(triangleWidth / 2, triangleHeight); 
+    path.relativeLineTo(triangleWidth / 2, -triangleHeight); 
     path.close();
 
-    canvas.drawShadow(path, Colors.black, 6.0, true);
-    canvas.drawPath(path, paint);
+    return path;
   }
 
   @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+  bool shouldReclip(covariant CustomClipper<Path> oldClipper) => false;
 }
