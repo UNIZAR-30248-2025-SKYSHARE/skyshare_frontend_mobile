@@ -3,7 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
-import '../../data/repositories/spot_repository.dart'; // Asegúrate de la ruta correcta
+import '../../data/repositories/spot_repository.dart'; 
+import '../../data/repositories/location_repository.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class CreateSpotScreen extends StatefulWidget {
@@ -24,6 +25,7 @@ class _CreateSpotScreenState extends State<CreateSpotScreen> {
   bool _isLoading = false;
 
   final SpotRepository _repo = SpotRepository();
+  final LocationRepository _locationRepo = LocationRepository();
 
   Future<void> _seleccionarImagen() async {
     showModalBottomSheet(
@@ -84,13 +86,17 @@ class _CreateSpotScreenState extends State<CreateSpotScreen> {
                     // Manejar usuario no logueado
                     return;
                   }
+    Map<String, String> informacionNombres = await _locationRepo.getCityCountryFromCoordinates(
+      widget.position.latitude, 
+      widget.position.longitude
+    );
 
     try {
       final exito = await _repo.insertSpot(
         nombre: _nombreController.text,
         descripcion: _descripcionController.text,
-        ciudad: 'Desconocida', 
-        pais: 'Desconocido',   
+        ciudad: informacionNombres['city'] ?? 'Desconocida', 
+        pais: informacionNombres['country'] ?? 'Desconocido',   
         lat: widget.position.latitude,
         lng: widget.position.longitude,
         imagen: _imagen!,
