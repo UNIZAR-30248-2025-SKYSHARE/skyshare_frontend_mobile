@@ -1,12 +1,44 @@
 import 'package:flutter/material.dart';
 import '../../data/models/spot_model.dart';
+import '../../data/models/comment_model.dart';
+import '../../data/repositories/comment_repository.dart';
 import 'star_rating.dart';
-import 'comment_item.dart';
 
-class SpotContent extends StatelessWidget {
+class SpotContent extends StatefulWidget {
   final Spot spot;
 
   const SpotContent({super.key, required this.spot});
+
+  @override
+  State<SpotContent> createState() => _SpotContentState();
+}
+class _SpotContentState extends State<SpotContent> {
+  final ComentarioRepository _repo = ComentarioRepository();
+  List<Comment> _comments = [];
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadComments();
+  }
+
+  Future<void> _loadComments() async {
+    final fetched = await _repo.fetchForSpot(widget.spot.id);
+    if (mounted) {
+      setState(() {
+        _comments = fetched;
+        _isLoading = false;
+      });
+    }
+  }
+
+  String _formatTime(DateTime date) {
+    final diff = DateTime.now().difference(date);
+    if (diff.inMinutes < 60) return '${diff.inMinutes} m';
+    if (diff.inHours < 24) return '${diff.inHours} h';
+    return '${diff.inDays} d';
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -40,7 +72,7 @@ class SpotContent extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                spot.nombre,
+                widget.spot.nombre,
                 style: const TextStyle(
                   color: Colors.white,
                   fontSize: 24,
@@ -53,7 +85,7 @@ class SpotContent extends StatelessWidget {
                   const Icon(Icons.location_on, size: 16, color: Colors.white70),
                   const SizedBox(width: 4),
                   Text(
-                    '${spot.ciudad}, ${spot.pais}',
+                    '${widget.spot.ciudad}, ${widget.spot.pais}',
                     style: const TextStyle(
                       color: Colors.white70,
                       fontSize: 14,
@@ -64,13 +96,13 @@ class SpotContent extends StatelessWidget {
             ],
           ),
         ),
-        StarRating(rating: spot.valoracionMedia),
+        StarRating(rating: widget.spot.valoracionMedia),
       ],
     );
   }
 
   Widget _buildDescription() {
-    if (spot.descripcion != null && spot.descripcion!.isNotEmpty) {
+    if (widget.spot.descripcion != null && widget.spot.descripcion!.isNotEmpty) {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -84,7 +116,7 @@ class SpotContent extends StatelessWidget {
           ),
           const SizedBox(height: 12),
           Text(
-            spot.descripcion!,
+            widget.spot.descripcion!,
             style: const TextStyle(
               color: Colors.white70,
               fontSize: 15,
@@ -123,8 +155,8 @@ class SpotContent extends StatelessWidget {
               ),
               const SizedBox(height: 4),
               Text(
-                spot.valoracionMedia != null
-                    ? spot.valoracionMedia!.toStringAsFixed(1)
+                widget.spot.valoracionMedia != null
+                    ? widget.spot.valoracionMedia!.toStringAsFixed(1)
                     : '—',
                 style: const TextStyle(
                   color: Colors.white,
@@ -138,14 +170,14 @@ class SpotContent extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               Text(
-                '${spot.totalValoraciones} valoraciones',
+                '${widget.spot.totalValoraciones} valoraciones',
                 style: const TextStyle(
                   color: Colors.white70,
                   fontSize: 14,
                 ),
               ),
               const SizedBox(height: 4),
-              StarRating(rating: spot.valoracionMedia),
+              StarRating(rating: widget.spot.valoracionMedia),
             ],
           ),
         ],
@@ -154,10 +186,16 @@ class SpotContent extends StatelessWidget {
   }
 
   Widget _buildCommentsSection() {
-    final exampleComments = [
-      {'author': 'Second comment', 'time': '2 h'},
-      {'author': 'First comment', 'time': '3 h'},
-    ];
+    if (_isLoading) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    if (_comments.isEmpty) {
+      return const Text(
+        'Sin comentarios',
+        style: TextStyle(color: Colors.white24),
+      );
+    }
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -171,12 +209,22 @@ class SpotContent extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 16),
-        ...exampleComments.map((c) {
-          return CommentItem(
-            author: c['author']!,
-            time: c['time']!,
-          );
-        }),
+        ..._comments.map((c) => Padding(
+              padding: const EdgeInsets.symmetric(vertical: 6),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    '${c.userId} · ${_formatTime(c.createdAt)}',
+                    style: const TextStyle(color: Colors.white70, fontSize: 12),
+                  ),
+                  Text(
+                    c.text,
+                    style: const TextStyle(color: Colors.white, fontSize: 14),
+                  ),
+                ],
+              ),
+            )),
       ],
     );
   }

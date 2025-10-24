@@ -378,7 +378,7 @@ class _MapScreenState extends State<MapScreen> {
     LatLng latLng,
   ) {
     const popupWidth = 260.0;
-    const popupHeight = 130.0;
+    const popupHeight = 260.0;
 
     double left = (MediaQuery.of(context).size.width - popupWidth) / 2;
     double top = 120.0;
@@ -431,6 +431,7 @@ class _MapScreenState extends State<MapScreen> {
               ),
             );
           },
+          
           backgroundColor: const Color(0xFF0F0E14),
         ),
       ),
