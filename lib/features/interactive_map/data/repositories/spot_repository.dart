@@ -44,9 +44,9 @@ class SpotRepository {
       'longitud': lng,
       'nombre': ciudad,
       'pais': pais,
-    }).select().single();
+      }).select().single();
 
-    final int idUbicacion = ubicacionResp['id_ubicacion'];
+      final int idUbicacion = ubicacionResp['id_ubicacion'];
 
       final resp = await client.from('spot').insert({
         'id_usuario_creador': creadorId,
@@ -63,14 +63,70 @@ class SpotRepository {
     }
   }
 
+  Future<bool> updateSpot({
+    required int spotId,
+    required String nombre,
+    required String? descripcion,
+    required XFile? nuevaImagen,
+  }) async {
+    try {
+      String? urlImagen;
+      if (nuevaImagen != null) {
+        urlImagen = await uploadImage(nuevaImagen, nombre);
+      }
+
+      final Map<String, dynamic> updates = {
+        'nombre': nombre,
+        'descripcion': descripcion,
+      };
+
+      if (urlImagen != null) {
+        updates['url_imagen'] = urlImagen;
+      }
+
+      final resp = await client
+          .from('spot')
+          .update(updates)
+          .eq('id_spot', spotId)
+          .select();
+      
+      return resp.isNotEmpty;
+    } catch (e) {
+      print('Error actualizando spot: $e');
+      return false;
+    }
+  }
+
+
+Future<bool> deleteSpot(int spotId) async {
+  try {
+    await client
+        .from('valoracion')
+        .delete()
+        .eq('id_spot', spotId);
+        
+    final resp = await client
+        .from('spot')
+        .delete()
+        .eq('id_spot', spotId)
+        .select();
+        
+    return resp.isNotEmpty;
+  } catch (e) {
+    print('Error eliminando spot y/o valoraciones: $e');
+    return false;
+  }
+}
+
+
   Future<List<Spot>> fetchAllSpots() async {
-    final resp = await client.from('spot').select('*, valoracion(*)');
+    final resp = await client.from('spot').select('*, valoracion(*), ubicacion(*)');
     final rows = (resp as List).map((e) => Map<String, dynamic>.from(e)).toList();
     return rows.map(Spot.fromMap).toList();
   }
 
   Future<Spot?> fetchSpotById(int id) async {
-    final resp = await client.from('spot').select().eq('id_spot', id).maybeSingle();
+    final resp = await client.from('spot').select('*, ubicacion(*)').eq('id_spot', id).maybeSingle();
     if (resp == null) return null;
     return Spot.fromMap(Map<String, dynamic>.from(resp));
   }

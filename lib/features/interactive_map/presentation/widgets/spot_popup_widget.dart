@@ -6,7 +6,9 @@ import '../../../interactive_map/data/models/comment_model.dart';
 import '../../../interactive_map/data/models/rating_model.dart';
 import '../../../interactive_map/data/repositories/comment_repository.dart';
 import '../../../interactive_map/data/repositories/rating_repository.dart';
+import '../../../interactive_map/data/repositories/spot_repository.dart'; 
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'spot_edit_dialog.dart'; 
 
 class SpotPopupWidget extends StatelessWidget {
   final Spot spot;
@@ -15,8 +17,10 @@ class SpotPopupWidget extends StatelessWidget {
   final VoidCallback onClose;
   final VoidCallback onViewDetails;
   final Color backgroundColor;
-  // <--- NUEVA PROPIEDAD: Callback para notificar a MapScreen que recargue los datos
   final VoidCallback? onSpotUpdated; 
+  
+  final dynamic onEdit;
+  final dynamic onDelete;
 
   SpotPopupWidget({
     super.key,
@@ -26,16 +30,37 @@ class SpotPopupWidget extends StatelessWidget {
     required this.onClose,
     required this.onViewDetails,
     required this.backgroundColor,
-    this.onSpotUpdated, // Incluido en el constructor
+    this.onSpotUpdated,
+    this.onEdit,
+    this.onDelete,
   });
 
   final ComentarioRepository _comentarioRepo = ComentarioRepository();
   final RatingRepository _ratingRepo = RatingRepository();
+  final SpotRepository _spotRepo = SpotRepository(); 
+
+  // Función para abrir el diálogo de edición
+  void _showEditDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (dialogContext) {
+        return SpotEditDialog(
+          spot: spot,
+          onSpotUpdated: onSpotUpdated ?? () {},
+          spotRepo: _spotRepo,
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
+    final BuildContext widgetContext = context; 
+
     const triangleHeight = 12.0;
     const borderRadius = 12.0;
+
+    final bool isMySpot = spot.esMio; // Condición clave
 
     return SizedBox(
       width: width,
@@ -52,7 +77,6 @@ class SpotPopupWidget extends StatelessWidget {
               clipper: _PopupClipper(
                   radius: borderRadius, triangleHeight: triangleHeight),
               child: Container(
-                // LOGICA DE IMAGEN DE FONDO
                 decoration: BoxDecoration(
                   color: backgroundColor,
                   image: spot.urlImagen != null && spot.urlImagen!.isNotEmpty
@@ -66,7 +90,6 @@ class SpotPopupWidget extends StatelessWidget {
                         )
                       : null,
                 ),
-                // Contenido de la burbuja (superpuesto a la imagen)
                 child: Padding(
                   padding:
                       const EdgeInsets.fromLTRB(12, 10, 12, 10 + triangleHeight),
@@ -123,62 +146,65 @@ class SpotPopupWidget extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(height: 6),
-                      // Botones de acción
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          // Fila 1: Comentar y Ver detalles
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            children: [
-                              ElevatedButton(
-                                onPressed: () {
-                                  _showCommentDialog(context);
-                                },
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: const Color(0xFF334155),
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 10, vertical: 8),
-                                ),
-                                child: const Text('Comentar'),
-                              ),
-                              const SizedBox(width: 6),
-                              ElevatedButton(
-                                onPressed: onViewDetails,
-                                style: ElevatedButton.styleFrom(
-                                    backgroundColor: const Color(0xFF1E293B),
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 10, vertical: 8)),
-                                child: const Text('Ver detalles'),
-                              ),
-                            ],
-                          ),
 
-                          const SizedBox(height: 6),
-                          // Fila 2: Cerrar y Puntuar
-                          Align(
-                            alignment: Alignment.centerRight,
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                TextButton(
-                                  onPressed: onClose,
-                                  child: const Text('Cerrar',
-                                      style:
-                                          TextStyle(color: Colors.white70)),
-                                ),
-                                const SizedBox(width: 8),
-                                ElevatedButton(
-                                  onPressed: () => _showRatingDialog(context),
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: const Color(0xFF334155),
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 10, vertical: 8),
-                                  ),
-                                  child: const Text('Puntuar'),
-                                ),
-                              ],
+                      // --- FILA 1: ACCIÓN PRINCIPAL (EDITAR o COMENTAR/PUNTUAR) ---
+                      Row(
+                        mainAxisAlignment: isMySpot ? MainAxisAlignment.end : MainAxisAlignment.start,
+                        children: [
+                          if (isMySpot)
+                            ElevatedButton.icon(
+                              icon: const Icon(Icons.edit, size: 16),
+                              label: const Text('Editar'),
+                              onPressed: () => _showEditDialog(widgetContext),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.blue[700],
+                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                              ),
+                            )
+                          else ...[
+                            // Botones para usuarios ajenos
+                            ElevatedButton(
+                              onPressed: () => _showCommentDialog(widgetContext),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: const Color(0xFF334155),
+                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                              ),
+                              child: const Text('Comentar'),
                             ),
+                            const SizedBox(width: 6),
+                            ElevatedButton(
+                              onPressed: () => _showRatingDialog(widgetContext),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: const Color(0xFF334155),
+                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                              ),
+                              child: const Text('Puntuar'),
+                            ),
+                          ],
+                        ],
+                      ),
+                      
+                      const SizedBox(height: 6),
+                      
+                      // --- FILA 2: VER DETALLES Y CERRAR ---
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          // Botón 'Ver detalles' (ElevatedButton para más visibilidad)
+                          ElevatedButton(
+                            onPressed: onViewDetails,
+                            style: ElevatedButton.styleFrom(
+                                backgroundColor: const Color(0xFF1E293B),
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 10, vertical: 8)),
+                            child: const Text('Ver detalles'),
+                          ),
+                          const SizedBox(width: 8),
+                          // Botón 'Cerrar' (TextButton para menos énfasis)
+                          TextButton(
+                            onPressed: onClose,
+                            child: const Text('Cerrar',
+                                style: TextStyle(color: Colors.white70)),
                           ),
                         ],
                       ),
@@ -192,8 +218,9 @@ class SpotPopupWidget extends StatelessWidget {
       ),
     );
   }
-
+  
   // --- MÉTODOS AUXILIARES Y DIÁLOGOS ---
+  // Se mantienen para la funcionalidad estándar
 
   Color _ratingColor(Spot s) {
     if (s.valoracionMedia == null) return Colors.grey;
@@ -202,18 +229,15 @@ class SpotPopupWidget extends StatelessWidget {
     return Colors.red;
   }
 
-  void _showCommentDialog(BuildContext context) {
+  void _showCommentDialog(BuildContext widgetContext) {
     final TextEditingController _controller = TextEditingController();
     showDialog(
-      context: context,
-      builder: (context) {
+      context: widgetContext, 
+      builder: (dialogContext) {
         return AlertDialog(
           backgroundColor: const Color(0xFF1E1E2E),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-          title: const Text(
-            'Comentar spot',
-            style: TextStyle(color: Colors.white),
-          ),
+          title: const Text('Comentar spot', style: TextStyle(color: Colors.white)),
           content: TextField(
             controller: _controller,
             maxLines: 4,
@@ -222,59 +246,34 @@ class SpotPopupWidget extends StatelessWidget {
               hintStyle: const TextStyle(color: Colors.white54),
               filled: true,
               fillColor: const Color(0xFF2A2A3C),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(10),
-                borderSide: BorderSide.none,
-              ),
+              border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide.none),
             ),
             style: const TextStyle(color: Colors.white),
           ),
           actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('Cancelar'),
-            ),
+            TextButton(onPressed: () => Navigator.pop(dialogContext), child: const Text('Cancelar')),
             FilledButton(
               onPressed: () async {
                 final content = _controller.text.trim();
                 if (content.isEmpty) return;
-                Navigator.pop(context);
+                Navigator.pop(dialogContext); 
                 try {
                   final user = Supabase.instance.client.auth.currentUser;
-                  if (user == null) {
-                    // Manejar usuario no logueado
-                    return;
-                  }
-                  final comentario = Comment(
-                    id: 0,
-                    spotId: spot.id,
-                    userId: 1, // Reemplazar con user.id si es compatible con el tipo
-                    text: content,
-                    createdAt: DateTime.now(),
-                  );
-                  final success =
-                      await _comentarioRepo.insertComentario(comentario);
+                  if (user == null) return;
+                  final comentario = Comment(id: 0, spotId: spot.id, userId: 1, text: content, createdAt: DateTime.now());
+                  final success = await _comentarioRepo.insertComentario(comentario);
                       
                   if (success) {
-                    // <--- LLAMADA DE RECARGA AÑADIDA
                     if (onSpotUpdated != null) onSpotUpdated!(); 
-
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Comentario enviado correctamente!'),
-                        backgroundColor: Colors.green,
-                      ),
-                    );
+                    if (!widgetContext.mounted) return; 
+                    ScaffoldMessenger.of(widgetContext).showSnackBar(const SnackBar(content: Text('Comentario enviado correctamente!'), backgroundColor: Colors.green));
                   } else {
+                    if (!widgetContext.mounted) return;
                     throw Exception('No se pudo insertar el comentario');
                   }
                 } catch (e) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text('Error al enviar comentario: $e'),
-                      backgroundColor: Colors.red,
-                    ),
-                  );
+                  if (!widgetContext.mounted) return;
+                  ScaffoldMessenger.of(widgetContext).showSnackBar(SnackBar(content: Text('Error al enviar comentario: $e'), backgroundColor: Colors.red));
                 }
               },
               child: const Text('Enviar'),
@@ -285,45 +284,29 @@ class SpotPopupWidget extends StatelessWidget {
     );
   }
 
-  void _showRatingDialog(BuildContext context) {
-    int rating = 0; // Valor inicial
+  void _showRatingDialog(BuildContext widgetContext) {
+    int rating = 0; 
     showDialog(
-      context: context,
-      builder: (context) {
+      context: widgetContext, 
+      builder: (dialogContext) {
         return AlertDialog(
           backgroundColor: const Color(0xFF1E1E2E),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-          title: const Text(
-            'Valorar spot',
-            style: TextStyle(color: Colors.white),
-          ),
+          title: const Text('Valorar spot', style: TextStyle(color: Colors.white)),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Text(
-                'Selecciona tu valoración:',
-                style: TextStyle(color: Colors.white70),
-              ),
+              const Text('Selecciona tu valoración:', style: TextStyle(color: Colors.white70)),
               const SizedBox(height: 16),
               StatefulBuilder(
-                builder: (context, setState) {
+                builder: (stfContext, setState) { 
                   return Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: List.generate(5, (index) {
                       final starIndex = index + 1;
                       return IconButton(
-                        icon: Icon(
-                          starIndex <= rating
-                              ? Icons.star
-                              : Icons.star_border,
-                          color: Colors.amber,
-                          size: 36,
-                        ),
-                        onPressed: () {
-                          setState(() {
-                            rating = starIndex;
-                          });
-                        },
+                        icon: Icon(starIndex <= rating ? Icons.star : Icons.star_border, color: Colors.amber, size: 36),
+                        onPressed: () {setState(() {rating = starIndex;});},
                       );
                     }),
                   );
@@ -332,52 +315,28 @@ class SpotPopupWidget extends StatelessWidget {
             ],
           ),
           actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('Cancelar'),
-            ),
+            TextButton(onPressed: () => Navigator.pop(dialogContext), child: const Text('Cancelar')),
             FilledButton(
               onPressed: () async {
                 if (rating == 0) return;
-                Navigator.pop(context);
+                Navigator.pop(dialogContext); 
                 try {
                   final user = Supabase.instance.client.auth.currentUser;
-                  if (user == null) {
-                    // Manejar usuario no logueado
-                    return;
-                  }
-
-                  // Crear objeto de valoración
-                  final valoracion = Rating(
-                    spotId: spot.id,
-                    userId: user.id, // Aquí debes usar UUID si la tabla es UUID
-                    value: rating,
-                    createdAt: DateTime.now(),
-                  );
-
-                  // Insertar en la base de datos usando tu repositorio
+                  if (user == null) return;
+                  final valoracion = Rating(spotId: spot.id, userId: user.id, value: rating, createdAt: DateTime.now());
                   final success = await _ratingRepo.insertRating(valoracion);
                   
                   if (success) {
-                    // <--- LLAMADA DE RECARGA AÑADIDA
                     if (onSpotUpdated != null) onSpotUpdated!(); 
-                    
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Valoración enviada correctamente!'),
-                        backgroundColor: Colors.green,
-                      ),
-                    );
+                    if (!widgetContext.mounted) return; 
+                    ScaffoldMessenger.of(widgetContext).showSnackBar(const SnackBar(content: Text('Valoración enviada correctamente!'), backgroundColor: Colors.green));
                   } else {
+                    if (!widgetContext.mounted) return;
                     throw Exception('No se pudo insertar la valoración');
                   }
                 } catch (e) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text('Error al enviar valoración: $e'),
-                      backgroundColor: Colors.red,
-                    ),
-                  );
+                  if (!widgetContext.mounted) return;
+                  ScaffoldMessenger.of(widgetContext).showSnackBar(SnackBar(content: Text('Error al enviar valoración: $e'), backgroundColor: Colors.red));
                 }
               },
               child: const Text('Enviar'),
@@ -399,14 +358,12 @@ class _PopupClipper extends CustomClipper<Path> {
 
   @override
   Path getClip(Size size) {
-    // Área del cuerpo rectangular redondeado
     final rect =
         Rect.fromLTWH(0, 0, size.width, size.height - triangleHeight);
     final rrect = RRect.fromRectAndRadius(rect, Radius.circular(radius));
 
     final path = Path()..addRRect(rrect);
 
-    // Dibuja el triángulo (el 'pico') centrado
     final triangleWidth = triangleHeight * 2;
     final tx = (size.width - triangleWidth) / 2;
 

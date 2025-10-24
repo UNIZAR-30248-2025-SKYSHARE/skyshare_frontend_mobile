@@ -1,3 +1,5 @@
+import 'package:supabase_flutter/supabase_flutter.dart'; // ¡Añadir esta importación!
+
 class Spot {
   final int id;
   final int ubicacionId;
@@ -26,6 +28,19 @@ class Spot {
     this.totalValoraciones = 0,
     this.urlImagen,
   });
+
+  bool get esMio {
+    final currentUser = Supabase.instance.client.auth.currentUser;
+    
+    if (currentUser == null) {
+      return false;
+    }
+    
+    final currentUserId = currentUser.id.trim().toLowerCase();
+    final spotCreatorId = creadorId?.trim().toLowerCase();
+    
+    return currentUserId == spotCreatorId;
+  }
 
   factory Spot.fromMap(Map<String, dynamic> map) {
     final ubicacion = map['ubicacion'] as Map<String, dynamic>? ?? {};
@@ -59,7 +74,7 @@ class Spot {
       ubicacionId: (map['id_ubicacion'] is int) 
         ? map['id_ubicacion'] as int 
         : int.parse(map['id_ubicacion'].toString()),
-      creadorId: map['id_usuario_creador']?.toString() ?? '',
+      creadorId: map['id_usuario_creador']?.toString(), 
       nombre: map['nombre']?.toString() ?? '',
       descripcion: map['descripcion']?.toString(),
       lat: (ubicacion['latitud'] is double) 
