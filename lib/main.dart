@@ -124,7 +124,6 @@ class MyApp extends StatelessWidget {
             locationRepository: ctx.read<location_repository_dashboard.LocationRepository>(),
           ),
         ),
-        // ✅ AGREGADO: AlertRepository y AlertProvider disponibles globalmente
         Provider<AlertRepository>(
           create: (ctx) => AlertRepository(client: ctx.read<SupabaseClient>()),
         ),
@@ -145,7 +144,6 @@ class MyApp extends StatelessWidget {
           useMaterial3: true,
           scaffoldBackgroundColor: const Color(0xFF0A0E27),
         ),
-        // ✅ CAMBIADO: Ya no necesitas el Provider local, usa el global
         home: kDebugMode
             ? const AlertsListScreen()
             : const AuthWrapper(),
