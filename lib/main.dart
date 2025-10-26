@@ -21,6 +21,9 @@ import 'core/services/supabase_service.dart';
 import 'core/widgets/app_navigation.dart';
 import 'features/interactive_map/presentation/map_screen.dart';
 import 'package:skyshare_frontend_mobile/features/interactive_map/providers/interactive_map_provider.dart';
+import 'features/alerts_configurable/presentation/alerts_list_screen.dart';
+import 'features/alerts_configurable/providers/alert_provider.dart';
+import 'features/alerts_configurable/data/repository/alerts_repository.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -51,7 +54,6 @@ Future<void> main() async {
         if (response.user != null) {
           final uid = response.user!.id;
           print('[DEBUG] Usuario dev autenticado: $uid');
-          // Enviar el playerId tras el login dev para registrar el dispositivo
           if (!kIsWeb) {
             print('[DEBUG] Enviando playerId a Supabase tras login dev...');
             await OneSignalService().sendPlayerId(supabase, uid);
@@ -122,6 +124,15 @@ class MyApp extends StatelessWidget {
             locationRepository: ctx.read<location_repository_dashboard.LocationRepository>(),
           ),
         ),
+        // ✅ AGREGADO: AlertRepository y AlertProvider disponibles globalmente
+        Provider<AlertRepository>(
+          create: (ctx) => AlertRepository(client: ctx.read<SupabaseClient>()),
+        ),
+        ChangeNotifierProvider<AlertProvider>(
+          create: (ctx) => AlertProvider(
+            repository: ctx.read<AlertRepository>(),
+          )..loadAlerts(), // Cargar alertas al inicio
+        ),
       ],
       child: MaterialApp(
         title: 'Skyshare',
@@ -134,7 +145,10 @@ class MyApp extends StatelessWidget {
           useMaterial3: true,
           scaffoldBackgroundColor: const Color(0xFF0A0E27),
         ),
-        home: const AuthWrapper(),
+        // ✅ CAMBIADO: Ya no necesitas el Provider local, usa el global
+        home: kDebugMode
+            ? const AlertsListScreen()
+            : const AuthWrapper(),
       ),
     );
   }
