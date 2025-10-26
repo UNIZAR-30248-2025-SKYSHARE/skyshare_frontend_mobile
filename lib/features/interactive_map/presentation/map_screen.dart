@@ -38,6 +38,11 @@ class _MapScreenState extends State<MapScreen> {
   LatLng? _selectedSpotLatLng;
   StreamSubscription? _mapSub;
 
+  // --- NUEVAS VARIABLES PARA LAZY LOADING ---
+  Timer? _debounce; // Para no llamar a la API en cada milisegundo de movimiento
+  final double _minLoadZoom = 10.0; // El zoom mínimo para empezar a cargar spots
+  // -----------------------------------------
+
   @override
   void initState() {
     super.initState();
@@ -47,38 +52,89 @@ class _MapScreenState extends State<MapScreen> {
         listen: false,
       );
       await mapProvider.fetchUserLocation();
-      await mapProvider.fetchSpots();
+
+      // YA NO cargamos todos los spots al inicio
+      // await mapProvider.fetchSpots(); 
+
       if (mapProvider.currentPosition != null) {
         _mapController.move(mapProvider.currentPosition!, 14.5);
       }
+
+      // Dispara la primera carga perezosa después de que el mapa se mueva
+      Future.delayed(const Duration(milliseconds: 500), () {
+        _fetchSpotsForCurrentView();
+      });
     });
 
-    _mapSub = _mapController.mapEventStream.listen((_) {
-      if (_selectedSpot != null) {
-        setState(() {
-          _selectedSpot = null;
-          _selectedSpotLatLng = null;
-        });
-      }
-    });
+    // MODIFICADO: Escuchamos todos los eventos en una función central
+    _mapSub = _mapController.mapEventStream.listen(_onMapEvent);
   }
 
   @override
   void dispose() {
     _mapSub?.cancel();
+    _debounce?.cancel(); // AÑADIDO: Limpiar el timer
     super.dispose();
   }
 
-  // --- NUEVA FUNCIÓN DE RECARGA CENTRALIZADA ---
+  // --- MODIFICADA: RECARGA CENTRALIZADA ---
   void _reloadSpots() {
-    final mapProvider = Provider.of<InteractiveMapProvider>(
-      context,
-      listen: false,
-    );
-    // Llama al método del proveedor para recargar los spots de la base de datos
-    mapProvider.fetchSpots();
+    // Ahora, recargar significa volver a cargar la vista actual
+    _fetchSpotsForCurrentView();
   }
-  // ---------------------------------------------
+  // ----------------------------------------
+
+  // --- NUEVA FUNCIÓN: Listener de eventos del mapa ---
+  void _onMapEvent(MapEvent event) {
+    // 1. Lógica para cerrar el popup (la que ya tenías)
+    if (_selectedSpot != null &&
+        (event is MapEventMove ||
+         event is MapEventScrollWheelZoom ||
+         event is MapEventFlingAnimation)) {
+      setState(() {
+        _selectedSpot = null;
+        _selectedSpotLatLng = null;
+      });
+    }
+
+    // 2. Lógica de carga perezosa (debounced)
+    // Solo nos interesa recargar cuando el usuario *termina* de moverse/hacer zoom
+    if (event is MapEventMoveEnd ||
+        event is MapEventRotateEnd ||
+        event is MapEventScrollWheelZoom) {
+      
+      // Cancela cualquier timer anterior
+      _debounce?.cancel();
+      
+      // Espera 500ms después del último movimiento antes de llamar a la API
+      _debounce = Timer(const Duration(milliseconds: 500), () {
+        _fetchSpotsForCurrentView();
+      });
+    }
+  }
+
+  // --- NUEVA FUNCIÓN: Carga spots basado en la vista actual ---
+  void _fetchSpotsForCurrentView() {
+    if (!mounted) return;
+    
+    final mapProvider = Provider.of<InteractiveMapProvider>(context, listen: false);
+    final zoom = _mapController.camera.zoom;
+
+    // 1. Comprueba el nivel de zoom
+    if (zoom < _minLoadZoom) {
+      // Si el zoom es muy bajo, limpia los spots para no sobrecargar
+      mapProvider.clearSpots(); // Llama al nuevo método del provider
+      return;
+    }
+
+    // 2. Obtiene los límites visibles del mapa
+    final LatLngBounds? bounds = _mapController.camera.visibleBounds;
+    if (bounds == null) return;
+    
+    // 3. Llama al provider con los límites
+    mapProvider.fetchSpots(bounds: bounds);
+  }
+  // -----------------------------------------------------------
 
   void _handleTap(TapPosition tapPosition, LatLng position) {
     if (_selectedSpot != null) {
@@ -142,7 +198,6 @@ class _MapScreenState extends State<MapScreen> {
     );
   }
 
-  // --- MODIFICACIÓN CLAVE: RECARGAR SPOTS TRAS LA CREACIÓN ---
   void _navigateToCreateSpot(LatLng position) async {
     final result = await Navigator.push<Map<String, dynamic>>(
       context,
@@ -152,21 +207,8 @@ class _MapScreenState extends State<MapScreen> {
     );
 
     if (result != null && mounted) {
-      setState(() {
-        // Agregamos el marcador de prueba (si aún lo usas)
-        _createdMarkers.add(
-          Marker(
-            point: position,
-            width: 40,
-            height: 40,
-            child: const Icon(
-              Icons.location_on,
-              color: Colors.red,
-              size: 40,
-            ),
-          ),
-        );
-      });
+      // Ya no es necesario el marcador temporal, _reloadSpots se encargará
+      // ... (puedes borrar _createdMarkers si ya no lo usas)
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -174,11 +216,10 @@ class _MapScreenState extends State<MapScreen> {
         ),
       );
 
-      // LLAMADA CLAVE: Recargar los spots para que el nuevo aparezca
+      // LLAMADA CLAVE: Recargar los spots de la vista actual
       _reloadSpots(); 
     }
   }
-  // -----------------------------------------------------------
 
   void _zoomIn() {
     final zoom = _mapController.camera.zoom + 1;
@@ -211,7 +252,7 @@ class _MapScreenState extends State<MapScreen> {
 
   void _onFilterClear() {
     setState(() {
-      _filterValue = '';
+    _filterValue = '';
     });
   }
 
@@ -309,7 +350,10 @@ class _MapScreenState extends State<MapScreen> {
     final mapProvider = Provider.of<InteractiveMapProvider>(context);
     final filteredSpots = _filterSpots(mapProvider.spots);
     final baseMarkers = _spotsToMarkers(filteredSpots);
-    final markers = [...baseMarkers, ..._createdMarkers];
+    
+    // _createdMarkers ya no es necesario si _reloadSpots es instantáneo
+    // final markers = [...baseMarkers, ..._createdMarkers];
+    final markers = baseMarkers; 
 
     return Scaffold(
       body: Stack(
@@ -373,7 +417,7 @@ class _MapScreenState extends State<MapScreen> {
                         fontSize: 11,
                         color: Colors.grey[600],
                       ),
-                    ),
+                  ),
                   ],
                 ),
               ),
@@ -441,16 +485,19 @@ class _MapScreenState extends State<MapScreen> {
               context,
               MaterialPageRoute(
                 builder: (_) => SpotDetailScreen(spot: spot),
-              ),
+               ),
             );
           },
+          // --- CONEXIÓN CLAVE ---
+          // Pasa la función _reloadSpots al popup
           onSpotUpdated: () {
             _reloadSpots(); // Recarga los datos
             setState(() {
-              _selectedSpot = null; // Cierra el popup para evitar errores de estado
+              _selectedSpot = null; // Cierra el popup
               _selectedSpotLatLng = null;
             });
           },
+          // ------------------------
           backgroundColor: const Color(0xFF0F0E14),
         ),
       ),

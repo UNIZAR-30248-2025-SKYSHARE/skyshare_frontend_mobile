@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import '../data/repositories/location_repository.dart';
 import '../data/models/spot_model.dart';
@@ -42,12 +43,20 @@ class InteractiveMapProvider with ChangeNotifier {
     }
   }
 
-  Future<void> fetchSpots() async {
+  // --- MODIFICADO PARA LAZY LOADING ---
+  Future<void> fetchSpots({LatLngBounds? bounds}) async {
+    // Si no hay bounds (zoom muy bajo), limpia los spots y no cargues nada.
+    if (bounds == null) {
+      clearSpots(); // Llama al nuevo método para limpiar
+      return;
+    }
+
     _isLoading = true;
     _errorMessage = null;
     notifyListeners();
     try {
-      final resp = await _locationRepository.fetchSpots();
+      // Pasa los 'bounds' al repositorio
+      final resp = await _locationRepository.fetchSpots(bounds: bounds);
       _spots = resp;
     } catch (e) {
       _errorMessage = 'Error al cargar spots: $e';
@@ -57,6 +66,7 @@ class InteractiveMapProvider with ChangeNotifier {
       notifyListeners();
     }
   }
+  // ------------------------------------
 
   Future<Map<String, String>> fetchSpotLocation(LatLng? location) async {
     _isLoading = true;
@@ -83,4 +93,14 @@ class InteractiveMapProvider with ChangeNotifier {
     }
     return {'city': city, 'country': country};
   }
+
+  // --- NUEVO MÉTODO AÑADIDO ---
+  // Método para limpiar los spots manualmente (ej. cuando el zoom es muy bajo)
+  void clearSpots() {
+    if (_spots.isEmpty) return; // No notificar si ya está vacío
+    
+    _spots = [];
+    notifyListeners();
+  }
+  // ------------------------------
 }
