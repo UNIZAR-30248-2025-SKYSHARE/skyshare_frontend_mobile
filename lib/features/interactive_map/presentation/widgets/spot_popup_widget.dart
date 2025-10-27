@@ -348,8 +348,6 @@ class SpotPopupWidget extends StatelessWidget {
   }
 }
 
-// --- CLIPPER PARA LA FORMA DE BURBUJA ---
-
 class _PopupClipper extends CustomClipper<Path> {
   final double radius;
   final double triangleHeight;
