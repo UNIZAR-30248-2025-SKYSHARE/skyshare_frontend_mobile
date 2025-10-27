@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../../core/services/supabase_service.dart';
 
@@ -19,7 +20,9 @@ class NotificationRepository {
             'player_id': playerId,
           }, onConflict: 'id_usuario');
     } catch (e, st) {
-      print('[ERROR] No se pudo actualizar el playerId: $e\n$st');
+      if (kDebugMode) {
+        print('[ERROR] No se pudo actualizar el playerId: $e\n$st');
+      }
     }
   }
 }
