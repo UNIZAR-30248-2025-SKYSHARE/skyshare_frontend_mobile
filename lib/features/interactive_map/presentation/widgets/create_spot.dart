@@ -1,16 +1,31 @@
+// create_spot_screen.dart (Refactorizado)
+
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
-import '../../data/repositories/spot_repository.dart'; 
+import '../../data/repositories/spot_repository.dart';
 import '../../data/repositories/location_repository.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:supabase_flutter/supabase_flutter.dart'; // Necesario para GoTrueClient y User
 
 class CreateSpotScreen extends StatefulWidget {
   final LatLng position;
+  // --- Dependencias Inyectadas ---
+  final SpotRepository spotRepository;
+  final LocationRepository locationRepository;
+  final ImagePicker imagePicker;
+  final GoTrueClient authClient; // Inyectamos el cliente de auth
 
-  const CreateSpotScreen({super.key, required this.position});
+  const CreateSpotScreen({
+    super.key,
+    required this.position,
+    // Las requerimos en el constructor
+    required this.spotRepository,
+    required this.locationRepository,
+    required this.imagePicker,
+    required this.authClient,
+  });
 
   @override
   State<CreateSpotScreen> createState() => _CreateSpotScreenState();
@@ -20,12 +35,14 @@ class _CreateSpotScreenState extends State<CreateSpotScreen> {
   final _formKey = GlobalKey<FormState>();
   final _nombreController = TextEditingController();
   final _descripcionController = TextEditingController();
-  XFile? _imagen; // Cambiado a XFile
-  final ImagePicker _picker = ImagePicker();
+  XFile? _imagen;
   bool _isLoading = false;
 
-  final SpotRepository _repo = SpotRepository();
-  final LocationRepository _locationRepo = LocationRepository();
+  // --- Accedemos a las dependencias via `widget` ---
+  SpotRepository get _repo => widget.spotRepository;
+  LocationRepository get _locationRepo => widget.locationRepository;
+  ImagePicker get _picker => widget.imagePicker;
+  GoTrueClient get _authClient => widget.authClient;
 
   Future<void> _seleccionarImagen() async {
     showModalBottomSheet(
@@ -38,7 +55,7 @@ class _CreateSpotScreenState extends State<CreateSpotScreen> {
               title: const Text('Cámara'),
               onTap: () async {
                 Navigator.pop(context);
-                final XFile? foto = await _picker.pickImage(
+                final XFile? foto = await _picker.pickImage( // Usamos _picker
                   source: ImageSource.camera,
                   maxWidth: 1920,
                   maxHeight: 1080,
@@ -54,7 +71,7 @@ class _CreateSpotScreenState extends State<CreateSpotScreen> {
               title: const Text('Galería'),
               onTap: () async {
                 Navigator.pop(context);
-                final XFile? foto = await _picker.pickImage(
+                final XFile? foto = await _picker.pickImage( // Usamos _picker
                   source: ImageSource.gallery,
                   maxWidth: 1920,
                   maxHeight: 1080,
@@ -81,22 +98,29 @@ class _CreateSpotScreenState extends State<CreateSpotScreen> {
     }
 
     setState(() => _isLoading = true);
-    final user = Supabase.instance.client.auth.currentUser;
-                  if (user == null) {
-                    // Manejar usuario no logueado
-                    return;
-                  }
-    Map<String, String> informacionNombres = await _locationRepo.getCityCountryFromCoordinates(
-      widget.position.latitude, 
-      widget.position.longitude
+    
+    // --- Usamos el authClient inyectado ---
+    final user = _authClient.currentUser;
+    if (user == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Error: Usuario no autenticado')),
+      );
+      setState(() => _isLoading = false); // Detenemos el loading
+      return;
+    }
+    
+    Map<String, String> informacionNombres =
+        await _locationRepo.getCityCountryFromCoordinates( // Usamos _locationRepo
+      widget.position.latitude,
+      widget.position.longitude,
     );
 
     try {
-      final exito = await _repo.insertSpot(
+      final exito = await _repo.insertSpot( // Usamos _repo
         nombre: _nombreController.text,
         descripcion: _descripcionController.text,
-        ciudad: informacionNombres['city'] ?? 'Desconocida', 
-        pais: informacionNombres['country'] ?? 'Desconocido',   
+        ciudad: informacionNombres['city'] ?? 'Desconocida',
+        pais: informacionNombres['country'] ?? 'Desconocido',
         lat: widget.position.latitude,
         lng: widget.position.longitude,
         imagen: _imagen!,
@@ -107,11 +131,13 @@ class _CreateSpotScreenState extends State<CreateSpotScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Spot creado correctamente')),
         );
+        // Comprobamos si el widget sigue montado antes de navegar
+        if (!mounted) return;
         Navigator.pop(context, {
-            'nombre': _nombreController.text,
-            'lat': widget.position.latitude,
-            'lng': widget.position.longitude,
-            'imagen': _imagen,
+          'nombre': _nombreController.text,
+          'lat': widget.position.latitude,
+          'lng': widget.position.longitude,
+          'imagen': _imagen,
         });
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -123,12 +149,16 @@ class _CreateSpotScreenState extends State<CreateSpotScreen> {
         SnackBar(content: Text('Error: $e')),
       );
     } finally {
-      setState(() => _isLoading = false);
+      // Comprobamos si sigue montado antes de actualizar estado
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    // El resto del método build es idéntico
     return Scaffold(
       appBar: AppBar(
         title: const Text('Crear Nuevo Spot'),

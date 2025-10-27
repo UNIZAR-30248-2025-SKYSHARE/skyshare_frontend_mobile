@@ -56,7 +56,7 @@ class InteractiveMapProvider with ChangeNotifier {
     notifyListeners();
     try {
       // Pasa los 'bounds' al repositorio
-      final resp = await _locationRepository.fetchSpots(bounds: bounds);
+      final resp = await _locationRepository.fetchSpots(bounds: bounds, limit: null);
       _spots = resp;
     } catch (e) {
       _errorMessage = 'Error al cargar spots: $e';

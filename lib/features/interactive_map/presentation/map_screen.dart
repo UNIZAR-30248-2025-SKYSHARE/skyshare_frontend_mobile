@@ -1,9 +1,13 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:provider/provider.dart';
+import 'package:skyshare_frontend_mobile/features/interactive_map/data/repositories/location_repository.dart';
+import 'package:skyshare_frontend_mobile/features/interactive_map/data/repositories/spot_repository.dart';
 import 'package:skyshare_frontend_mobile/features/interactive_map/presentation/spot_detail_screen.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import '../providers/interactive_map_provider.dart';
 import './widgets/map_widget.dart';
 import './widgets/loading_overlay.dart';
@@ -202,22 +206,36 @@ class _MapScreenState extends State<MapScreen> {
     final result = await Navigator.push<Map<String, dynamic>>(
       context,
       MaterialPageRoute(
-        builder: (context) => CreateSpotScreen(position: position),
+        builder: (context) => CreateSpotScreen(
+          position: position,
+          
+          // --- ARREGLO ---
+          // Debes pasar las dependencias que el constructor ahora requiere
+          
+          // Opción 1: Instanciarlas aquí (simple, pero no ideal para DI)
+          spotRepository: SpotRepository(),
+          locationRepository: LocationRepository(),
+          imagePicker: ImagePicker(),
+          authClient: Supabase.instance.client.auth,
+
+          /* // Opción 2: Si usas Provider/GetIt (Mejor práctica)
+          // (Asegúrate de tenerlos registrados en tu árbol de widgets)
+          spotRepository: context.read<SpotRepository>(),
+          locationRepository: context.read<LocationRepository>(),
+          imagePicker: context.read<ImagePicker>(),
+          authClient: context.read<GoTrueClient>(),
+          */
+        ),
       ),
     );
 
     if (result != null && mounted) {
-      // Ya no es necesario el marcador temporal, _reloadSpots se encargará
-      // ... (puedes borrar _createdMarkers si ya no lo usas)
-
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Spot "${result['nombre']}" creado!'),
         ),
       );
-
-      // LLAMADA CLAVE: Recargar los spots de la vista actual
-      _reloadSpots(); 
+      _reloadSpots();
     }
   }
 

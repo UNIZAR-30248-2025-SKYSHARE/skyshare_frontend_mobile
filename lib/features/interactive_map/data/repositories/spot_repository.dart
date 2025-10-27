@@ -40,10 +40,10 @@ class SpotRepository {
       final urlImagen = await uploadImage(imagen, nombre);
 
       final ubicacionResp = await client.from('ubicacion').insert({
-      'latitud': lat,
-      'longitud': lng,
-      'nombre': ciudad,
-      'pais': pais,
+        'latitud': lat,
+        'longitud': lng,
+        'nombre': ciudad,
+        'pais': pais,
       }).select().single();
 
       final int idUbicacion = ubicacionResp['id_ubicacion'];
@@ -97,27 +97,25 @@ class SpotRepository {
     }
   }
 
-
-Future<bool> deleteSpot(int spotId) async {
-  try {
-    await client
-        .from('valoracion')
-        .delete()
-        .eq('id_spot', spotId);
-        
-    final resp = await client
-        .from('spot')
-        .delete()
-        .eq('id_spot', spotId)
-        .select();
-        
-    return resp.isNotEmpty;
-  } catch (e) {
-    print('Error eliminando spot y/o valoraciones: $e');
-    return false;
+  Future<bool> deleteSpot(int spotId) async {
+    try {
+      await client
+          .from('valoracion')
+          .delete()
+          .eq('id_spot', spotId);
+          
+      final resp = await client
+          .from('spot')
+          .delete()
+          .eq('id_spot', spotId)
+          .select();
+          
+      return resp.isNotEmpty;
+    } catch (e) {
+      print('Error eliminando spot y/o valoraciones: $e');
+      return false;
+    }
   }
-}
-
 
   Future<List<Spot>> fetchAllSpots() async {
     final resp = await client.from('spot').select('*, valoracion(*), ubicacion(*)');
