@@ -22,11 +22,21 @@ class OneSignalService {
 
     final appId = dotenv.env['ONESIGNAL_APP_ID'];
     if (appId == null || appId.isEmpty) {
+      if (kDebugMode) {
+        print('[OneSignal] ERROR: ONESIGNAL_APP_ID no está definido en .env');
+      }
       return;
     }
 
     try {
+      if (kDebugMode) {
+        print('[OneSignal] Initializing SDK with appId=$appId');
+      }
+      _wrapper.setLogLevel(OSLogLevel.verbose);
       _wrapper.initialize(appId);
+      if (kDebugMode) {
+        print('[OneSignal] Initialized OK');
+      }
 
       _wrapper.addPushSubscriptionObserver((OSPushSubscriptionChangedState state) {
         try {
@@ -46,6 +56,9 @@ class OneSignalService {
           }
 
           if (id != null && id.isNotEmpty) {
+            if (kDebugMode) {
+              print('[OneSignal] PlayerId available: $id');
+            }
           }
         } catch (e, st) {
           if (kDebugMode) {
@@ -65,7 +78,13 @@ class OneSignalService {
 
   Future<void> requestPermission() async {
     try {
-      await _wrapper.requestPermission();
+      if (kDebugMode) {
+        print('[OneSignal] Requesting push permission...');
+      }
+      final accepted = await _wrapper.requestPermission();
+      if (kDebugMode) {
+        print('[OneSignal] Permission granted? $accepted');
+      }
     } catch (e, st) {
       if (kDebugMode) {
         print('[OneSignal] Request permission ERROR: $e\n$st');
@@ -76,6 +95,10 @@ class OneSignalService {
   Future<String?> getPlayerId() async {
     try {
       final id = _wrapper.getPlayerId();
+
+      if (kDebugMode) {
+        print('[OneSignal] Current playerId: $id');
+      }
       return id;
     } catch (e, st) {
       if (kDebugMode) {
@@ -89,13 +112,23 @@ class OneSignalService {
     try {
       final playerId = await getPlayerId();
       if (playerId == null || playerId.isEmpty) {
+        if (kDebugMode) {
+          print('[OneSignal] sendPlayerId skipped: playerId is null/empty');
+        }
         return;
       }
 
+      if (kDebugMode) {
+        print('[OneSignal] Sending playerId to Supabase. userId=$userId, playerId=$playerId');
+      }
       await NotificationRepository(client: client).updatePlayerId(
         userId: userId,
         playerId: playerId,
       );
+
+      if (kDebugMode) {
+        print('[OneSignal] playerId sent to Supabase OK');
+      }
     } catch (e, st) {
       if (kDebugMode) {
         print('[OneSignal] sendPlayerId ERROR: $e\n$st');

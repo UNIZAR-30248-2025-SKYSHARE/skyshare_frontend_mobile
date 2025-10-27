@@ -74,4 +74,20 @@ class LocationRepository {
     final resp = await client.from('usuarioubicacion').delete().eq('id_usuario', uid);
     return resp != null;
   }
+
+  Future<Location?> fetchLocationById(int id) async {
+    try {
+      final resp = await client
+          .from('ubicacion')
+          .select()
+          .eq('id_ubicacion', id)
+          .limit(1)
+          .maybeSingle();
+
+      if (resp == null) return null;
+      return Location.fromMap(Map<String, dynamic>.from(resp as Map));
+    } catch (e) {
+      return null;
+    }
+  }
 }

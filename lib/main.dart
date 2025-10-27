@@ -21,6 +21,10 @@ import 'core/services/supabase_service.dart';
 import 'core/widgets/app_navigation.dart';
 import 'features/interactive_map/presentation/map_screen.dart';
 import 'package:skyshare_frontend_mobile/features/interactive_map/providers/interactive_map_provider.dart';
+import 'features/alerts_configurable/providers/alert_provider.dart';
+import 'features/alerts_configurable/data/repository/alerts_repository.dart';
+import 'features/alerts_configurable/presentation/alerts_list_screen.dart';
+
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -51,7 +55,6 @@ Future<void> main() async {
         if (response.user != null) {
           final uid = response.user!.id;
           print('[DEBUG] Usuario dev autenticado: $uid');
-          // Enviar el playerId tras el login dev para registrar el dispositivo
           if (!kIsWeb) {
             print('[DEBUG] Enviando playerId a Supabase tras login dev...');
             await OneSignalService().sendPlayerId(supabase, uid);
@@ -122,6 +125,14 @@ class MyApp extends StatelessWidget {
             locationRepository: ctx.read<location_repository_dashboard.LocationRepository>(),
           ),
         ),
+        Provider<AlertRepository>(
+          create: (ctx) => AlertRepository(client: ctx.read<SupabaseClient>()),
+        ),
+        ChangeNotifierProvider<AlertProvider>(
+          create: (ctx) => AlertProvider(
+            repository: ctx.read<AlertRepository>(),
+          )..loadAlerts(), // Cargar alertas al inicio
+        ),
       ],
       child: MaterialApp(
         title: 'Skyshare',
@@ -185,8 +196,6 @@ class _RootAppState extends State<RootApp> {
     });
   }
 
-  void _onAddLocation() {}
-
   @override
   Widget build(BuildContext context) {
     final provider = context.watch<DashboardProvider>();
@@ -194,8 +203,9 @@ class _RootAppState extends State<RootApp> {
     final pages = <Widget>[
       const DashboardScreen(),                   
       const PhaseLunarScreen(),
+      const AlertsListScreen(),
       const MapScreen(),
-      const Center(child: Text('Perfil - placeholder')),
+      const Center(child: Text('Perfil - placeholder'))
     ];
 
     return Scaffold(
@@ -204,7 +214,6 @@ class _RootAppState extends State<RootApp> {
         selectedIndex: _selectedIndex,
         onTap: _onTap,
         locationCount: locationCount,
-        onAddLocation: _onAddLocation,
         selectedLocationIndex: _selectedLocationIndex,
         onLocationSelected: _onLocationSelected,
       ),
