@@ -1,4 +1,5 @@
 // data/repository/alerts_repository.dart
+import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../model/alert_model.dart';
 
@@ -99,7 +100,9 @@ class AlertRepository {
         }
       }
 
-      print('DEBUG: Datos a insertar: $dataToInsert'); // Para debug
+      if (kDebugMode) {
+        print('DEBUG: Datos a insertar: $dataToInsert');
+      } // Para debug
 
       // Insertar y obtener el registro creado
       final resp = await client
@@ -108,11 +111,15 @@ class AlertRepository {
           .select()
           .single();
 
-      print('DEBUG: Respuesta de Supabase: $resp'); // Para debug
+      if (kDebugMode) {
+        print('DEBUG: Respuesta de Supabase: $resp');
+      } // Para debug
 
       return AlertModel.fromMap(Map<String, dynamic>.from(resp as Map));
     } catch (e) {
-      print('ERROR al crear alerta: $e'); // Para debug
+      if (kDebugMode) {
+        print('ERROR al crear alerta: $e');
+      } // Para debug
       throw Exception('Error al crear alerta: $e');
     }
   }

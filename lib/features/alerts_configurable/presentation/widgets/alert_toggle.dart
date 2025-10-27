@@ -1,4 +1,3 @@
-// widgets/alert_toggle.dart
 import 'package:flutter/material.dart';
 import 'alert_style.dart';
 
@@ -8,15 +7,16 @@ class AlertToggle extends StatelessWidget {
   final ValueChanged<bool> onChanged;
 
   const AlertToggle({
-    Key? key,
+    super.key,
     required this.label,
     required this.value,
     required this.onChanged,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
     return Container(
+      key: const Key('alert_toggle_container'),
       padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
       decoration: BoxDecoration(
         border: Border.all(color: Colors.white30, width: 1),
@@ -30,10 +30,13 @@ class AlertToggle extends StatelessWidget {
             style: const TextStyle(color: Colors.white, fontSize: 16),
           ),
           Switch(
+            key: const Key('alert_toggle_switch'),
             value: value,
             onChanged: onChanged,
-            activeColor: kAlertAccent,
-            activeTrackColor: kAlertAccent.withOpacity(0.4),
+            activeThumbColor: kAlertAccent,
+            activeTrackColor: kAlertAccent.withAlpha((0.4 * 255).toInt()),
+            inactiveThumbColor: Colors.grey,
+            inactiveTrackColor: Colors.grey.withAlpha((0.2 * 255).toInt()),
           ),
         ],
       ),

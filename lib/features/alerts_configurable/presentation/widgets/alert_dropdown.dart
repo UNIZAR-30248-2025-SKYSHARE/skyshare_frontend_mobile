@@ -9,14 +9,14 @@ class AlertDropdown<T> extends StatelessWidget {
   final String? Function(T?)? validator;
 
   const AlertDropdown({
-    Key? key,
+    super.key,
     required this.hintText,
     required this.value,
     required this.items,
     required this.onChanged,
     this.enabled = true,
     this.validator,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

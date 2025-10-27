@@ -1,4 +1,4 @@
-// screens/alert_form_screen.dart
+// widgets/alert_form_screen.dart (updated)
 import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -31,7 +31,6 @@ class AlertFormScreen extends StatefulWidget {
 class _AlertFormScreenState extends State<AlertFormScreen> {
   final _formKey = GlobalKey<FormState>();
   
-  final _nameController = TextEditingController();
   final _dateController = TextEditingController();
   final _timeController = TextEditingController();
 
@@ -56,7 +55,6 @@ class _AlertFormScreenState extends State<AlertFormScreen> {
 
   @override
   void dispose() {
-    _nameController.dispose();
     _dateController.dispose();
     _timeController.dispose();
     _valorMinController.dispose();
@@ -67,7 +65,6 @@ class _AlertFormScreenState extends State<AlertFormScreen> {
   void _loadExistingData() {
     if (widget.existingAlert != null) {
       final alert = widget.existingAlert!;
-      _nameController.text = alert.parametroObjetivo ?? '';
       _repetitionType = alert.tipoRepeticion;
       _isActive = alert.activa;
       _currentType = alert.tipoAlerta;
@@ -91,7 +88,8 @@ class _AlertFormScreenState extends State<AlertFormScreen> {
     if (tipo == 'fase lunar') {
       _lunarPhase = alert.parametroObjetivo;
     } else if (tipo == 'meteorologica') {
-      _weatherMetric = alert.parametroObjetivo ?? 'Nubosidad';
+      // Default metric now in English if not present
+      _weatherMetric = alert.parametroObjetivo ?? 'Cloudiness';
       if (alert.valorMinimo != null) {
         _valorMinController.text = alert.valorMinimo.toString();
       }
@@ -124,31 +122,31 @@ class _AlertFormScreenState extends State<AlertFormScreen> {
       case 'estrellas':
         return _starEventType;
       default:
-        return _nameController.text.isNotEmpty ? _nameController.text : null;
+        return null;
     }
   }
 
   bool _validateForm() {
-    // Validar campos específicos según tipo
+    // Validate specific fields per type
     if (_currentType == 'fase lunar' && _lunarPhase == null) {
-      _showError('Por favor selecciona una fase lunar');
+      _showError('Please select a lunar phase');
       return false;
     }
     
     if (_currentType == 'meteorologica') {
       if (_weatherMetric == null) {
-        _showError('Por favor selecciona un parámetro meteorológico');
+        _showError('Please select a weather parameter');
         return false;
       }
     }
     
     if (_currentType == 'estrellas' && _starEventType == null) {
-      _showError('Por favor selecciona una constelación');
+      _showError('Please select a constellation or event');
       return false;
     }
 
     if (_dateController.text.isEmpty) {
-      _showError('Por favor selecciona una fecha');
+      _showError('Please select a date');
       return false;
     }
 
@@ -156,9 +154,8 @@ class _AlertFormScreenState extends State<AlertFormScreen> {
   }
 
   AlertModel _createAlertData({required int idUbicacion}) {
-    final parametroObjetivo = _currentType == 'meteorologica'
-        ? _nameController.text.trim().isNotEmpty ? _nameController.text.trim() : _getSpecificParameterValue()
-        : _getSpecificParameterValue() ?? _nameController.text.trim();
+    // Alert name is auto-generated from the selected parameter.
+    final parametroObjetivo = _getSpecificParameterValue();
     
     double? minV;
     double? maxV;
@@ -174,7 +171,7 @@ class _AlertFormScreenState extends State<AlertFormScreen> {
     return AlertModel(
       idAlerta: widget.existingAlert?.idAlerta ?? 0,
       idUsuario: widget.existingAlert?.idUsuario ?? 'user123',
-      idUbicacion: idUbicacion, // ✅ Usar ID en vez de nombre
+      idUbicacion: idUbicacion,
       tipoAlerta: _currentType,
       parametroObjetivo: parametroObjetivo,
       tipoRepeticion: _repetitionType,
@@ -219,11 +216,14 @@ class _AlertFormScreenState extends State<AlertFormScreen> {
 
     setState(() => _isSaving = true);
 
-    final provider = Provider.of<AlertProvider>(context, listen: false);
+  final provider = Provider.of<AlertProvider>(context, listen: false);
+  // Capture repositories/providers that will be used after awaits to avoid
+  // using BuildContext across async gaps.
+  final locRepo = Provider.of<dashboard_location.LocationRepository>(context, listen: false);
 
     try {
       
-      int idUbicacion = 1; // Fallback por defecto
+      int idUbicacion = 1; // default fallback
       
       if (widget.existingAlert != null) {
         idUbicacion = widget.existingAlert!.idUbicacion;
@@ -231,8 +231,6 @@ class _AlertFormScreenState extends State<AlertFormScreen> {
         try {
           final loc = await LocationService.instance.getCurrentLocation()
               .timeout(const Duration(seconds: 8));
-          
-          final locRepo = Provider.of<dashboard_location.LocationRepository>(context, listen: false);
 
           try {
             final existing = await locRepo.findLocationByName(loc.city, loc.country);
@@ -252,34 +250,34 @@ class _AlertFormScreenState extends State<AlertFormScreen> {
               }
             }
           } catch (e) {
-            if (kDebugMode) print('Error al resolver/crear ubicación: $e');
+            if (kDebugMode) print('Error resolving/creating location: $e');
           }
           
         } catch (e) {
-          if (kDebugMode) print('Error obteniendo ubicación, usando fallback: $e');
+          if (kDebugMode) print('Error getting location, using fallback: $e');
         }
       }
 
       final alertData = _createAlertData(idUbicacion: idUbicacion);
       
       if (widget.existingAlert != null) {
-        if (kDebugMode) print('DEBUG Form: Actualizando alerta...');
+        if (kDebugMode) print('DEBUG Form: Updating alert...');
         await provider.updateAlert(widget.existingAlert!.idAlerta, alertData)
             .timeout(const Duration(seconds: 10));
         
         if (mounted) {
-          if (kDebugMode) print('DEBUG Form: Alerta actualizada exitosamente');
-          _showSuccess('Alerta actualizada correctamente');
+          if (kDebugMode) print('DEBUG Form: Alert updated successfully');
+          _showSuccess('Alert updated successfully');
           Navigator.of(context).pop(true);
         }
       } else {
-        if (kDebugMode) print('DEBUG Form: Creando nueva alerta...');
+        if (kDebugMode) print('DEBUG Form: Creating new alert...');
         await provider.addAlert(alertData)
             .timeout(const Duration(seconds: 10));
         
         if (mounted) {
-          if (kDebugMode) print('DEBUG Form: Alerta creada exitosamente');
-          _showSuccess('Alerta creada correctamente');
+          if (kDebugMode) print('DEBUG Form: Alert created successfully');
+          _showSuccess('Alert created successfully');
           Navigator.of(context).pop(true);
         }
       }
@@ -287,12 +285,12 @@ class _AlertFormScreenState extends State<AlertFormScreen> {
       if (kDebugMode) print('ERROR Form: Timeout - $e');
       if (mounted) {
         setState(() => _isSaving = false);
-        _showError('La operación tardó demasiado. Verifica tu conexión a internet.');
+        _showError('The operation timed out. Check your internet connection.');
       }
     } catch (e) {
       if (mounted) {
         setState(() => _isSaving = false);
-        _showError('Error al guardar: ${e.toString()}');
+        _showError('Error saving: ${e.toString()}');
       }
     }
   }
@@ -355,15 +353,15 @@ class _AlertFormScreenState extends State<AlertFormScreen> {
     return Column(
       children: [
         AlertFormField(
-          label: 'FASE LUNAR',
+          label: 'LUNAR PHASE',
           child: AlertDropdown<String>(
-            hintText: 'Seleccionar fase lunar',
+            hintText: 'Select lunar phase',
             value: _lunarPhase,
             items: const [
-              DropdownMenuItem(value: 'Luna Nueva', child: Text('Luna Nueva')),
-              DropdownMenuItem(value: 'Cuarto Creciente', child: Text('Cuarto Creciente')),
-              DropdownMenuItem(value: 'Luna Llena', child: Text('Luna Llena')),
-              DropdownMenuItem(value: 'Cuarto Menguante', child: Text('Cuarto Menguante')),
+              DropdownMenuItem(value: 'New Moon', child: Text('New Moon')),
+              DropdownMenuItem(value: 'First Quarter', child: Text('First Quarter')),
+              DropdownMenuItem(value: 'Full Moon', child: Text('Full Moon')),
+              DropdownMenuItem(value: 'Last Quarter', child: Text('Last Quarter')),
             ],
             onChanged: (value) {
               setState(() {
@@ -380,24 +378,24 @@ class _AlertFormScreenState extends State<AlertFormScreen> {
     String? validateValue(String? v, String metric) {
       if (v == null || v.isEmpty) return null;
       final parsed = double.tryParse(v);
-      if (parsed == null) return 'Introduce un número válido';
-      if (metric == 'Nubosidad') {
-        if (parsed < 0 || parsed > 100) return 'Rango 0-100';
-      } else if (metric == 'Contaminación lumínica') {
-        if (parsed < 0 || parsed > 9) return 'Rango 0-9';
-      } else if (metric == 'Indicador del cielo') {
-        if (parsed < 0 || parsed > 6) return 'Rango 0-6';
+      if (parsed == null) return 'Enter a valid number';
+      if (metric == 'Cloudiness') {
+        if (parsed < 0 || parsed > 100) return 'Range 0-100';
+      } else if (metric == 'Light pollution') {
+        if (parsed < 0 || parsed > 9) return 'Range 0-9';
+      } else if (metric == 'Sky indicator') {
+        if (parsed < 0 || parsed > 6) return 'Range 0-6';
       }
       return null;
     }
 
-    final metric = _weatherMetric ?? 'Nubosidad';
+    final metric = _weatherMetric ?? 'Cloudiness';
 
     return Column(
       children: [
         AlertChipSelector(
-          label: 'PARÁMETRO METEOROLÓGICO',
-          options: const ['Nubosidad', 'Contaminación lumínica', 'Indicador del cielo'],
+          label: 'WEATHER PARAMETER',
+          options: const ['Cloudiness', 'Light pollution', 'Sky indicator'],
           selectedValue: metric,
           onChanged: (value) {
             setState(() {
@@ -406,13 +404,13 @@ class _AlertFormScreenState extends State<AlertFormScreen> {
           },
         ),
         AlertFormField(
-          label: 'VALOR MÍNIMO',
+          label: 'MINIMUM VALUE',
           child: TextFormField(
             controller: _valorMinController,
             keyboardType: const TextInputType.numberWithOptions(decimal: true),
             style: const TextStyle(color: Colors.white),
             decoration: InputDecoration(
-              hintText: 'Valor mínimo (opcional)',
+              hintText: 'Minimum value (optional)',
               hintStyle: const TextStyle(color: Colors.white54),
               contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               border: OutlineInputBorder(
@@ -432,13 +430,13 @@ class _AlertFormScreenState extends State<AlertFormScreen> {
           ),
         ),
         AlertFormField(
-          label: 'VALOR MÁXIMO',
+          label: 'MAXIMUM VALUE',
           child: TextFormField(
             controller: _valorMaxController,
             keyboardType: const TextInputType.numberWithOptions(decimal: true),
             style: const TextStyle(color: Colors.white),
             decoration: InputDecoration(
-              hintText: 'Valor máximo (opcional)',
+              hintText: 'Maximum value (optional)',
               hintStyle: const TextStyle(color: Colors.white54),
               contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               border: OutlineInputBorder(
@@ -465,9 +463,9 @@ class _AlertFormScreenState extends State<AlertFormScreen> {
     return Column(
       children: [
         AlertFormField(
-          label: 'CONSTELACIÓN',
+          label: 'CONSTELLATION',
           child: AlertDropdown<String>(
-            hintText: 'Seleccionar constelación',
+            hintText: 'Select constellation',
             value: _starEventType,
             items: const [
               DropdownMenuItem(value: 'Virgo', child: Text('Virgo')),
@@ -506,18 +504,9 @@ class _AlertFormScreenState extends State<AlertFormScreen> {
   String _getAlertTypeTitle() {
     switch (_currentType) {
       case 'fase lunar': return 'LUNAR';
-      case 'meteorologica': return 'METEOROLÓGICA';
-      case 'estrellas': return 'DE ESTRELLAS';
+      case 'meteorologica': return 'WEATHER';
+      case 'estrellas': return 'STARS';
       default: return _currentType.toUpperCase();
-    }
-  }
-
-  String _getExampleName() {
-    switch (_currentType) {
-      case 'fase lunar': return 'Próxima Luna Llena';
-      case 'meteorologica': return 'Tormenta en Barcelona';
-      case 'estrellas': return 'Perseidas 2024';
-      default: return 'Mi Alerta';
     }
   }
 
@@ -527,17 +516,17 @@ class _AlertFormScreenState extends State<AlertFormScreen> {
       builder: (context) => AlertDialog(
         backgroundColor: const Color(0xFF1a1a2e),
         title: const Text(
-          'Eliminar Alerta',
+          'Delete Alert',
           style: TextStyle(color: Colors.white),
         ),
         content: const Text(
-          '¿Estás seguro de que quieres eliminar esta alerta? Esta acción no se puede deshacer.',
+          'Are you sure you want to delete this alert? This action cannot be undone.',
           style: TextStyle(color: Colors.white70),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text('CANCELAR', style: TextStyle(color: Colors.white70)),
+            child: const Text('CANCEL', style: TextStyle(color: Colors.white70)),
           ),
           TextButton(
             onPressed: () async {
@@ -546,21 +535,28 @@ class _AlertFormScreenState extends State<AlertFormScreen> {
               setState(() => _isSaving = true);
               
               try {
-                await Provider.of<AlertProvider>(context, listen: false)
-                    .deleteAlert(widget.existingAlert!.idAlerta);
-                
-                if (mounted) {
-                  _showSuccess('Alerta eliminada correctamente');
-                  Navigator.of(context).pop(true);
-                }
+        final provider = Provider.of<AlertProvider>(context, listen: false);
+        final navigator = Navigator.of(context);
+        final messenger = ScaffoldMessenger.of(context);
+
+        await provider.deleteAlert(widget.existingAlert!.idAlerta);
+
+        if (mounted) {
+          messenger.showSnackBar(const SnackBar(
+            content: Text('Alert deleted successfully'),
+            backgroundColor: Colors.green,
+            duration: Duration(seconds: 2),
+          ));
+          navigator.pop(true);
+        }
               } catch (e) {
                 if (mounted) {
                   setState(() => _isSaving = false);
-                  _showError('Error al eliminar la alerta: $e');
+                  _showError('Error deleting alert: $e');
                 }
               }
             },
-            child: const Text('ELIMINAR', style: TextStyle(color: Colors.red)),
+            child: const Text('DELETE', style: TextStyle(color: Colors.red)),
           ),
         ],
       ),
@@ -582,7 +578,7 @@ class _AlertFormScreenState extends State<AlertFormScreen> {
             onPressed: () => Navigator.of(context).pop(),
           ),
           title: Text(
-            '${isEditing ? 'EDITAR' : 'CREAR'} ALERTA ${_getAlertTypeTitle()}',
+            '${isEditing ? 'EDIT' : 'CREATE'} ALERT ${_getAlertTypeTitle()}',
             style: const TextStyle(
               color: Colors.white,
               fontSize: 18,
@@ -599,21 +595,21 @@ class _AlertFormScreenState extends State<AlertFormScreen> {
                   key: _formKey,
                   child: ListView(
                     children: [
-                      // Selector de tipo de alerta (sin "evento")
+                      // Alert type selector
                       AlertFormField(
-                        label: 'TIPO DE ALERTA',
+                        label: 'ALERT TYPE',
                         child: AlertDropdown<String>(
-                          hintText: 'Seleccionar tipo',
+                          hintText: 'Select type',
                           value: _currentType,
                           items: const [
-                            DropdownMenuItem(value: 'estrellas', child: Text('Estrellas')),
-                            DropdownMenuItem(value: 'fase lunar', child: Text('Fase lunar')),
-                            DropdownMenuItem(value: 'meteorologica', child: Text('Meteorológica')),
+                            DropdownMenuItem(value: 'estrellas', child: Text('Stars')),
+                            DropdownMenuItem(value: 'fase lunar', child: Text('Lunar phase')),
+                            DropdownMenuItem(value: 'meteorologica', child: Text('Weather')),
                           ],
                           onChanged: (value) {
                             setState(() {
                               _currentType = value ?? _currentType;
-                              // Limpiar campos específicos al cambiar tipo
+                              // Clear type-specific fields on change
                               _lunarPhase = null;
                               _weatherMetric = null;
                               _starEventType = null;
@@ -624,30 +620,28 @@ class _AlertFormScreenState extends State<AlertFormScreen> {
                         ),
                       ),
 
-                      // Campos comunes
+                      // Common fields (NOTE: name field removed - see comment below)
                       AlertCommonFields(
-                        nameController: _nameController,
                         dateController: _dateController,
                         timeController: _timeController,
                         onSelectDate: _selectDate,
                         onSelectTime: _selectTime,
-                        exampleNameGetter: _getExampleName,
                       ),
 
-                      // Campos específicos del tipo
+                      // Type-specific fields
                       _buildTypeSpecificFields(),
                       
-                      // Repetición
+                      // Repetition
                       AlertFormField(
-                        label: 'FRECUENCIA',
+                        label: 'FREQUENCY',
                         child: AlertDropdown<String>(
-                          hintText: 'Seleccionar frecuencia',
+                          hintText: 'Select frequency',
                           value: _repetitionType,
                           items: const [
-                            DropdownMenuItem(value: 'UNICA', child: Text('Única vez')),
-                            DropdownMenuItem(value: 'DIARIA', child: Text('Diaria')),
-                            DropdownMenuItem(value: 'SEMANAL', child: Text('Semanal')),
-                            DropdownMenuItem(value: 'MENSUAL', child: Text('Mensual')),
+                            DropdownMenuItem(value: 'UNICA', child: Text('Once')),
+                            DropdownMenuItem(value: 'DIARIA', child: Text('Daily')),
+                            DropdownMenuItem(value: 'SEMANAL', child: Text('Weekly')),
+                            DropdownMenuItem(value: 'MENSUAL', child: Text('Monthly')),
                           ],
                           onChanged: (value) {
                             setState(() {
@@ -657,11 +651,11 @@ class _AlertFormScreenState extends State<AlertFormScreen> {
                         ),
                       ),
 
-                      // Activa / Inactiva
+                      // Active / Inactive
                       AlertFormField(
-                        label: 'ESTADO',
+                        label: 'STATUS',
                         child: AlertToggle(
-                          label: 'ACTIVA',
+                          label: 'ACTIVE',
                           value: _isActive,
                           onChanged: (v) => setState(() => _isActive = v),
                         ),
@@ -669,7 +663,7 @@ class _AlertFormScreenState extends State<AlertFormScreen> {
 
                       const SizedBox(height: 12),
 
-                      // Botones de acción
+                      // Action buttons
                       Row(
                         children: [
                           Expanded(
@@ -694,7 +688,7 @@ class _AlertFormScreenState extends State<AlertFormScreen> {
                                       ),
                                     )
                                   : Text(
-                                      isEditing ? 'Guardar cambios' : 'Crear alerta',
+                                      isEditing ? 'Save changes' : 'Create alert',
                                       style: const TextStyle(
                                         fontSize: 16,
                                         fontWeight: FontWeight.bold,
@@ -716,7 +710,7 @@ class _AlertFormScreenState extends State<AlertFormScreen> {
                                   ),
                                 ),
                                 child: const Text(
-                                  'Eliminar',
+                                  'Delete',
                                   style: TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.bold,
@@ -733,7 +727,7 @@ class _AlertFormScreenState extends State<AlertFormScreen> {
                 ),
               ),
               
-              // Overlay de carga
+              // Loading overlay
               if (_isSaving)
                 Container(
                   color: Colors.black54,
@@ -749,4 +743,4 @@ class _AlertFormScreenState extends State<AlertFormScreen> {
       ),
     );
   }
-  }
+}

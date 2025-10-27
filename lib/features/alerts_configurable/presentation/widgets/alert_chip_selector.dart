@@ -8,12 +8,12 @@ class AlertChipSelector extends StatefulWidget {
   final String label;
 
   const AlertChipSelector({
-    Key? key,
+    super.key,
     required this.options,
     required this.selectedValue,
     required this.onChanged,
     required this.label,
-  }) : super(key: key);
+  });
 
   @override
   State<AlertChipSelector> createState() => _AlertChipSelectorState();

@@ -1,4 +1,3 @@
-// alert_model.dart - Modelo actualizado
 class AlertModel {
   final int idAlerta;
   final String idUsuario;

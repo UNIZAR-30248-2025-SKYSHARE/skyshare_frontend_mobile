@@ -5,12 +5,18 @@ class AlertFormField extends StatelessWidget {
   final Widget child;
   final EdgeInsetsGeometry? padding;
 
+  // Keys opcionales para testing
+  final Key? labelKey;
+  final Key? childKey;
+
   const AlertFormField({
-    Key? key,
+    super.key,
     required this.label,
     required this.child,
     this.padding,
-  }) : super(key: key);
+    this.labelKey,
+    this.childKey,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -21,6 +27,7 @@ class AlertFormField extends StatelessWidget {
         children: [
           Text(
             label.toUpperCase(),
+            key: labelKey ?? Key('alert_form_label_$label'),
             style: const TextStyle(
               color: Colors.white70,
               fontSize: 14,
@@ -28,7 +35,10 @@ class AlertFormField extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 8),
-          child,
+          Container(
+            key: childKey ?? Key('alert_form_child_$label'),
+            child: child,
+          ),
         ],
       ),
     );

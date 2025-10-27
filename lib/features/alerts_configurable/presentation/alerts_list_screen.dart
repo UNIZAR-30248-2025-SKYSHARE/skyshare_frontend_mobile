@@ -31,6 +31,7 @@ class _AlertsListScreenState extends State<AlertsListScreen> {
 
   void _handleAlertTap(dynamic alert) {
     final typeStr = (alert?.tipoAlerta ?? 'estrellas').toString().toLowerCase();
+    final provider = Provider.of<AlertProvider>(context, listen: false);
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (context) => AlertFormScreen(
@@ -39,10 +40,8 @@ class _AlertsListScreenState extends State<AlertsListScreen> {
         ),
       ),
     ).then((result) {
-      // Si el formulario devuelve true, significa que se guardó correctamente
+      // If the form returns true, reload alerts using the captured provider
       if (result == true) {
-        // Recargar las alertas desde Supabase
-        final provider = Provider.of<AlertProvider>(context, listen: false);
         provider.loadAlerts();
       }
     });
@@ -60,11 +59,11 @@ class _AlertsListScreenState extends State<AlertsListScreen> {
           try {
             await provider.deleteAlert(alertId);
             if (mounted) {
-              _showSuccessMessage('Alerta eliminada correctamente');
+              _showSuccessMessage('Alert deleted successfully');
             }
           } catch (e) {
             if (mounted) {
-              _showErrorMessage('Error al eliminar la alerta');
+              _showErrorMessage('Error deleting alert');
             }
           }
         },
@@ -73,14 +72,13 @@ class _AlertsListScreenState extends State<AlertsListScreen> {
   }
 
   void _handleCreateAlert() {
+    final provider = Provider.of<AlertProvider>(context, listen: false);
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (context) => const AlertFormScreen(alertType: 'estrellas'),
       ),
     ).then((result) {
       if (result == true) {
-        // Recargar las alertas
-        final provider = Provider.of<AlertProvider>(context, listen: false);
         provider.loadAlerts();
       }
     });
@@ -145,7 +143,7 @@ class _AlertsListScreenState extends State<AlertsListScreen> {
       backgroundColor: Colors.transparent,
       elevation: 0,
       title: const Text(
-        'Mis Alertas',
+        'My Alerts',
         style: TextStyle(
           fontSize: 20,
           fontWeight: FontWeight.bold,
@@ -160,7 +158,7 @@ class _AlertsListScreenState extends State<AlertsListScreen> {
             final provider = Provider.of<AlertProvider>(context, listen: false);
             provider.loadAlerts();
           },
-          tooltip: 'Recargar alertas',
+          tooltip: 'Reload alerts',
         ),
       ],
     );
@@ -182,12 +180,12 @@ class _AlertsListScreenState extends State<AlertsListScreen> {
                 await provider.toggleAlert(alertId, value);
                 if (mounted) {
                   _showSuccessMessage(
-                    value ? 'Alerta activada' : 'Alerta desactivada'
+                    value ? 'Alert activated' : 'Alert deactivated'
                   );
                 }
               } catch (e) {
                 if (mounted) {
-                  _showErrorMessage('Error al cambiar el estado de la alerta');
+                  _showErrorMessage('Error changing alert status');
                 }
               }
             },
@@ -245,7 +243,7 @@ class _AlertsListView extends StatelessWidget {
       child: ListView.separated(
         padding: const EdgeInsets.all(16),
         itemCount: alerts.length,
-        separatorBuilder: (_, __) => const SizedBox(height: 12),
+  separatorBuilder: (context, index) => const SizedBox(height: 12),
         itemBuilder: (context, index) {
           final alert = alerts[index];
           return AlertCardWidget(

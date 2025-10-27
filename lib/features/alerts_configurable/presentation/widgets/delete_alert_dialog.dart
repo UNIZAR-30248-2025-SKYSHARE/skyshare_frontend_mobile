@@ -27,7 +27,7 @@ class DeleteAlertDialog extends StatelessWidget {
         Container(
           padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(
-            color: Colors.red.withOpacity(0.1),
+          color: Colors.red.withAlpha((0.1 * 255).toInt()),
             shape: BoxShape.circle,
           ),
           child: const Icon(
@@ -37,9 +37,10 @@ class DeleteAlertDialog extends StatelessWidget {
           ),
         ),
         const SizedBox(width: 12),
-        const Expanded(
+        const Flexible(
+          fit: FlexFit.tight,
           child: Text(
-            '¿Eliminar alerta?',
+            'Delete alert?',
             style: TextStyle(
               color: Colors.white,
               fontSize: 18,
@@ -55,7 +56,7 @@ class DeleteAlertDialog extends StatelessWidget {
     return const Padding(
       padding: EdgeInsets.only(top: 8.0),
       child: Text(
-        'Esta acción no se puede deshacer. La alerta será eliminada permanentemente.',
+        'This action cannot be undone. The alert will be permanently deleted.',
         style: TextStyle(
           color: Colors.white70,
           fontSize: 14,
@@ -68,6 +69,7 @@ class DeleteAlertDialog extends StatelessWidget {
   List<Widget> _buildActions(BuildContext context) {
     return [
       TextButton(
+        key: const Key('delete_dialog_cancel'),
         onPressed: () => Navigator.of(context).pop(),
         child: const Text(
           'Cancelar',
@@ -78,14 +80,12 @@ class DeleteAlertDialog extends StatelessWidget {
         ),
       ),
       ElevatedButton(
+        key: const Key('delete_dialog_confirm'),
         onPressed: onConfirm,
         style: ElevatedButton.styleFrom(
           backgroundColor: Colors.red,
           foregroundColor: Colors.white,
-          padding: const EdgeInsets.symmetric(
-            horizontal: 24,
-            vertical: 12,
-          ),
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(8),
           ),

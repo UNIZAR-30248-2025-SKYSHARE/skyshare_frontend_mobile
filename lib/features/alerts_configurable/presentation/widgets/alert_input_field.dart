@@ -10,7 +10,7 @@ class AlertInputField extends StatelessWidget {
   final bool readOnly;
 
   const AlertInputField({
-    Key? key,
+    super.key,
     required this.hintText,
     required this.controller,
     this.keyboardType,
@@ -18,7 +18,7 @@ class AlertInputField extends StatelessWidget {
     this.validator,
     this.suffixIcon,
     this.readOnly = false,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

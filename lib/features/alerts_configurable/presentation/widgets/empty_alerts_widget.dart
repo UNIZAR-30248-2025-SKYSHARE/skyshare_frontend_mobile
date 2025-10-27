@@ -12,17 +12,18 @@ class EmptyAlertsWidget extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            // Icono de estrella grande
+            // Icono de estrella grande con Key
             Icon(
               Icons.notifications_off_outlined,
+              key: const Key('empty_alerts_icon'),
               size: 120,
-              color: Colors.white.withOpacity(0.3),
+              color: Colors.white.withAlpha((0.3 * 255).toInt()),
             ),
             const SizedBox(height: 24),
             
-            // Texto principal
             const Text(
-              'No tienes alertas',
+              'You don\'t have alerts',
+              key: Key('empty_alerts_title'),
               style: TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
@@ -32,12 +33,12 @@ class EmptyAlertsWidget extends StatelessWidget {
             ),
             const SizedBox(height: 12),
             
-            // Texto secundario
             Text(
-              'Crea tu primera alerta astronómica\npara no perderte ningún evento',
+              ' Make your first astronomical alert \nso you don\'t miss any event',
+              key: const Key('empty_alerts_subtitle'),
               style: TextStyle(
                 fontSize: 16,
-                color: Colors.white.withOpacity(0.7),
+              color: Colors.white.withAlpha((0.7 * 255).toInt()),
                 height: 1.5,
               ),
               textAlign: TextAlign.center,

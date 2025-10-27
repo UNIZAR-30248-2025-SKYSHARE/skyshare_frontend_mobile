@@ -14,17 +14,14 @@ class AlertsHeaderWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
+      key: const Key('alerts_header_container'),
       width: double.infinity,
-      padding: const EdgeInsets.symmetric(
-        horizontal: 20,
-        vertical: 16,
-      ),
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
       decoration: BoxDecoration(
-        // make header slightly transparent so the star background is visible
         color: Colors.transparent,
         border: Border(
           bottom: BorderSide(
-            color: Colors.white.withOpacity(0.1),
+          color: Colors.white.withAlpha((0.1 * 255).toInt()),
             width: 1,
           ),
         ),
@@ -33,11 +30,13 @@ class AlertsHeaderWidget extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           _InfoChip(
+            key: const Key('alerts_header_total'),
             icon: Icons.notifications,
-            label: '$totalAlerts ${totalAlerts == 1 ? 'alerta' : 'alertas'}',
+            label: '$totalAlerts ${totalAlerts == 1 ? 'alert' : 'alerts'}',
             color: Colors.white70,
           ),
           _InfoChip(
+            key: const Key('alerts_header_active'),
             icon: Icons.check_circle,
             label: '$activeAlerts activas',
             color: kAlertAccentDark,
@@ -54,6 +53,7 @@ class _InfoChip extends StatelessWidget {
   final Color color;
 
   const _InfoChip({
+    super.key,
     required this.icon,
     required this.label,
     required this.color,

@@ -6,12 +6,13 @@ import 'alert_style.dart';
 import 'package:skyshare_frontend_mobile/features/dashboard/data/repositories/location_repository.dart'
     as dashboard_location;
 
-/// Card that displays a single alert with a human-friendly location name.
 class AlertCardWidget extends StatefulWidget {
   final AlertModel alert;
   final VoidCallback? onTap;
   final ValueChanged<bool>? onToggle;
   final VoidCallback? onDelete;
+
+  final dashboard_location.LocationRepository? locationRepository;
 
   const AlertCardWidget({
     super.key,
@@ -19,6 +20,7 @@ class AlertCardWidget extends StatefulWidget {
     this.onTap,
     this.onToggle,
     this.onDelete,
+    this.locationRepository,
   });
 
   @override
@@ -29,43 +31,44 @@ class _AlertCardWidgetState extends State<AlertCardWidget> {
   String? _locationName;
   bool _isLoadingLocation = false;
 
-  String _getAlertTitle() => widget.alert.parametroObjetivo ?? 'Alerta';
+  String _getAlertTitle() => widget.alert.parametroObjetivo ?? 'Alert';
 
   String _getRepetitionText() {
-    final tipo = (widget.alert.tipoRepeticion ?? '').toUpperCase();
+    final tipo = widget.alert.tipoRepeticion.toUpperCase();
     switch (tipo) {
       case 'DIARIA':
-        return 'Todos los días';
+        return 'Every day';
       case 'SEMANAL':
-        return 'Cada semana';
+        return 'Every week';
       case 'MENSUAL':
-        return 'Cada mes';
+        return 'Every month';
       case 'UNICA':
       default:
-        return 'Una vez';
+        return 'Once';
     }
   }
 
   Color _getCardColor() {
     if (widget.alert.activa == false) {
-      return kAlertAccent.withOpacity(0.04);
+      return kAlertAccent.withAlpha((0.04 * 255).toInt());
     }
-    return kAlertAccent.withOpacity(0.12);
+    return kAlertAccent.withAlpha((0.12 * 255).toInt());
   }
 
   Future<void> _resolveLocationName(int? idUbicacion) async {
     if (idUbicacion == null || _isLoadingLocation) return;
-    
+
     setState(() {
       _isLoadingLocation = true;
     });
 
     try {
-      final repo = dashboard_location.LocationRepository();
+      final repo =
+          widget.locationRepository ?? dashboard_location.LocationRepository();
       final loc = await repo.fetchLocationById(idUbicacion);
       if (mounted) {
         setState(() {
-          _locationName = loc?.name; // Cambiado de 'nombre' a 'name'
+          _locationName = loc?.name;
           _isLoadingLocation = false;
         });
       }
@@ -94,16 +97,16 @@ class _AlertCardWidgetState extends State<AlertCardWidget> {
 
   @override
   Widget build(BuildContext context) {
-    final isActive = widget.alert.activa ?? false;
+    final isActive = widget.alert.activa;
     final repetition = _getRepetitionText();
-    
+
     String subtitleText;
     if (_isLoadingLocation) {
-      subtitleText = 'Cargando ubicación... • $repetition';
+      subtitleText = 'Loading location... • $repetition';
     } else if (_locationName != null && _locationName!.isNotEmpty) {
       subtitleText = '$_locationName • $repetition';
     } else {
-      subtitleText = 'Ubicación #${widget.alert.idUbicacion ?? '-'} • $repetition';
+      subtitleText = 'Location #${widget.alert.idUbicacion} • $repetition';
     }
 
     return GestureDetector(
@@ -114,8 +117,8 @@ class _AlertCardWidgetState extends State<AlertCardWidget> {
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
             color: isActive
-                ? Colors.white.withOpacity(0.2)
-                : Colors.grey.withOpacity(0.1),
+                ? Colors.white.withAlpha((0.2 * 255).toInt())
+                : Colors.grey.withAlpha((0.1 * 255).toInt()),
             width: 1,
           ),
         ),
@@ -126,8 +129,9 @@ class _AlertCardWidgetState extends State<AlertCardWidget> {
               AlertInfoRowWidget(
                 icon: CircleAvatar(
                   radius: 24,
-                  backgroundColor:
-                      isActive ? kAlertAccent.withOpacity(0.18) : Colors.transparent,
+                  backgroundColor: isActive
+                      ? kAlertAccent.withAlpha((0.18 * 255).toInt())
+                      : Colors.transparent,
                   child: Icon(
                     widget.alert.tipoAlerta == 'fase lunar'
                         ? Icons.brightness_2
@@ -139,23 +143,24 @@ class _AlertCardWidgetState extends State<AlertCardWidget> {
                     size: 28,
                     color: () {
                       if (widget.alert.tipoAlerta == 'fase lunar') return Colors.white;
-                      if (widget.alert.tipoAlerta == 'meteorologica') return Colors.yellow.shade600;
+                      if (widget.alert.tipoAlerta == 'meteorologica')
+                        return Colors.yellow.shade600.withAlpha((0.5 * 255).toInt());
                       if (widget.alert.tipoAlerta == 'estrellas') return kAlertAccent;
                       return isActive ? kAlertAccent : Colors.grey;
                     }(),
                   ),
                 ),
                 title: _getAlertTitle(),
-                subtitle: subtitleText, // Cambiado de subtitleWidget a subtitle
+                subtitle: subtitleText,
                 isActive: isActive,
                 switchValue: isActive,
-                onSwitchChanged: widget.onToggle ?? (bool value) {}, // Convertido a no-nullable
+                onSwitchChanged: widget.onToggle ?? (bool value) {},
               ),
               const SizedBox(height: 12),
               AlertFooterWidget(
                 date: widget.alert.fechaObjetivo,
                 isActive: isActive,
-                onDelete: widget.onDelete ?? () {}, // Convertido a no-nullable
+                onDelete: widget.onDelete ?? () {},
               ),
             ],
           ),

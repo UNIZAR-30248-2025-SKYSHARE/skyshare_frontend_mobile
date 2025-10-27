@@ -16,6 +16,7 @@ class AlertErrorWidget extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.all(24.0),
         child: Column(
+          mainAxisSize: MainAxisSize.min,
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             _buildErrorIcon(),
@@ -36,9 +37,10 @@ class AlertErrorWidget extends StatelessWidget {
       width: 80,
       height: 80,
       decoration: BoxDecoration(
-        color: Colors.red.withOpacity(0.1),
+      color: Colors.red.withAlpha((0.1 * 255).toInt()),
         shape: BoxShape.circle,
       ),
+      alignment: Alignment.center,
       child: const Icon(
         Icons.error_outline,
         color: Colors.red,
@@ -49,7 +51,7 @@ class AlertErrorWidget extends StatelessWidget {
 
   Widget _buildErrorTitle() {
     return const Text(
-      'Error al cargar alertas',
+      'Error loading alerts', // traducido
       style: TextStyle(
         color: Colors.white,
         fontSize: 18,
@@ -71,16 +73,14 @@ class AlertErrorWidget extends StatelessWidget {
 
   Widget _buildRetryButton() {
     return ElevatedButton.icon(
+      key: const Key('alert_retry_button'),
       onPressed: onRetry,
       icon: const Icon(Icons.refresh),
-      label: const Text('Reintentar'),
+      label: const Text('Retry'), // traducido
       style: ElevatedButton.styleFrom(
         backgroundColor: Colors.blue,
         foregroundColor: Colors.white,
-        padding: const EdgeInsets.symmetric(
-          horizontal: 32,
-          vertical: 14,
-        ),
+        padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 14),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),
         ),

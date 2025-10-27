@@ -13,23 +13,25 @@ class AlertFooterWidget extends StatelessWidget {
   });
 
   String _getDateText() {
-    if (date == null) return 'Sin fecha';
+    if (date == null) return 'No date set';
 
-    final now = DateTime.now();
-    final diff = date!.difference(now);
+    // Solo fecha, sin horas/minutos/segundos
+    final today = DateTime.now();
+    final currentDate = DateTime(today.year, today.month, today.day);
+    final targetDate = DateTime(date!.year, date!.month, date!.day);
+    final diff = targetDate.difference(currentDate).inDays;
 
-    if (diff.inDays == 0) {
-      return 'Hoy';
-    } else if (diff.inDays == 1) {
-      return 'Mañana';
-    } else if (diff.inDays < 7) {
-      return 'En ${diff.inDays} días';
-    } else if (diff.inDays < 30) {
-      final weeks = (diff.inDays / 7).floor();
-      return 'En $weeks ${weeks == 1 ? 'semana' : 'semanas'}';
-    } else {
-      return '${date!.day.toString().padLeft(2, '0')}/${date!.month.toString().padLeft(2, '0')}/${date!.year}';
+    if (diff == 0) return 'Today';
+    if (diff == 1) return 'Tomorrow';
+    if (diff < 7) return 'In $diff days';
+    if (diff < 30) {
+      final weeks = (diff / 7).floor();
+      return 'In $weeks ${weeks == 1 ? 'week' : 'weeks'}';
     }
+
+    return '${targetDate.day.toString().padLeft(2, '0')}/'
+        '${targetDate.month.toString().padLeft(2, '0')}/'
+        '${targetDate.year}';
   }
 
   @override
@@ -45,11 +47,12 @@ class AlertFooterWidget extends StatelessWidget {
 
   Widget _buildDateInfo() {
     return Container(
+      key: const Key('alert_footer_date'),
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
         color: isActive
-            ? Colors.white.withOpacity(0.1)
-            : Colors.grey.withOpacity(0.05),
+            ? Colors.white.withAlpha((0.1 * 255).toInt())
+            : Colors.grey.withAlpha((0.05 * 255).toInt()),
         borderRadius: BorderRadius.circular(8),
       ),
       child: Row(
@@ -75,20 +78,13 @@ class AlertFooterWidget extends StatelessWidget {
   }
 
   Widget _buildDeleteButton() {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.red.withOpacity(0.08),
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: IconButton(
-        onPressed: onDelete,
-        icon: const Icon(Icons.delete_outline),
-        color: Colors.red.shade700,
-        iconSize: 20,
-        padding: const EdgeInsets.all(8),
-        constraints: const BoxConstraints(),
-        tooltip: 'Eliminar alerta',
-      ),
+    return IconButton(
+      key: const Key('alert_footer_delete'),
+      onPressed: onDelete,
+      icon: const Icon(Icons.delete_outline),
+      color: Colors.red.shade700,
+      iconSize: 24,
+      tooltip: 'Delete alert',
     );
   }
 }
