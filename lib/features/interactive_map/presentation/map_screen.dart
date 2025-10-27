@@ -34,7 +34,6 @@ class MapScreen extends StatefulWidget {
 }
 
 class _MapScreenState extends State<MapScreen> {
-  final List<Marker> _createdMarkers = [];
   final MapController _mapController = MapController();
   String _filterValue = '';
   FilterType _filterType = FilterType.nombre;
@@ -132,8 +131,7 @@ class _MapScreenState extends State<MapScreen> {
     }
 
     // 2. Obtiene los límites visibles del mapa
-    final LatLngBounds? bounds = _mapController.camera.visibleBounds;
-    if (bounds == null) return;
+    final LatLngBounds bounds = _mapController.camera.visibleBounds;
     
     // 3. Llama al provider con los límites
     mapProvider.fetchSpots(bounds: bounds);

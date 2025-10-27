@@ -1,4 +1,4 @@
-import 'package:supabase_flutter/supabase_flutter.dart'; // ¡Añadir esta importación!
+import 'package:supabase_flutter/supabase_flutter.dart'; 
 
 class Spot {
   final int id;

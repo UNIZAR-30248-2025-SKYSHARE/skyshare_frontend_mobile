@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'dart:io';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:image_picker/image_picker.dart';
@@ -58,7 +59,7 @@ class SpotRepository {
 
       return resp.isNotEmpty;
     } catch (e) {
-      print('Error insertando spot: $e');
+      log('Error insertando spot: $e');
       return false;
     }
   }
@@ -92,7 +93,7 @@ class SpotRepository {
       
       return resp.isNotEmpty;
     } catch (e) {
-      print('Error actualizando spot: $e');
+      log('Error actualizando spot: $e');
       return false;
     }
   }
@@ -112,7 +113,7 @@ class SpotRepository {
           
       return resp.isNotEmpty;
     } catch (e) {
-      print('Error eliminando spot y/o valoraciones: $e');
+      log('Error eliminando spot y/o valoraciones: $e');
       return false;
     }
   }

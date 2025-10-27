@@ -1,5 +1,3 @@
-// create_spot_screen.dart (Refactorizado)
-
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -11,7 +9,6 @@ import 'package:supabase_flutter/supabase_flutter.dart'; // Necesario para GoTru
 
 class CreateSpotScreen extends StatefulWidget {
   final LatLng position;
-  // --- Dependencias Inyectadas ---
   final SpotRepository spotRepository;
   final LocationRepository locationRepository;
   final ImagePicker imagePicker;
@@ -20,7 +17,6 @@ class CreateSpotScreen extends StatefulWidget {
   const CreateSpotScreen({
     super.key,
     required this.position,
-    // Las requerimos en el constructor
     required this.spotRepository,
     required this.locationRepository,
     required this.imagePicker,
@@ -45,6 +41,7 @@ class _CreateSpotScreenState extends State<CreateSpotScreen> {
   GoTrueClient get _authClient => widget.authClient;
 
   Future<void> _seleccionarImagen() async {
+    // Es seguro usar 'context' aquí porque no hay 'await' antes.
     showModalBottomSheet(
       context: context,
       builder: (context) => SafeArea(
@@ -54,6 +51,7 @@ class _CreateSpotScreenState extends State<CreateSpotScreen> {
               leading: const Icon(Icons.camera_alt),
               title: const Text('Cámara'),
               onTap: () async {
+                // Es seguro usar 'context' en Navigator.pop ANTES del await
                 Navigator.pop(context);
                 final XFile? foto = await _picker.pickImage( // Usamos _picker
                   source: ImageSource.camera,
@@ -70,6 +68,7 @@ class _CreateSpotScreenState extends State<CreateSpotScreen> {
               leading: const Icon(Icons.photo_library),
               title: const Text('Galería'),
               onTap: () async {
+                // Es seguro usar 'context' en Navigator.pop ANTES del await
                 Navigator.pop(context);
                 final XFile? foto = await _picker.pickImage( // Usamos _picker
                   source: ImageSource.gallery,
@@ -91,6 +90,7 @@ class _CreateSpotScreenState extends State<CreateSpotScreen> {
   Future<void> _guardarSpot() async {
     if (!_formKey.currentState!.validate()) return;
     if (_imagen == null) {
+      // Seguro: Sin await previo
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Por favor, añade una foto')),
       );
@@ -99,9 +99,9 @@ class _CreateSpotScreenState extends State<CreateSpotScreen> {
 
     setState(() => _isLoading = true);
     
-    // --- Usamos el authClient inyectado ---
     final user = _authClient.currentUser;
     if (user == null) {
+      // Seguro: Sin await previo
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Error: Usuario no autenticado')),
       );
@@ -115,6 +115,14 @@ class _CreateSpotScreenState extends State<CreateSpotScreen> {
       widget.position.longitude,
     );
 
+    // --- PUNTO IMPORTANTE ---
+    // A partir de aquí, hemos tenido un 'await' (arriba).
+    // Todas las llamadas a 'context' deben ser verificadas.
+    // Aunque 'informacionNombres' no usa context, cualquier 'await'
+    // nos obliga a verificar 'mounted' antes de usar 'context'.
+    
+    if (!mounted) return; // Verificación por si el widget se desmontó durante el await
+
     try {
       final exito = await _repo.insertSpot( // Usamos _repo
         nombre: _nombreController.text,
@@ -127,12 +135,17 @@ class _CreateSpotScreenState extends State<CreateSpotScreen> {
         creadorId: user.id,
       );
 
+      // --- CORRECCIÓN ---
+      // Verificamos 'mounted' OTRA VEZ después del 'await' de insertSpot
+      if (!mounted) return;
+
       if (exito) {
+        // Ahora esta llamada es segura
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Spot creado correctamente')),
         );
-        // Comprobamos si el widget sigue montado antes de navegar
-        if (!mounted) return;
+        
+        // Y esta también es segura
         Navigator.pop(context, {
           'nombre': _nombreController.text,
           'lat': widget.position.latitude,
@@ -140,16 +153,20 @@ class _CreateSpotScreenState extends State<CreateSpotScreen> {
           'imagen': _imagen,
         });
       } else {
+        // Esta también es segura
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Error al crear el spot')),
         );
       }
     } catch (e) {
+      // --- CORRECCIÓN ---
+      // Verificamos 'mounted' también en el bloque catch
+      if (!mounted) return; 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error: $e')),
       );
     } finally {
-      // Comprobamos si sigue montado antes de actualizar estado
+      // Esta comprobación ya estaba correcta
       if (mounted) {
         setState(() => _isLoading = false);
       }

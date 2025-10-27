@@ -1,5 +1,3 @@
-import 'package:uuid/uuid.dart';
-
 class Rating {
   final int spotId; 
   final String userId; 

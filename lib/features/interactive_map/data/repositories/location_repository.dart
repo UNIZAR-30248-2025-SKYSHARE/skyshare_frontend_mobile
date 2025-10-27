@@ -1,8 +1,9 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:developer';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:http/http.dart' as http; // Importado
+import 'package:http/http.dart' as http; 
 import 'package:latlong2/latlong.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../../core/services/supabase_service.dart'; 
@@ -101,7 +102,7 @@ class LocationRepository {
 
       return rows.map(Spot.fromMap).toList();
     } catch (e) {
-      print('Error en fetchSpots (LocationRepository): $e');
+      log('Error en fetchSpots (LocationRepository): $e');
       return [];
     }
   }

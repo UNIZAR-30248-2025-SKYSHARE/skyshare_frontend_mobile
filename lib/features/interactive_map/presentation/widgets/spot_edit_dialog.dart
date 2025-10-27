@@ -1,7 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../data/models/spot_model.dart';
 import '../../data/repositories/spot_repository.dart';
 
@@ -111,8 +110,8 @@ class _SpotEditDialogState extends State<SpotEditDialog> {
                 Navigator.pop(confirmContext);
                 await _handleDelete();
               },
-              child: const Text('Eliminar', style: TextStyle(color: Colors.white)),
               style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+              child: const Text('Eliminar', style: TextStyle(color: Colors.white)),
             ),
           ],
         );
@@ -182,7 +181,7 @@ class _SpotEditDialogState extends State<SpotEditDialog> {
             // Botón de Seleccionar Imagen
             TextButton.icon(
               icon: const Icon(Icons.photo, color: Colors.blue),
-              label: Text(_pickedFile != null ? 'Cambiar imagen' : 'Seleccionar nueva imagen', style: TextStyle(color: Colors.blue)),
+              label: Text(_pickedFile != null ? 'Cambiar imagen' : 'Seleccionar nueva imagen', style: const TextStyle(color: Colors.blue)),
               onPressed: _pickImage,
             ),
             const Divider(color: Colors.white30),

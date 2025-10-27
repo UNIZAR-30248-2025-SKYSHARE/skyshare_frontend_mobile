@@ -84,6 +84,7 @@ class SpotPopupWidget extends StatelessWidget {
                           image: NetworkImage(spot.urlImagen!), 
                           fit: BoxFit.cover,
                           colorFilter: ColorFilter.mode(
+                            // ignore: deprecated_member_use
                             Colors.black.withOpacity(0.5), 
                             BlendMode.darken,
                           ),
@@ -230,7 +231,7 @@ class SpotPopupWidget extends StatelessWidget {
   }
 
   void _showCommentDialog(BuildContext widgetContext) {
-    final TextEditingController _controller = TextEditingController();
+    final TextEditingController controller = TextEditingController();
     showDialog(
       context: widgetContext, 
       builder: (dialogContext) {
@@ -239,7 +240,7 @@ class SpotPopupWidget extends StatelessWidget {
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
           title: const Text('Comentar spot', style: TextStyle(color: Colors.white)),
           content: TextField(
-            controller: _controller,
+            controller: controller,
             maxLines: 4,
             decoration: InputDecoration(
               hintText: 'Escribe tu comentario aquí...',
@@ -254,7 +255,7 @@ class SpotPopupWidget extends StatelessWidget {
             TextButton(onPressed: () => Navigator.pop(dialogContext), child: const Text('Cancelar')),
             FilledButton(
               onPressed: () async {
-                final content = _controller.text.trim();
+                final content = controller.text.trim();
                 if (content.isEmpty) return;
                 Navigator.pop(dialogContext); 
                 try {
