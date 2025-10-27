@@ -73,7 +73,7 @@ void main() {
       final container = tester.widget<Container>(find.byType(Container).first);
       final decoration = container.decoration as BoxDecoration;
       final color = decoration.color!;
-      expect(color.opacity, closeTo(0.04, 0.01));
+      expect(color.a, closeTo(0.04, 0.01));
     });
 
     testWidgets('ejecuta callback onTap correctamente', (tester) async {

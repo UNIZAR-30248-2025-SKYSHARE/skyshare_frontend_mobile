@@ -7,8 +7,6 @@ class AppNavigation extends StatelessWidget {
   final int selectedIndex;
   final NavTapCallback onTap;
   final int locationCount;
-  final int maxLocations;
-  final VoidCallback onAddLocation;
   final int selectedLocationIndex;
   final LocationSelectCallback? onLocationSelected;
 
@@ -16,8 +14,6 @@ class AppNavigation extends StatelessWidget {
     required this.selectedIndex,
     required this.onTap,
     required this.locationCount,
-    required this.onAddLocation,
-    this.maxLocations = 3,
     this.selectedLocationIndex = 0,
     this.onLocationSelected,
     super.key,
@@ -25,8 +21,6 @@ class AppNavigation extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final showAdd = locationCount < maxLocations;
-    final dotsCount = showAdd ? locationCount + 1 : locationCount;
     return Container(
       decoration: const BoxDecoration(
         gradient: LinearGradient(
@@ -55,56 +49,25 @@ class AppNavigation extends StatelessWidget {
               Expanded(
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
-                  children: List.generate(
-                    dotsCount,
-                    (index) {
-                      if (showAdd && index == locationCount) {
-                        return GestureDetector(
-                          onTap: onAddLocation,
-                          child: Container(
-                            margin: const EdgeInsets.symmetric(horizontal: 8),
-                            width: 20,
-                            height: 20,
-                            decoration: const BoxDecoration(
-                              color: Color.fromRGBO(255, 255, 255, 0.95),
-                              shape: BoxShape.circle,
-                            ),
-                            child: const Center(child: Icon(Icons.add, size: 12, color: Colors.black)),
-                          ),
-                        );
-                      }
-                      final isActive = index == selectedLocationIndex;
-                      return GestureDetector(
-                        onTap: () {
-                          if (onLocationSelected != null) {
-                            onLocationSelected!(index);
-                          }
-                          onTap(0);
-                        },
-                        child: Container(
-                          margin: const EdgeInsets.symmetric(horizontal: 8),
-                          width: isActive ? 16 : 12,
-                          height: isActive ? 16 : 12,
-                          decoration: BoxDecoration(
-                            color: isActive ? const Color(0xFFFFFFFF) : const Color.fromRGBO(255, 255, 255, 0.65),
-                            shape: BoxShape.circle,
-                            boxShadow: isActive
-                            ? [const BoxShadow(color: Color.fromRGBO(255, 255, 255, 0.12), blurRadius: 6, offset: Offset(0, 2))]
-                            : null,
-                          ),
-                        ),
-                      );
-                    },
-                  ),
+                  children: [
+                    IconButton(
+                      onPressed: () => onTap(2),
+                      icon: Icon(
+                        Icons.notifications,
+                        color: selectedIndex == 2 ? Colors.white : Colors.white70,
+                      ),
+                      tooltip: 'Alertas',
+                    ),
+                  ],
                 ),
               ),
               IconButton(
-                onPressed: () => onTap(2),
-                icon: Icon(Icons.map, color: selectedIndex == 2 ? Colors.white : Colors.white70),
+                onPressed: () => onTap(3),
+                icon: Icon(Icons.map, color: selectedIndex == 3 ? Colors.white : Colors.white70),
               ),
               IconButton(
-                onPressed: () => onTap(3),
-                icon: Icon(Icons.person, color: selectedIndex == 3 ? Colors.white : Colors.white70),
+                onPressed: () => onTap(4),
+                icon: Icon(Icons.person, color: selectedIndex == 4 ? Colors.white : Colors.white70),
               ),
               const SizedBox(width: 6),
             ],

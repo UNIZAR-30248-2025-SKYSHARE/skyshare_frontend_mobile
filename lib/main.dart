@@ -21,9 +21,10 @@ import 'core/services/supabase_service.dart';
 import 'core/widgets/app_navigation.dart';
 import 'features/interactive_map/presentation/map_screen.dart';
 import 'package:skyshare_frontend_mobile/features/interactive_map/providers/interactive_map_provider.dart';
-import 'features/alerts_configurable/presentation/alerts_list_screen.dart';
 import 'features/alerts_configurable/providers/alert_provider.dart';
 import 'features/alerts_configurable/data/repository/alerts_repository.dart';
+import 'features/alerts_configurable/presentation/alerts_list_screen.dart';
+
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -144,9 +145,7 @@ class MyApp extends StatelessWidget {
           useMaterial3: true,
           scaffoldBackgroundColor: const Color(0xFF0A0E27),
         ),
-        home: kDebugMode
-            ? const AlertsListScreen()
-            : const AuthWrapper(),
+        home: const AuthWrapper(),
       ),
     );
   }
@@ -197,8 +196,6 @@ class _RootAppState extends State<RootApp> {
     });
   }
 
-  void _onAddLocation() {}
-
   @override
   Widget build(BuildContext context) {
     final provider = context.watch<DashboardProvider>();
@@ -206,8 +203,9 @@ class _RootAppState extends State<RootApp> {
     final pages = <Widget>[
       const DashboardScreen(),                   
       const PhaseLunarScreen(),
+      const AlertsListScreen(),
       const MapScreen(),
-      const Center(child: Text('Perfil - placeholder')),
+      const Center(child: Text('Perfil - placeholder'))
     ];
 
     return Scaffold(
@@ -216,7 +214,6 @@ class _RootAppState extends State<RootApp> {
         selectedIndex: _selectedIndex,
         onTap: _onTap,
         locationCount: locationCount,
-        onAddLocation: _onAddLocation,
         selectedLocationIndex: _selectedLocationIndex,
         onLocationSelected: _onLocationSelected,
       ),

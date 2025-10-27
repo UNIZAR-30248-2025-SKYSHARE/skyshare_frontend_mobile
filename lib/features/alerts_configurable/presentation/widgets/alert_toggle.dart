@@ -33,10 +33,14 @@ class AlertToggle extends StatelessWidget {
             key: const Key('alert_toggle_switch'),
             value: value,
             onChanged: onChanged,
-            activeThumbColor: kAlertAccent,
-            activeTrackColor: kAlertAccent.withAlpha((0.4 * 255).toInt()),
-            inactiveThumbColor: Colors.grey,
-            inactiveTrackColor: Colors.grey.withAlpha((0.2 * 255).toInt()),
+            thumbColor: WidgetStateProperty.resolveWith((states) {
+              return states.contains(WidgetState.selected) ? kAlertAccent : Colors.grey;
+            }),
+            trackColor: WidgetStateProperty.resolveWith((states) {
+              return states.contains(WidgetState.selected) 
+                ? kAlertAccent.withAlpha((0.4 * 255).toInt())
+                : Colors.grey.withAlpha((0.2 * 255).toInt());
+            }),
           ),
         ],
       ),

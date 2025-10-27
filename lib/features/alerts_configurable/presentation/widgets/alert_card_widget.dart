@@ -143,8 +143,9 @@ class _AlertCardWidgetState extends State<AlertCardWidget> {
                     size: 28,
                     color: () {
                       if (widget.alert.tipoAlerta == 'fase lunar') return Colors.white;
-                      if (widget.alert.tipoAlerta == 'meteorologica')
+                      if (widget.alert.tipoAlerta == 'meteorologica') {
                         return Colors.yellow.shade600.withAlpha((0.5 * 255).toInt());
+                      }
                       if (widget.alert.tipoAlerta == 'estrellas') return kAlertAccent;
                       return isActive ? kAlertAccent : Colors.grey;
                     }(),
