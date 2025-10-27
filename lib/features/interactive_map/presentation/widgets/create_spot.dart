@@ -107,7 +107,12 @@ class _CreateSpotScreenState extends State<CreateSpotScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Spot creado correctamente')),
         );
-        Navigator.pop(context);
+        Navigator.pop(context, {
+            'nombre': _nombreController.text,
+            'lat': widget.position.latitude,
+            'lng': widget.position.longitude,
+            'imagen': _imagen,
+        });
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Error al crear el spot')),
