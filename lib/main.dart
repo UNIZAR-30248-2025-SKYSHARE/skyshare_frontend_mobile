@@ -6,6 +6,7 @@ import 'package:skyshare_frontend_mobile/features/auth/data/repositories/auth_re
 import 'package:skyshare_frontend_mobile/features/auth/presentation/auth_screen.dart';
 import 'package:skyshare_frontend_mobile/features/auth/providers/auth_provider.dart';
 import 'package:skyshare_frontend_mobile/features/phase_lunar/presentation/phase_lunar_screen.dart';
+import 'package:skyshare_frontend_mobile/features/push_notifications/services/one_signal_service.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'features/dashboard/providers/dashboard_provider.dart';
 import 'features/dashboard/presentation/dashboard_screen.dart';
@@ -27,6 +28,16 @@ Future<void> main() async {
   await SupabaseService.instance.init();
   final supabase = SupabaseService.instance.client;
 
+  if(!kIsWeb){ 
+    await OneSignalService().init();
+    await OneSignalService().requestPermission();
+
+    final user = supabase.auth.currentUser;
+    if(user != null){
+      await OneSignalService().sendPlayerId(supabase, user.id);
+    }
+  }
+
   if (kDebugMode) {
     final devEmail = dotenv.env['DEV_EMAIL'];
     final devPassword = dotenv.env['DEV_PASSWORD'];
@@ -38,7 +49,13 @@ Future<void> main() async {
         );
 
         if (response.user != null) {
-          print('[DEBUG] Usuario dev autenticado: ${response.user!.id}');
+          final uid = response.user!.id;
+          print('[DEBUG] Usuario dev autenticado: $uid');
+          // Enviar el playerId tras el login dev para registrar el dispositivo
+          if (!kIsWeb) {
+            print('[DEBUG] Enviando playerId a Supabase tras login dev...');
+            await OneSignalService().sendPlayerId(supabase, uid);
+          }
         } else {
           print('[DEBUG] No se pudo autenticar el usuario dev (respuesta sin user).');
         }
