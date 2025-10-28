@@ -2694,7 +2694,13 @@
       "in": "body",
       "schema": {
         "$ref": "#/definitions/valoracion"
-      }
+      },
+      "example": {
+          "id_usuario": "21",
+          "id_spot": "15",
+          "puntuacion": 4,
+          "fecha_valoracion": "2025-10-28T18:30:00Z"
+       }
     },
     "rowFilter.valoracion.id_usuario": {
       "name": "id_usuario",
