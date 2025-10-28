@@ -1,4 +1,4 @@
-{
+
   "swagger": "2.0",
   "info": {
     "description": "",
@@ -2069,11 +2069,15 @@
         "id_spot": {
           "description": "Note:\nThis is a Primary Key.<pk/>\nThis is a Foreign Key to `spot.id_spot`.<fk table='spot' column='id_spot'/>",
           "format": "integer",
-          "type": "integer"
+          "type": "integer",
+          "minimum": 1
+
         },
         "puntuacion": {
           "format": "integer",
-          "type": "integer"
+          "type": "integer",
+          "minimum": 1
+
         },
         "fecha_valoracion": {
           "format": "date",
