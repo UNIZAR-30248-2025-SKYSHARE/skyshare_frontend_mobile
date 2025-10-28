@@ -62,7 +62,6 @@ class SpotImageHeader extends StatelessWidget {
                   begin: Alignment.bottomCenter,
                   end: Alignment.topCenter,
                   colors: [
-                    // aquí también reemplazamos withOpacity
                     const Color(0xFF13121A).withValues(alpha: 0.9),
                     const Color(0xFF13121A).withValues(alpha: 0.1),
                     Colors.transparent,

@@ -92,7 +92,7 @@ class _SpotEditDialogState extends State<SpotEditDialog> {
 
   void _confirmDelete() {
     if (!mounted) return;
-    Navigator.pop(context); // Cierra el diálogo de edición
+    Navigator.pop(context); 
 
     showDialog(
       context: context,
@@ -143,14 +143,12 @@ class _SpotEditDialogState extends State<SpotEditDialog> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Campo Nombre
             TextField(
               controller: _nombreController,
               decoration: const InputDecoration(labelText: 'Nombre', labelStyle: TextStyle(color: Colors.white70)),
               style: const TextStyle(color: Colors.white),
             ),
             const SizedBox(height: 12),
-            // Campo Descripción
             TextField(
               controller: _descripcionController,
               decoration: const InputDecoration(labelText: 'Descripción', labelStyle: TextStyle(color: Colors.white70)),
@@ -158,7 +156,6 @@ class _SpotEditDialogState extends State<SpotEditDialog> {
               style: const TextStyle(color: Colors.white),
             ),
             const SizedBox(height: 20),
-            // Visualizador de Imagen
             const Text('Imagen:', style: TextStyle(color: Colors.white70)),
             const SizedBox(height: 8),
             Center(
@@ -178,7 +175,6 @@ class _SpotEditDialogState extends State<SpotEditDialog> {
               ),
             ),
             const SizedBox(height: 12),
-            // Botón de Seleccionar Imagen
             TextButton.icon(
               icon: const Icon(Icons.photo, color: Colors.blue),
               label: Text(_pickedFile != null ? 'Cambiar imagen' : 'Seleccionar nueva imagen', style: const TextStyle(color: Colors.blue)),
@@ -186,7 +182,6 @@ class _SpotEditDialogState extends State<SpotEditDialog> {
             ),
             const Divider(color: Colors.white30),
             const SizedBox(height: 10),
-            // Opción de Eliminar
             TextButton.icon(
               icon: const Icon(Icons.delete_forever, color: Colors.red),
               label: const Text('Eliminar Spot (Permanente)', style: TextStyle(color: Colors.red)),

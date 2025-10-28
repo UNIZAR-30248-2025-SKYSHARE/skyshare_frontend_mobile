@@ -30,6 +30,11 @@ void main() {
   late MockLocationRepository mockLocationRepository;
   late InteractiveMapProvider mapProvider;
 
+  setUpAll(() {
+    registerFallbackValue(const LatLng(0, 0));
+    registerFallbackValue(LatLngBounds(const LatLng(0, 0), const LatLng(0, 0)));
+  });
+
   setUp(() {
     mockLocationRepository = MockLocationRepository();
     mapProvider = InteractiveMapProvider(locationRepository: mockLocationRepository);
@@ -38,6 +43,8 @@ void main() {
   testWidgets('debería mostrar el mapa y cargar ubicación inicial', (tester) async {
     when(() => mockLocationRepository.getCurrentLatLng())
         .thenAnswer((_) async => const LatLng(40.4168, -3.7038));
+    when(() => mockLocationRepository.fetchSpots(limit: any(named: 'limit'), bounds: any(named: 'bounds')))
+        .thenAnswer((_) async => []);
 
     await tester.pumpWidget(
       MaterialApp(
@@ -48,6 +55,8 @@ void main() {
       ),
     );
 
+    await tester.pumpAndSettle();
+    await tester.pump(const Duration(milliseconds: 600));
     await tester.pumpAndSettle();
 
     expect(find.byType(MapScreen), findsOneWidget);
@@ -56,6 +65,8 @@ void main() {
   testWidgets('debería manejar error al obtener ubicación', (tester) async {
     when(() => mockLocationRepository.getCurrentLatLng())
         .thenAnswer((_) async => null);
+    when(() => mockLocationRepository.fetchSpots(limit: any(named: 'limit'), bounds: any(named: 'bounds')))
+        .thenAnswer((_) async => []);
 
     await tester.pumpWidget(
       MaterialApp(
@@ -66,6 +77,8 @@ void main() {
       ),
     );
 
+    await tester.pumpAndSettle();
+    await tester.pump(const Duration(milliseconds: 600));
     await tester.pumpAndSettle();
 
     expect(mapProvider.errorMessage, isNotNull);
@@ -74,9 +87,10 @@ void main() {
   testWidgets('debería obtener información de ubicación al hacer tap', (tester) async {
     when(() => mockLocationRepository.getCurrentLatLng())
         .thenAnswer((_) async => const LatLng(40.4168, -3.7038));
-    
     when(() => mockLocationRepository.getCityCountryFromCoordinates(any(), any()))
         .thenAnswer((_) async => {'city': 'Madrid', 'country': 'España'});
+    when(() => mockLocationRepository.fetchSpots(limit: any(named: 'limit'), bounds: any(named: 'bounds')))
+        .thenAnswer((_) async => []);
 
     await tester.pumpWidget(
       MaterialApp(
@@ -88,9 +102,11 @@ void main() {
     );
 
     await tester.pumpAndSettle();
+    await tester.pump(const Duration(milliseconds: 600));
+    await tester.pumpAndSettle();
 
     final result = await mapProvider.fetchSpotLocation(const LatLng(40.4168, -3.7038));
-    
+
     expect(result['city'], 'Madrid');
     expect(result['country'], 'España');
   });
@@ -111,7 +127,7 @@ void main() {
       descripcion: 'Lugar bonito',
     );
 
-    when(() => mockLocationRepository.fetchSpots(limit: any(named: 'limit')))
+    when(() => mockLocationRepository.fetchSpots(limit: any(named: 'limit'), bounds: any(named: 'bounds')))
         .thenAnswer((_) async => [spot]);
 
     await tester.pumpWidget(
@@ -124,6 +140,8 @@ void main() {
     );
 
     await tester.pumpAndSettle();
+    await tester.pump(const Duration(milliseconds: 600));
+    await tester.pumpAndSettle();
 
     expect(find.byIcon(Icons.location_on), findsWidgets);
   });
@@ -131,6 +149,8 @@ void main() {
   testWidgets('debería mostrar y expandir el FilterWidget', (tester) async {
     when(() => mockLocationRepository.getCurrentLatLng())
         .thenAnswer((_) async => const LatLng(40.4168, -3.7038));
+    when(() => mockLocationRepository.fetchSpots(limit: any(named: 'limit'), bounds: any(named: 'bounds')))
+        .thenAnswer((_) async => []);
 
     await tester.pumpWidget(
       MaterialApp(
@@ -141,6 +161,8 @@ void main() {
       ),
     );
 
+    await tester.pumpAndSettle();
+    await tester.pump(const Duration(milliseconds: 600));
     await tester.pumpAndSettle();
 
     expect(find.byIcon(Icons.filter_list), findsOneWidget);
@@ -183,7 +205,7 @@ void main() {
       ),
     ];
 
-    when(() => mockLocationRepository.fetchSpots(limit: any(named: 'limit')))
+    when(() => mockLocationRepository.fetchSpots(limit: any(named: 'limit'), bounds: any(named: 'bounds')))
         .thenAnswer((_) async => spots);
 
     await tester.pumpWidget(
@@ -195,6 +217,8 @@ void main() {
       ),
     );
 
+    await tester.pumpAndSettle();
+    await tester.pump(const Duration(milliseconds: 600));
     await tester.pumpAndSettle();
 
     await tester.tap(find.byIcon(Icons.filter_list));
@@ -237,7 +261,7 @@ void main() {
       ),
     ];
 
-    when(() => mockLocationRepository.fetchSpots(limit: any(named: 'limit')))
+    when(() => mockLocationRepository.fetchSpots(limit: any(named: 'limit'), bounds: any(named: 'bounds')))
         .thenAnswer((_) async => spots);
 
     await tester.pumpWidget(
@@ -249,6 +273,8 @@ void main() {
       ),
     );
 
+    await tester.pumpAndSettle();
+    await tester.pump(const Duration(milliseconds: 600));
     await tester.pumpAndSettle();
 
     await tester.tap(find.byIcon(Icons.filter_list));
@@ -279,7 +305,7 @@ void main() {
       ),
     ];
 
-    when(() => mockLocationRepository.fetchSpots(limit: any(named: 'limit')))
+    when(() => mockLocationRepository.fetchSpots(limit: any(named: 'limit'), bounds: any(named: 'bounds')))
         .thenAnswer((_) async => spots);
 
     await tester.pumpWidget(
@@ -291,6 +317,8 @@ void main() {
       ),
     );
 
+    await tester.pumpAndSettle();
+    await tester.pump(const Duration(milliseconds: 600));
     await tester.pumpAndSettle();
 
     await tester.tap(find.byIcon(Icons.filter_list));
@@ -305,6 +333,8 @@ void main() {
   testWidgets('debería limpiar filtro correctamente', (tester) async {
     when(() => mockLocationRepository.getCurrentLatLng())
         .thenAnswer((_) async => const LatLng(40.4168, -3.7038));
+    when(() => mockLocationRepository.fetchSpots(limit: any(named: 'limit'), bounds: any(named: 'bounds')))
+        .thenAnswer((_) async => []);
 
     await tester.pumpWidget(
       MaterialApp(
@@ -315,6 +345,8 @@ void main() {
       ),
     );
 
+    await tester.pumpAndSettle();
+    await tester.pump(const Duration(milliseconds: 600));
     await tester.pumpAndSettle();
 
     await tester.tap(find.byIcon(Icons.filter_list));

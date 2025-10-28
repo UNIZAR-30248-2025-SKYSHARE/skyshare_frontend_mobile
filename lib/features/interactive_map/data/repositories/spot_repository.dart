@@ -125,7 +125,12 @@ class SpotRepository {
   }
 
   Future<Spot?> fetchSpotById(int id) async {
-    final resp = await client.from('spot').select('*, ubicacion(*)').eq('id_spot', id).maybeSingle();
+    final resp = await client
+      .from('spot')
+      .select('*, ubicacion(*), valoracion(puntuacion)')
+      .eq('id_spot', id)
+      .maybeSingle();
+
     if (resp == null) return null;
     return Spot.fromMap(Map<String, dynamic>.from(resp));
   }

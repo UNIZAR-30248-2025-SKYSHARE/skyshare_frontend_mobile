@@ -11,16 +11,15 @@ import '../models/spot_model.dart';
 
 class LocationRepository {
   final SupabaseClient client;
-  final http.Client httpClient; // <-- 1. AÑADIDO: Cliente HTTP para inyección
+  final http.Client httpClient;
 
   LocationRepository({
     SupabaseClient? client,
-    http.Client? httpClient, // <-- 2. AÑADIDO: Parámetro en el constructor
+    http.Client? httpClient,
   })  : client = client ?? SupabaseService.instance.client,
-        httpClient = httpClient ?? http.Client(); // <-- 3. AÑADIDO: Inicialización
+        httpClient = httpClient ?? http.Client();
 
   Future<Position?> getCurrentPosition() async {
-    // ... (este método no cambia)
     try {
       final serviceEnabled = await Geolocator.isLocationServiceEnabled();
       if (!serviceEnabled) return null;
@@ -41,10 +40,8 @@ class LocationRepository {
     final url = Uri.parse(
         'https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=$lat&lon=$lng&zoom=14&addressdetails=1');
     try {
-      // --- 4. CAMBIADO: Usa el httpClient inyectado en lugar de http.get() ---
       final response =
           await httpClient.get(url, headers: {'User-Agent': 'MiAppFlutter/1.0'});
-      // --------------------------------------------------------------------
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
@@ -66,14 +63,12 @@ class LocationRepository {
   }
 
   Future<LatLng?> getCurrentLatLng() async {
-    // ... (este método no cambia)
     final position = await getCurrentPosition();
     if (position == null) return null;
     return LatLng(position.latitude, position.longitude);
   }
 
   Future<List<Spot>> fetchSpots({LatLngBounds? bounds, required limit}) async {
-    // ... (este método no cambia)
     if (bounds == null) {
       return [];
     }

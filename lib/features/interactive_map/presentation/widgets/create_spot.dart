@@ -5,14 +5,15 @@ import 'package:latlong2/latlong.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import '../../data/repositories/spot_repository.dart';
 import '../../data/repositories/location_repository.dart';
-import 'package:supabase_flutter/supabase_flutter.dart'; // Necesario para GoTrueClient y User
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:skyshare_frontend_mobile/core/widgets/star_background.dart';
 
 class CreateSpotScreen extends StatefulWidget {
   final LatLng position;
   final SpotRepository spotRepository;
   final LocationRepository locationRepository;
   final ImagePicker imagePicker;
-  final GoTrueClient authClient; // Inyectamos el cliente de auth
+  final GoTrueClient authClient;
 
   const CreateSpotScreen({
     super.key,
@@ -34,14 +35,12 @@ class _CreateSpotScreenState extends State<CreateSpotScreen> {
   XFile? _imagen;
   bool _isLoading = false;
 
-  // --- Accedemos a las dependencias via `widget` ---
   SpotRepository get _repo => widget.spotRepository;
   LocationRepository get _locationRepo => widget.locationRepository;
   ImagePicker get _picker => widget.imagePicker;
   GoTrueClient get _authClient => widget.authClient;
 
   Future<void> _seleccionarImagen() async {
-    // Es seguro usar 'context' aquí porque no hay 'await' antes.
     showModalBottomSheet(
       context: context,
       builder: (context) => SafeArea(
@@ -49,11 +48,10 @@ class _CreateSpotScreenState extends State<CreateSpotScreen> {
           children: [
             ListTile(
               leading: const Icon(Icons.camera_alt),
-              title: const Text('Cámara'),
+              title: const Text('Camera'),
               onTap: () async {
-                // Es seguro usar 'context' en Navigator.pop ANTES del await
                 Navigator.pop(context);
-                final XFile? foto = await _picker.pickImage( // Usamos _picker
+                final XFile? foto = await _picker.pickImage(
                   source: ImageSource.camera,
                   maxWidth: 1920,
                   maxHeight: 1080,
@@ -66,11 +64,10 @@ class _CreateSpotScreenState extends State<CreateSpotScreen> {
             ),
             ListTile(
               leading: const Icon(Icons.photo_library),
-              title: const Text('Galería'),
+              title: const Text('Gallery'),
               onTap: () async {
-                // Es seguro usar 'context' en Navigator.pop ANTES del await
                 Navigator.pop(context);
-                final XFile? foto = await _picker.pickImage( // Usamos _picker
+                final XFile? foto = await _picker.pickImage(
                   source: ImageSource.gallery,
                   maxWidth: 1920,
                   maxHeight: 1080,
@@ -90,7 +87,6 @@ class _CreateSpotScreenState extends State<CreateSpotScreen> {
   Future<void> _guardarSpot() async {
     if (!_formKey.currentState!.validate()) return;
     if (_imagen == null) {
-      // Seguro: Sin await previo
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Por favor, añade una foto')),
       );
@@ -98,54 +94,43 @@ class _CreateSpotScreenState extends State<CreateSpotScreen> {
     }
 
     setState(() => _isLoading = true);
-    
+
     final user = _authClient.currentUser;
     if (user == null) {
-      // Seguro: Sin await previo
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Error: Usuario no autenticado')),
       );
-      setState(() => _isLoading = false); // Detenemos el loading
+      setState(() => _isLoading = false);
       return;
     }
-    
-    Map<String, String> informacionNombres =
-        await _locationRepo.getCityCountryFromCoordinates( // Usamos _locationRepo
+
+    Map<String, String> datosLocalizacion =
+        await _locationRepo.getCityCountryFromCoordinates(
       widget.position.latitude,
       widget.position.longitude,
     );
 
-    // --- PUNTO IMPORTANTE ---
-    // A partir de aquí, hemos tenido un 'await' (arriba).
-    // Todas las llamadas a 'context' deben ser verificadas.
-    // Aunque 'informacionNombres' no usa context, cualquier 'await'
-    // nos obliga a verificar 'mounted' antes de usar 'context'.
-    
-    if (!mounted) return; // Verificación por si el widget se desmontó durante el await
+    if (!mounted) return;
 
     try {
-      final exito = await _repo.insertSpot( // Usamos _repo
+      final exito = await _repo.insertSpot(
         nombre: _nombreController.text,
         descripcion: _descripcionController.text,
-        ciudad: informacionNombres['city'] ?? 'Desconocida',
-        pais: informacionNombres['country'] ?? 'Desconocido',
+        ciudad: datosLocalizacion['city'] ?? 'Desconocida',
+        pais: datosLocalizacion['country'] ?? 'Desconocido',
         lat: widget.position.latitude,
         lng: widget.position.longitude,
         imagen: _imagen!,
         creadorId: user.id,
       );
 
-      // --- CORRECCIÓN ---
-      // Verificamos 'mounted' OTRA VEZ después del 'await' de insertSpot
       if (!mounted) return;
 
       if (exito) {
-        // Ahora esta llamada es segura
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Spot creado correctamente')),
         );
-        
-        // Y esta también es segura
+
         Navigator.pop(context, {
           'nombre': _nombreController.text,
           'lat': widget.position.latitude,
@@ -153,20 +138,16 @@ class _CreateSpotScreenState extends State<CreateSpotScreen> {
           'imagen': _imagen,
         });
       } else {
-        // Esta también es segura
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Error al crear el spot')),
         );
       }
     } catch (e) {
-      // --- CORRECCIÓN ---
-      // Verificamos 'mounted' también en el bloque catch
-      if (!mounted) return; 
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error: $e')),
       );
     } finally {
-      // Esta comprobación ya estaba correcta
       if (mounted) {
         setState(() => _isLoading = false);
       }
@@ -175,165 +156,218 @@ class _CreateSpotScreenState extends State<CreateSpotScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // El resto del método build es idéntico
     return Scaffold(
+      extendBodyBehindAppBar: true,
       appBar: AppBar(
-        title: const Text('Crear Nuevo Spot'),
-        backgroundColor: Colors.grey[900],
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () => Navigator.of(context).pop(),
+        ),
       ),
-      body: Stack(
-        children: [
-          SingleChildScrollView(
-            padding: const EdgeInsets.all(16),
-            child: Form(
-              key: _formKey,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Center(
-                    child: GestureDetector(
-                      onTap: _seleccionarImagen,
-                      child: Container(
-                        width: 150,
-                        height: 150,
-                        decoration: BoxDecoration(
-                          color: Colors.grey[800],
-                          shape: BoxShape.circle,
-                          border: Border.all(
-                            color: Colors.grey[600]!,
-                            width: 3,
-                          ),
-                        ),
-                        child: _imagen == null
-                            ? Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
+      body: StarBackground(
+        child: Stack(
+          children: [
+            SingleChildScrollView(
+              padding: const EdgeInsets.fromLTRB(20, 96, 20, 40),
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Center(
+                      child: GestureDetector(
+                        onTap: _seleccionarImagen,
+                        child: Stack(
+                          alignment: Alignment.center,
+                          children: [
+                            Container(
+                              width: 140,
+                              height: 140,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                gradient: LinearGradient(
+                                  colors: [Colors.grey, Colors.grey.shade700],
+                                  begin: Alignment.topLeft,
+                                  end: Alignment.bottomRight,
+                                ),
+                                border: Border.all(color: Colors.grey.shade600, width: 2.5),
+                              ),
+                              child: ClipOval(
+                                child: _imagen == null
+                                    ? const SizedBox.shrink()
+                                    : (kIsWeb
+                                        ? Image.network(
+                                            _imagen!.path,
+                                            fit: BoxFit.cover,
+                                          )
+                                        : Image.file(
+                                            File(_imagen!.path),
+                                            fit: BoxFit.cover,
+                                          )),
+                              ),
+                            ),
+                            if (_imagen == null)
+                              Column(
+                                mainAxisSize: MainAxisSize.min,
                                 children: [
-                                  Icon(Icons.add_photo_alternate,
-                                      size: 64, color: Colors.grey[400]),
-                                  const SizedBox(height: 8),
-                                  Text(
-                                    'Añadir foto',
-                                    style: TextStyle(
-                                      color: Colors.grey[400],
-                                      fontSize: 16,
-                                    ),
-                                  ),
+                                  Icon(Icons.image, size: 46, color: Colors.grey.shade400),
+                                  const SizedBox(height: 6),
+                                  Text('Add photo',
+                                      style: TextStyle(color: Colors.grey.shade400)),
                                 ],
-                              )
-                            : ClipOval(
-                                child: kIsWeb
-                                    ? Image.network(
-                                        _imagen!.path,
-                                        fit: BoxFit.cover,
-                                        width: 200,
-                                        height: 200,
-                                      )
-                                    : Image.file(
-                                        File(_imagen!.path),
-                                        fit: BoxFit.cover,
-                                        width: 200,
-                                        height: 200,
-                                      ),
                               ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 24),
-                  TextFormField(
-                    controller: _nombreController,
-                    decoration: InputDecoration(
-                      labelText: 'Nombre del spot *',
-                      hintText: 'Ej: Mirador del Pico',
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      prefixIcon: const Icon(Icons.title),
-                    ),
-                    validator: (value) {
-                      if (value == null || value.trim().isEmpty) {
-                        return 'El nombre es obligatorio';
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 16),
-                  TextFormField(
-                    controller: _descripcionController,
-                    decoration: InputDecoration(
-                      labelText: 'Descripción *',
-                      hintText: 'Describe este lugar...',
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      prefixIcon: const Icon(Icons.description),
-                      alignLabelWithHint: true,
-                    ),
-                    maxLines: 5,
-                    validator: (value) {
-                      if (value == null || value.trim().isEmpty) {
-                        return 'La descripción es obligatoria';
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 16),
-                  Container(
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: Colors.grey[850],
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Row(
-                      children: [
-                        const Icon(Icons.location_on, color: Colors.red),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'Lat: ${widget.position.latitude.toStringAsFixed(5)}',
-                                style: TextStyle(
-                                  color: Colors.grey[300],
-                                  fontSize: 12,
+                            Positioned(
+                              right: 0,
+                              bottom: 0,
+                              child: Container(
+                                width: 44,
+                                height: 44,
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFF6F00FF),
+                                  shape: BoxShape.circle,
+                                  border: Border.all(color: Colors.white, width: 2),
                                 ),
+                                child: const Icon(Icons.add, color: Colors.white),
                               ),
-                              const SizedBox(height: 4),
-                              Text(
-                                'Lng: ${widget.position.longitude.toStringAsFixed(5)}',
-                                style: TextStyle(
-                                  color: Colors.grey[300],
-                                  fontSize: 12,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+
+                    const SizedBox(height: 28),
+
+                    TextFormField(
+                      controller: _nombreController,
+                      enabled: !_isLoading,
+                      style: const TextStyle(color: Colors.white),
+                      decoration: InputDecoration(
+                        hintText: 'Name of the spot',
+                        hintStyle: const TextStyle(color: Colors.white54),
+                        filled: true,
+                        fillColor: Colors.white.withAlpha((0.03 * 255).round()),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide: const BorderSide(color: Colors.white24),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide: const BorderSide(color: Colors.white54),
+                        ),
+                        errorBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide: const BorderSide(color: Colors.red),
+                        ),
+                        focusedErrorBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide: const BorderSide(color: Colors.red),
+                        ),
+                        contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 14),
+                      ),
+                      validator: (value) =>
+                          value == null || value.trim().isEmpty ? 'El nombre es obligatorio' : null,
+                    ),
+
+                    const SizedBox(height: 16),
+
+                    TextFormField(
+                      controller: _descripcionController,
+                      enabled: !_isLoading,
+                      style: const TextStyle(color: Colors.white),
+                      decoration: InputDecoration(
+                        hintText: 'Description',
+                        hintStyle: const TextStyle(color: Colors.white54),
+                        filled: true,
+                        fillColor: Colors.white.withAlpha((0.03 * 255).round()),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide: const BorderSide(color: Colors.white24),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide: const BorderSide(color: Colors.white54),
+                        ),
+                        errorBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide: const BorderSide(color: Colors.red),
+                        ),
+                        focusedErrorBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide: const BorderSide(color: Colors.red),
+                        ),
+                        contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 14),
+                      ),
+                      maxLines: 5,
+                      validator: (value) => value == null || value.trim().isEmpty
+                          ? 'La descripción es obligatoria'
+                          : null,
+                    ),
+
+                    const SizedBox(height: 16),
+
+                    Container(
+                      padding: const EdgeInsets.all(14),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withAlpha((0.03 * 255).round()),
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(color: Colors.white24),
+                      ),
+                      child: Row(
+                        children: [
+                          const Icon(Icons.location_on, color: Colors.white70),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Lat: ${widget.position.latitude.toStringAsFixed(5)}',
+                                  style: const TextStyle(color: Colors.white, fontSize: 13),
                                 ),
-                              ),
-                            ],
+                                const SizedBox(height: 4),
+                                Text(
+                                  'Lng: ${widget.position.longitude.toStringAsFixed(5)}',
+                                  style: const TextStyle(color: Colors.white, fontSize: 13),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    const SizedBox(height: 26),
+
+                    SizedBox(
+                      height: 54,
+                      child: ElevatedButton(
+                        onPressed: _isLoading ? null : _guardarSpot,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF6F00FF),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(30),
                           ),
                         ),
-                      ],
+                        child: const Text(
+                          'SAVE CHANGES',
+                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                        ),
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 24),
-                  FilledButton.icon(
-                    onPressed: _isLoading ? null : _guardarSpot,
-                    icon: const Icon(Icons.save),
-                    label: const Text('Crear Spot'),
-                    style: FilledButton.styleFrom(
-                      padding: const EdgeInsets.all(16),
-                      backgroundColor: Colors.blue[700],
-                    ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
-          ),
-          if (_isLoading)
-            Container(
-              color: Colors.black45,
-              child: const Center(
-                child: CircularProgressIndicator(),
+
+            if (_isLoading)
+              Container(
+                color: Colors.black.withValues(alpha: 0.45),
+                child: const Center(child: CircularProgressIndicator()),
               ),
-            ),
-        ],
+          ],
+        ),
       ),
     );
   }

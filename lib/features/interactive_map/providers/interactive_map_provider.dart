@@ -43,11 +43,9 @@ class InteractiveMapProvider with ChangeNotifier {
     }
   }
 
-  // --- MODIFICADO PARA LAZY LOADING ---
   Future<void> fetchSpots({LatLngBounds? bounds}) async {
-    // Si no hay bounds (zoom muy bajo), limpia los spots y no cargues nada.
     if (bounds == null) {
-      clearSpots(); // Llama al nuevo método para limpiar
+      clearSpots(); 
       return;
     }
 
@@ -55,7 +53,6 @@ class InteractiveMapProvider with ChangeNotifier {
     _errorMessage = null;
     notifyListeners();
     try {
-      // Pasa los 'bounds' al repositorio
       final resp = await _locationRepository.fetchSpots(bounds: bounds, limit: null);
       _spots = resp;
     } catch (e) {
@@ -66,7 +63,6 @@ class InteractiveMapProvider with ChangeNotifier {
       notifyListeners();
     }
   }
-  // ------------------------------------
 
   Future<Map<String, String>> fetchSpotLocation(LatLng? location) async {
     _isLoading = true;
@@ -94,13 +90,10 @@ class InteractiveMapProvider with ChangeNotifier {
     return {'city': city, 'country': country};
   }
 
-  // --- NUEVO MÉTODO AÑADIDO ---
-  // Método para limpiar los spots manualmente (ej. cuando el zoom es muy bajo)
   void clearSpots() {
-    if (_spots.isEmpty) return; // No notificar si ya está vacío
+    if (_spots.isEmpty) return;
     
     _spots = [];
     notifyListeners();
   }
-  // ------------------------------
 }

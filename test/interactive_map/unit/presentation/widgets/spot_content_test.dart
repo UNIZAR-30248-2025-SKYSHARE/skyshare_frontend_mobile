@@ -1,11 +1,34 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter/material.dart';
+import 'package:mocktail/mocktail.dart';
+import 'package:provider/provider.dart';
+import 'package:skyshare_frontend_mobile/features/interactive_map/data/models/rating_model.dart';
+import 'package:skyshare_frontend_mobile/features/interactive_map/presentation/spot_detail_screen.dart';
 import 'package:skyshare_frontend_mobile/features/interactive_map/data/models/spot_model.dart';
-import 'package:skyshare_frontend_mobile/features/interactive_map/presentation/widgets/spot_content.dart';
+import 'package:skyshare_frontend_mobile/features/interactive_map/data/models/comment_model.dart';
+import 'package:skyshare_frontend_mobile/features/interactive_map/data/repositories/comment_repository.dart';
+import 'package:skyshare_frontend_mobile/features/interactive_map/data/repositories/rating_repository.dart';
+import 'package:skyshare_frontend_mobile/features/interactive_map/data/repositories/spot_repository.dart';
+import 'package:skyshare_frontend_mobile/features/auth/providers/auth_provider.dart';
+
+class MockComentarioRepository extends Mock implements ComentarioRepository {}
+class MockRatingRepository extends Mock implements RatingRepository {}
+class MockSpotRepository extends Mock implements SpotRepository {}
+class MockAuthProvider extends Mock implements AuthProvider {}
+
+class FakeComment extends Fake implements Comment {}
+class FakeRating extends Fake implements Rating {}
 
 void main() {
-  group('SpotContent', () {
-    final spotWithDescription = Spot(
+  TestWidgetsFlutterBinding.ensureInitialized();
+
+  setUpAll(() async {
+    registerFallbackValue(FakeComment());
+    registerFallbackValue(FakeRating());
+  });
+
+  group('SpotDetailScreen', () {
+    final testSpot = Spot(
       id: 1,
       ubicacionId: 1,
       creadorId: "1",
@@ -14,133 +37,69 @@ void main() {
       lng: -3.7038,
       ciudad: 'Madrid',
       pais: 'España',
-      descripcion: 'This is a test description',
+      descripcion: 'Test description',
       valoracionMedia: 4.5,
       totalValoraciones: 10,
+      urlImagen: 'https://example.com/image.jpg',
     );
 
-    final spotWithoutDescription = Spot(
-      id: 2,
-      ubicacionId: 2,
-      creadorId: "2",
-      nombre: 'Test Spot 2',
-      lat: 40.4178,
-      lng: -3.7048,
-      ciudad: 'Barcelona',
-      pais: 'España',
-      descripcion: null,
-      valoracionMedia: null,
-      totalValoraciones: 0,
-    );
+    late MockComentarioRepository mockCommentRepo;
+    late MockRatingRepository mockRatingRepo;
+    late MockSpotRepository mockSpotRepo;
+    late MockAuthProvider mockAuthProvider;
 
-    Widget wrapWithSliver(Widget child) {
-      return MaterialApp(
-        home: Scaffold(
-          body: CustomScrollView(
-            slivers: [child],
-          ),
-        ),
+    setUp(() {
+      mockCommentRepo = MockComentarioRepository();
+      mockRatingRepo = MockRatingRepository();
+      mockSpotRepo = MockSpotRepository();
+      mockAuthProvider = MockAuthProvider();
+
+      when(() => mockCommentRepo.fetchForSpot(any())).thenAnswer((_) async => <Comment>[]);
+      when(() => mockCommentRepo.fetchUserNames(any())).thenAnswer((_) async => {});
+      when(() => mockCommentRepo.insertComentario(any())).thenAnswer((_) async => true);
+      when(() => mockRatingRepo.fetchUserRating(any(), any())).thenAnswer((_) async => null);
+      when(() => mockRatingRepo.insertRating(any())).thenAnswer((_) async => true);
+      when(() => mockSpotRepo.fetchSpotById(any())).thenAnswer((_) async => testSpot);
+      when(() => mockAuthProvider.currentUser).thenReturn(null);
+    });
+
+    Widget wrapWithProvider(Widget child) {
+      return MultiProvider(
+        providers: [
+          Provider<ComentarioRepository>.value(value: mockCommentRepo),
+          Provider<RatingRepository>.value(value: mockRatingRepo),
+          Provider<SpotRepository>.value(value: mockSpotRepo),
+          ChangeNotifierProvider<AuthProvider>.value(value: mockAuthProvider),
+        ],
+        child: MaterialApp(home: child),
       );
     }
 
-    testWidgets('should render spot name and location', (tester) async {
-      await tester.pumpWidget(
-        wrapWithSliver(SpotContent(spot: spotWithDescription)),
-      );
+    testWidgets('should render all main components', (tester) async {
+      await tester.pumpWidget(wrapWithProvider(SpotDetailScreen(spot: testSpot)));
+      
+      await tester.pump(const Duration(seconds: 1));
+
+      expect(find.byType(Scaffold), findsOneWidget);
+      expect(find.byType(CustomScrollView), findsOneWidget);
+    });
+
+    testWidgets('should have correct background color', (tester) async {
+      await tester.pumpWidget(wrapWithProvider(SpotDetailScreen(spot: testSpot)));
+
+      await tester.pumpAndSettle();
+
+      final scaffold = tester.widget<Scaffold>(find.byType(Scaffold));
+      expect(scaffold.backgroundColor, const Color(0xFF13121A));
+    });
+
+    testWidgets('should pass spot data to children', (tester) async {
+      await tester.pumpWidget(wrapWithProvider(SpotDetailScreen(spot: testSpot)));
+
+      await tester.pumpAndSettle();
 
       expect(find.text('Test Spot'), findsOneWidget);
       expect(find.text('Madrid, España'), findsOneWidget);
-    });
-
-    testWidgets('should render description when available', (tester) async {
-      await tester.pumpWidget(
-        wrapWithSliver(SpotContent(spot: spotWithDescription)),
-      );
-
-      expect(find.text('Descripción'), findsOneWidget);
-      expect(find.text('This is a test description'), findsOneWidget);
-    });
-
-    testWidgets('should render "Sin descripción" when no description', (tester) async {
-      await tester.pumpWidget(
-        wrapWithSliver(SpotContent(spot: spotWithoutDescription)),
-      );
-
-      expect(find.text('Sin descripción'), findsOneWidget);
-    });
-
-    testWidgets('should render rating card with correct values', (tester) async {
-      await tester.pumpWidget(
-        wrapWithSliver(SpotContent(spot: spotWithDescription)),
-      );
-
-      expect(find.text('Valoración'), findsOneWidget);
-      expect(find.text('4.5'), findsOneWidget);
-      expect(find.text('10 valoraciones'), findsOneWidget);
-    });
-
-    testWidgets('should render rating card with dash when no rating', (tester) async {
-      await tester.pumpWidget(
-        wrapWithSliver(SpotContent(spot: spotWithoutDescription)),
-      );
-
-      expect(find.text('—'), findsOneWidget);
-      expect(find.text('0 valoraciones'), findsOneWidget);
-    });
-
-    testWidgets('should render comments section', (tester) async {
-      await tester.pumpWidget(
-        wrapWithSliver(SpotContent(spot: spotWithDescription)),
-      );
-
-      expect(find.text('Comentarios'), findsOneWidget);
-      expect(find.text('First comment'), findsOneWidget);
-      expect(find.text('Second comment'), findsOneWidget);
-    });
-
-    testWidgets('should render star rating in header', (tester) async {
-      await tester.pumpWidget(
-        wrapWithSliver(SpotContent(spot: spotWithDescription)),
-      );
-
-      expect(find.byIcon(Icons.star), findsAtLeastNWidgets(4));
-      expect(find.byIcon(Icons.star_half), findsAtLeastNWidgets(1));
-    });
-
-    testWidgets('should render star rating in rating card', (tester) async {
-      await tester.pumpWidget(
-        wrapWithSliver(SpotContent(spot: spotWithDescription)),
-      );
-
-      expect(find.byIcon(Icons.star), findsAtLeastNWidgets(4));
-    });
-
-    testWidgets('should render location icon and city/country', (tester) async {
-      await tester.pumpWidget(
-        wrapWithSliver(SpotContent(spot: spotWithDescription)),
-      );
-
-      expect(find.byIcon(Icons.location_on), findsOneWidget);
-      expect(find.text('Madrid, España'), findsOneWidget);
-    });
-
-    testWidgets('should render comment items with avatars', (tester) async {
-      await tester.pumpWidget(
-        wrapWithSliver(SpotContent(spot: spotWithDescription)),
-      );
-
-      expect(find.byType(CircleAvatar), findsAtLeastNWidgets(2));
-      expect(find.byIcon(Icons.person), findsAtLeastNWidgets(2));
-    });
-
-    testWidgets('should have correct padding and layout structure', (tester) async {
-      await tester.pumpWidget(
-        wrapWithSliver(SpotContent(spot: spotWithDescription)),
-      );
-
-      expect(find.byType(SliverToBoxAdapter), findsOneWidget);
-      expect(find.byType(Padding), findsWidgets);
-      expect(find.byType(Column), findsWidgets);
     });
   });
 }

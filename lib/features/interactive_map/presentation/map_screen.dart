@@ -40,11 +40,9 @@ class _MapScreenState extends State<MapScreen> {
   Spot? _selectedSpot;
   LatLng? _selectedSpotLatLng;
   StreamSubscription? _mapSub;
-
-  // --- NUEVAS VARIABLES PARA LAZY LOADING ---
-  Timer? _debounce; // Para no llamar a la API en cada milisegundo de movimiento
-  final double _minLoadZoom = 10.0; // El zoom mínimo para empezar a cargar spots
-  // -----------------------------------------
+  Timer? _debounce;
+  Timer? _initTimer;
+  final double _minLoadZoom = 10.0;
 
   @override
   void initState() {
@@ -55,88 +53,63 @@ class _MapScreenState extends State<MapScreen> {
         listen: false,
       );
       await mapProvider.fetchUserLocation();
-
-      // YA NO cargamos todos los spots al inicio
-      // await mapProvider.fetchSpots(); 
-
       if (mapProvider.currentPosition != null) {
         _mapController.move(mapProvider.currentPosition!, 14.5);
       }
-
-      // Dispara la primera carga perezosa después de que el mapa se mueva
-      Future.delayed(const Duration(milliseconds: 500), () {
+      _initTimer = Timer(const Duration(milliseconds: 500), () {
         _fetchSpotsForCurrentView();
       });
     });
-
-    // MODIFICADO: Escuchamos todos los eventos en una función central
     _mapSub = _mapController.mapEventStream.listen(_onMapEvent);
   }
 
   @override
   void dispose() {
     _mapSub?.cancel();
-    _debounce?.cancel(); // AÑADIDO: Limpiar el timer
+    _debounce?.cancel();
+    _initTimer?.cancel();
     super.dispose();
   }
 
-  // --- MODIFICADA: RECARGA CENTRALIZADA ---
   void _reloadSpots() {
-    // Ahora, recargar significa volver a cargar la vista actual
     _fetchSpotsForCurrentView();
   }
-  // ----------------------------------------
 
-  // --- NUEVA FUNCIÓN: Listener de eventos del mapa ---
   void _onMapEvent(MapEvent event) {
-    // 1. Lógica para cerrar el popup (la que ya tenías)
     if (_selectedSpot != null &&
         (event is MapEventMove ||
-         event is MapEventScrollWheelZoom ||
-         event is MapEventFlingAnimation)) {
+            event is MapEventScrollWheelZoom ||
+            event is MapEventFlingAnimation)) {
       setState(() {
         _selectedSpot = null;
         _selectedSpotLatLng = null;
       });
     }
-
-    // 2. Lógica de carga perezosa (debounced)
-    // Solo nos interesa recargar cuando el usuario *termina* de moverse/hacer zoom
     if (event is MapEventMoveEnd ||
         event is MapEventRotateEnd ||
         event is MapEventScrollWheelZoom) {
-      
-      // Cancela cualquier timer anterior
       _debounce?.cancel();
-      
-      // Espera 500ms después del último movimiento antes de llamar a la API
       _debounce = Timer(const Duration(milliseconds: 500), () {
         _fetchSpotsForCurrentView();
       });
     }
   }
 
-  // --- NUEVA FUNCIÓN: Carga spots basado en la vista actual ---
   void _fetchSpotsForCurrentView() {
     if (!mounted) return;
-    
     final mapProvider = Provider.of<InteractiveMapProvider>(context, listen: false);
     final zoom = _mapController.camera.zoom;
-
-    // 1. Comprueba el nivel de zoom
     if (zoom < _minLoadZoom) {
-      // Si el zoom es muy bajo, limpia los spots para no sobrecargar
-      mapProvider.clearSpots(); // Llama al nuevo método del provider
+      mapProvider.clearSpots();
       return;
     }
-
-    // 2. Obtiene los límites visibles del mapa
-    final LatLngBounds bounds = _mapController.camera.visibleBounds;
-    
-    // 3. Llama al provider con los límites
-    mapProvider.fetchSpots(bounds: bounds);
+    try {
+      final LatLngBounds bounds = _mapController.camera.visibleBounds;
+      mapProvider.fetchSpots(bounds: bounds);
+    } catch (_) {
+      mapProvider.fetchSpots();
+    }
   }
-  // -----------------------------------------------------------
 
   void _handleTap(TapPosition tapPosition, LatLng position) {
     if (_selectedSpot != null) {
@@ -157,17 +130,12 @@ class _MapScreenState extends State<MapScreen> {
       context,
       listen: false,
     );
-    
     _showLoadingDialog();
     final result = await mapProvider.fetchSpotLocation(position);
-    
     if (mounted) Navigator.pop(context);
-    
     final city = result['city'] ?? 'Desconocida';
     final country = result['country'] ?? 'Desconocido';
-    
     if (!mounted) return;
-    
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
@@ -206,23 +174,10 @@ class _MapScreenState extends State<MapScreen> {
       MaterialPageRoute(
         builder: (context) => CreateSpotScreen(
           position: position,
-          
-          // --- ARREGLO ---
-          // Debes pasar las dependencias que el constructor ahora requiere
-          
-          // Opción 1: Instanciarlas aquí (simple, pero no ideal para DI)
           spotRepository: SpotRepository(),
           locationRepository: LocationRepository(),
           imagePicker: ImagePicker(),
           authClient: Supabase.instance.client.auth,
-
-          /* // Opción 2: Si usas Provider/GetIt (Mejor práctica)
-          // (Asegúrate de tenerlos registrados en tu árbol de widgets)
-          spotRepository: context.read<SpotRepository>(),
-          locationRepository: context.read<LocationRepository>(),
-          imagePicker: context.read<ImagePicker>(),
-          authClient: context.read<GoTrueClient>(),
-          */
         ),
       ),
     );
@@ -268,13 +223,12 @@ class _MapScreenState extends State<MapScreen> {
 
   void _onFilterClear() {
     setState(() {
-    _filterValue = '';
+      _filterValue = '';
     });
   }
 
   List<Spot> _filterSpots(List<Spot> spots) {
     if (_filterValue.isEmpty) return spots;
-
     switch (_filterType) {
       case FilterType.nombre:
         return spots
@@ -351,7 +305,6 @@ class _MapScreenState extends State<MapScreen> {
 
   String _getFilterDescription() {
     if (_filterValue.isEmpty) return '';
-
     switch (_filterType) {
       case FilterType.nombre:
         return 'nombre contiene "$_filterValue"';
@@ -366,10 +319,7 @@ class _MapScreenState extends State<MapScreen> {
     final mapProvider = Provider.of<InteractiveMapProvider>(context);
     final filteredSpots = _filterSpots(mapProvider.spots);
     final baseMarkers = _spotsToMarkers(filteredSpots);
-    
-    // _createdMarkers ya no es necesario si _reloadSpots es instantáneo
-    // final markers = [...baseMarkers, ..._createdMarkers];
-    final markers = baseMarkers; 
+    final markers = baseMarkers;
 
     return Scaffold(
       body: Stack(
@@ -433,7 +383,7 @@ class _MapScreenState extends State<MapScreen> {
                         fontSize: 11,
                         color: Colors.grey[600],
                       ),
-                  ),
+                    ),
                   ],
                 ),
               ),
@@ -483,15 +433,12 @@ class _MapScreenState extends State<MapScreen> {
         child: SpotPopupWidget(
           spot: spot,
           width: popupWidth,
-          height: popupHeight,
-          // Cierra el popup
           onClose: () {
             setState(() {
               _selectedSpot = null;
               _selectedSpotLatLng = null;
             });
           },
-          // Navega a detalles
           onViewDetails: () {
             setState(() {
               _selectedSpot = null;
@@ -501,19 +448,16 @@ class _MapScreenState extends State<MapScreen> {
               context,
               MaterialPageRoute(
                 builder: (_) => SpotDetailScreen(spot: spot),
-               ),
+              ),
             );
           },
-          // --- CONEXIÓN CLAVE ---
-          // Pasa la función _reloadSpots al popup
           onSpotUpdated: () {
-            _reloadSpots(); // Recarga los datos
+            _reloadSpots();
             setState(() {
-              _selectedSpot = null; // Cierra el popup
+              _selectedSpot = null;
               _selectedSpotLatLng = null;
             });
           },
-          // ------------------------
           backgroundColor: const Color(0xFF0F0E14),
         ),
       ),

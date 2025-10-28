@@ -9,7 +9,6 @@ import 'package:skyshare_frontend_mobile/features/interactive_map/data/repositor
 import 'package:skyshare_frontend_mobile/features/interactive_map/presentation/widgets/create_spot.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-
 class MockSpotRepository extends Mock implements SpotRepository {}
 class MockLocationRepository extends Mock implements LocationRepository {}
 class MockImagePicker extends Mock implements ImagePicker {}
@@ -20,12 +19,11 @@ class MockXFile extends Mock implements XFile {}
 Future<File> createDummyFile() async {
   final directory = Directory.systemTemp;
   final file = File('${directory.path}/dummy_image.png');
-  await file.writeAsBytes([1, 2, 3, 4, 5]); // Contenido dummy
+  await file.writeAsBytes([1, 2, 3, 4, 5]); 
   return file;
 }
 
 void main() {
-  // --- Declaración de Mocks ---
   late MockSpotRepository mockSpotRepository;
   late MockLocationRepository mockLocationRepository;
   late MockImagePicker mockImagePicker;
@@ -33,14 +31,13 @@ void main() {
   late MockUser mockUser;
   late XFile mockImageFile;
 
-  const testPosition = LatLng(40.7128, -74.0060); // New York
+  const testPosition = LatLng(40.7128, -74.0060);
   const testSpotName = 'Mi Spot de Prueba';
   const testSpotDesc = 'Una descripción genial.';
   const testUserId = 'test-user-id-123';
   final testLocationInfo = {'city': 'New York', 'country': 'USA'};
   
   setUpAll(() {
-    // Registra fallbacks para mocktail
     registerFallbackValue(ImageSource.camera);
     registerFallbackValue(XFile(''));
   });
@@ -92,13 +89,35 @@ void main() {
     );
   }
 
+  Finder findTextFormFieldByHint(String hintText) {
+    final textFinder = find.text(hintText);
+    return find.ancestor(of: textFinder, matching: find.byType(TextFormField));
+  }
+
+  Finder findAddPhotoButton() {
+    return find.descendant(
+      of: find.byType(Stack), 
+      matching: find.byWidgetPredicate(
+        (widget) => widget is GestureDetector &&
+            find.text('Add photo').evaluate().isNotEmpty,
+      ),
+    ).first;
+  }
+
   testWidgets('Error: Muestra error si no se selecciona imagen', (tester) async {
     await tester.pumpWidget(createTestWidget());
+    await tester.pumpAndSettle();
 
-    await tester.enterText(find.byLabelText('Nombre del spot *'), testSpotName);
-    await tester.enterText(find.byLabelText('Descripción *'), testSpotDesc);
+    await tester.enterText(
+      findTextFormFieldByHint('Name of the spot'), 
+      testSpotName
+    );
+    await tester.enterText(
+      findTextFormFieldByHint('Description'), 
+      testSpotDesc
+    );
 
-    final buttonFinder = find.text('Crear Spot');
+    final buttonFinder = find.text('SAVE CHANGES');
     await tester.ensureVisible(buttonFinder);
     await tester.pumpAndSettle();
     await tester.tap(buttonFinder);
@@ -119,15 +138,20 @@ void main() {
 
   testWidgets('Error: Muestra error de validación si el nombre está vacío', (tester) async {
     await tester.pumpWidget(createTestWidget());
-
-    await tester.tap(find.byIcon(Icons.add_photo_alternate));
-    await tester.pumpAndSettle();
-    await tester.tap(find.text('Galería'));
     await tester.pumpAndSettle();
 
-    await tester.enterText(find.byLabelText('Descripción *'), testSpotDesc);
+    await tester.tap(findAddPhotoButton());
+    await tester.pumpAndSettle();
+    
+    await tester.tap(find.text('Gallery'));
+    await tester.pumpAndSettle();
 
-    final buttonFinder = find.text('Crear Spot');
+    await tester.enterText(
+      findTextFormFieldByHint('Description'), 
+      testSpotDesc
+    );
+
+    final buttonFinder = find.text('SAVE CHANGES');
     await tester.ensureVisible(buttonFinder);
     await tester.pumpAndSettle();
     await tester.tap(buttonFinder);
@@ -136,21 +160,26 @@ void main() {
     expect(find.text('El nombre es obligatorio'), findsOneWidget);
   });
   
-    testWidgets('Error: Muestra error de validación si la descripción está vacía', (tester) async {
+  testWidgets('Error: Muestra error de validación si la descripción está vacía', (tester) async {
     await tester.pumpWidget(createTestWidget());
-
-    await tester.tap(find.byIcon(Icons.add_photo_alternate));
-    await tester.pumpAndSettle();
-    await tester.tap(find.text('Galería'));
     await tester.pumpAndSettle();
 
-    await tester.enterText(find.byLabelText('Nombre del spot *'), testSpotName);
+    await tester.tap(findAddPhotoButton());
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Gallery'));
+    await tester.pumpAndSettle();
 
-    final buttonFinder = find.text('Crear Spot');
+    await tester.enterText(
+      findTextFormFieldByHint('Name of the spot'), 
+      testSpotName
+    );
+
+    final buttonFinder = find.text('SAVE CHANGES');
     await tester.ensureVisible(buttonFinder);
     await tester.pumpAndSettle();
     await tester.tap(buttonFinder);
     await tester.pumpAndSettle();
+    
     expect(find.text('La descripción es obligatoria'), findsOneWidget);
   });
 
@@ -167,26 +196,33 @@ void main() {
         )).thenAnswer((_) async => false);
 
     await tester.pumpWidget(createTestWidget());
-
-    await tester.tap(find.byIcon(Icons.add_photo_alternate));
     await tester.pumpAndSettle();
-    await tester.tap(find.text('Galería'));
-    await tester.pumpAndSettle();
-    await tester.enterText(find.byLabelText('Nombre del spot *'), testSpotName);
-    await tester.enterText(find.byLabelText('Descripción *'), testSpotDesc);
 
-    final buttonFinder = find.text('Crear Spot');
+    await tester.tap(findAddPhotoButton());
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Gallery'));
+    await tester.pumpAndSettle();
+    
+    await tester.enterText(
+      findTextFormFieldByHint('Name of the spot'), 
+      testSpotName
+    );
+    await tester.enterText(
+      findTextFormFieldByHint('Description'), 
+      testSpotDesc
+    );
+
+    final buttonFinder = find.text('SAVE CHANGES');
     await tester.ensureVisible(buttonFinder);
     await tester.pumpAndSettle();
     await tester.tap(buttonFinder);
-    await tester.pump(); // Loading
-    await tester.pumpAndSettle(); // Fin
+    await tester.pump(); 
+    await tester.pumpAndSettle(); 
 
     expect(find.text('Error al crear el spot'), findsOneWidget);
   });
   
   testWidgets('Error: Muestra SnackBar si insertSpot lanza una excepción', (tester) async {
-    // 1. Arrange
     final exception = Exception('Error de base de datos');
     when(() => mockSpotRepository.insertSpot(
           nombre: any(named: 'nombre'),
@@ -200,39 +236,29 @@ void main() {
         )).thenThrow(exception);
 
     await tester.pumpWidget(createTestWidget());
-
-    await tester.tap(find.byIcon(Icons.add_photo_alternate));
     await tester.pumpAndSettle();
-    await tester.tap(find.text('Galería'));
-    await tester.pumpAndSettle();
-    await tester.enterText(find.byLabelText('Nombre del spot *'), testSpotName);
-    await tester.enterText(find.byLabelText('Descripción *'), testSpotDesc);
 
-    final buttonFinder = find.text('Crear Spot');
+    await tester.tap(findAddPhotoButton());
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Gallery'));
+    await tester.pumpAndSettle();
+    
+    await tester.enterText(
+      findTextFormFieldByHint('Name of the spot'), 
+      testSpotName
+    );
+    await tester.enterText(
+      findTextFormFieldByHint('Description'), 
+      testSpotDesc
+    );
+
+    final buttonFinder = find.text('SAVE CHANGES');
     await tester.ensureVisible(buttonFinder);
     await tester.pumpAndSettle();
     await tester.tap(buttonFinder);
-    await tester.pump(); // Loading
-    await tester.pumpAndSettle(); // Fin
+    await tester.pump();
+    await tester.pumpAndSettle(); 
 
     expect(find.text('Error: $exception'), findsOneWidget);
   });
-}
-
-extension on CommonFinders {
-  FinderBase<Element> byLabelText(String labelText) {
-    return find.byWidgetPredicate((Widget widget) {
-      if (widget is TextFormField) {
-        return widget.decoration?.labelText == labelText;
-      }
-      if (widget is TextField) {
-        return widget.decoration?.labelText == labelText;
-      }
-      return false;
-    });
-  }
-}
-
-extension on TextFormField {
-  get decoration => null;
 }

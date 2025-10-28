@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
@@ -6,6 +5,9 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:skyshare_frontend_mobile/features/auth/data/repositories/auth_repository.dart';
 import 'package:skyshare_frontend_mobile/features/auth/presentation/auth_screen.dart';
 import 'package:skyshare_frontend_mobile/features/auth/providers/auth_provider.dart';
+import 'package:skyshare_frontend_mobile/features/interactive_map/data/repositories/comment_repository.dart';
+import 'package:skyshare_frontend_mobile/features/interactive_map/data/repositories/rating_repository.dart';
+import 'package:skyshare_frontend_mobile/features/interactive_map/data/repositories/spot_repository.dart';
 import 'package:skyshare_frontend_mobile/features/phase_lunar/presentation/phase_lunar_screen.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'features/dashboard/providers/dashboard_provider.dart';
@@ -30,29 +32,6 @@ Future<void> main() async {
 
   SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
 
-  if (kDebugMode) {
-    final devEmail = dotenv.env['DEV_EMAIL'];
-    final devPassword = dotenv.env['DEV_PASSWORD'];
-    if (devEmail != null && devPassword != null && devEmail.isNotEmpty && devPassword.isNotEmpty) {
-      try {
-        final response = await supabase.auth.signInWithPassword(
-          email: devEmail,
-          password: devPassword,
-        );
-
-        if (response.user != null) {
-          print('[DEBUG] Usuario dev autenticado: ${response.user!.id}');
-        } else {
-          print('[DEBUG] No se pudo autenticar el usuario dev (respuesta sin user).');
-        }
-      } catch (e, st) {
-        print('[DEBUG] Error al iniciar sesión en Supabase: $e\n$st');
-      }
-    } else {
-      print('[DEBUG] DEV_EMAIL o DEV_PASSWORD no están definidas en el .env. Comprueba el fichero .env');
-    }
-  }
-  
   runApp(MyApp(supabase: supabase));
 }
 
@@ -86,6 +65,15 @@ class MyApp extends StatelessWidget {
             lunarPhaseRepo: ctx.read<LunarPhaseRepository>(),
             locationRepo: ctx.read<location_repository_lunar.LocationRepository>(),
           ),
+        ),
+        Provider<ComentarioRepository>(
+          create: (ctx) => ComentarioRepository(client: ctx.read<SupabaseClient>()),
+        ),
+        Provider<RatingRepository>(
+          create: (ctx) => RatingRepository(client: ctx.read<SupabaseClient>()),
+        ),
+        Provider<SpotRepository>(
+          create: (ctx) => SpotRepository(client: ctx.read<SupabaseClient>()),
         ),
         Provider<location_repository_map.LocationRepository>(
           create: (ctx) => location_repository_map.LocationRepository(),
@@ -140,7 +128,6 @@ class AuthWrapper extends StatelessWidget {
     }
   }
 }
-
 
 class RootApp extends StatefulWidget {
   const RootApp({super.key});
