@@ -1,10 +1,14 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:skyshare_frontend_mobile/features/auth/data/repositories/auth_repository.dart';
 import 'package:skyshare_frontend_mobile/features/auth/presentation/auth_screen.dart';
 import 'package:skyshare_frontend_mobile/features/auth/providers/auth_provider.dart';
+import 'package:skyshare_frontend_mobile/features/interactive_map/data/repositories/comment_repository.dart';
+import 'package:skyshare_frontend_mobile/features/interactive_map/data/repositories/rating_repository.dart';
+import 'package:skyshare_frontend_mobile/features/interactive_map/data/repositories/spot_repository.dart';
 import 'package:skyshare_frontend_mobile/features/phase_lunar/presentation/phase_lunar_screen.dart';
 import 'package:skyshare_frontend_mobile/features/push_notifications/services/one_signal_service.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -31,6 +35,7 @@ Future<void> main() async {
   await dotenv.load();
   await SupabaseService.instance.init();
   final supabase = SupabaseService.instance.client;
+
 
   if(!kIsWeb){ 
     await OneSignalService().init();
@@ -70,6 +75,8 @@ Future<void> main() async {
     }
   }
   
+  SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
+
   runApp(MyApp(supabase: supabase));
 }
 
@@ -103,6 +110,15 @@ class MyApp extends StatelessWidget {
             lunarPhaseRepo: ctx.read<LunarPhaseRepository>(),
             locationRepo: ctx.read<location_repository_lunar.LocationRepository>(),
           ),
+        ),
+        Provider<ComentarioRepository>(
+          create: (ctx) => ComentarioRepository(client: ctx.read<SupabaseClient>()),
+        ),
+        Provider<RatingRepository>(
+          create: (ctx) => RatingRepository(client: ctx.read<SupabaseClient>()),
+        ),
+        Provider<SpotRepository>(
+          create: (ctx) => SpotRepository(client: ctx.read<SupabaseClient>()),
         ),
         Provider<location_repository_map.LocationRepository>(
           create: (ctx) => location_repository_map.LocationRepository(),
@@ -165,7 +181,6 @@ class AuthWrapper extends StatelessWidget {
     }
   }
 }
-
 
 class RootApp extends StatefulWidget {
   const RootApp({super.key});

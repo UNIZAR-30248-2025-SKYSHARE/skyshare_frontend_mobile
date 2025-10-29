@@ -1,3 +1,5 @@
+import 'package:supabase_flutter/supabase_flutter.dart'; 
+
 class Spot {
   final int id;
   final int ubicacionId;
@@ -6,8 +8,11 @@ class Spot {
   final String? descripcion;
   final double lat;
   final double lng;
+  final String ciudad;
+  final String pais;
   final double? valoracionMedia;
   final int totalValoraciones;
+  final String? urlImagen; 
 
   Spot({
     required this.id,
@@ -16,15 +21,30 @@ class Spot {
     required this.nombre,
     required this.lat,
     required this.lng,
+    required this.ciudad,
+    required this.pais,
     this.descripcion,
     this.valoracionMedia,
     this.totalValoraciones = 0,
+    this.urlImagen,
   });
+
+  bool get esMio {
+    final currentUser = Supabase.instance.client.auth.currentUser;
+    
+    if (currentUser == null) {
+      return false;
+    }
+    
+    final currentUserId = currentUser.id.trim().toLowerCase();
+    final spotCreatorId = creadorId?.trim().toLowerCase();
+    
+    return currentUserId == spotCreatorId;
+  }
 
   factory Spot.fromMap(Map<String, dynamic> map) {
     final ubicacion = map['ubicacion'] as Map<String, dynamic>? ?? {};
     
-    // Calcular valoración media desde las valoraciones
     double? valoracionMedia;
     int totalValoraciones = 0;
     
@@ -54,7 +74,7 @@ class Spot {
       ubicacionId: (map['id_ubicacion'] is int) 
         ? map['id_ubicacion'] as int 
         : int.parse(map['id_ubicacion'].toString()),
-      creadorId: map['id_usuario_creador']?.toString() ?? '',
+      creadorId: map['id_usuario_creador']?.toString(), 
       nombre: map['nombre']?.toString() ?? '',
       descripcion: map['descripcion']?.toString(),
       lat: (ubicacion['latitud'] is double) 
@@ -67,8 +87,11 @@ class Spot {
         : (ubicacion['longitud'] is int 
           ? (ubicacion['longitud'] as int).toDouble() 
           : double.parse((ubicacion['longitud'] ?? '0').toString())),
+      ciudad: ubicacion['nombre']?.toString() ?? 'Desconocida',
+      pais: ubicacion['pais']?.toString() ?? 'Desconocido',
       valoracionMedia: valoracionMedia,
       totalValoraciones: totalValoraciones,
+      urlImagen: map['url_imagen']?.toString(), 
     );
   }
 

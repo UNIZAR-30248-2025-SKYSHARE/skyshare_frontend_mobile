@@ -49,7 +49,7 @@ dependencies:
 
   #Flutter Map
   flutter_map: ^6.0.0
-  latlong2: ^0.9.0
+  latlong2: ^0.9.1
   image_picker: ^1.0.4
 
   #Push notifications 

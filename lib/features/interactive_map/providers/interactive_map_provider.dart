@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import '../data/repositories/location_repository.dart';
 import '../data/models/spot_model.dart';
@@ -42,12 +43,17 @@ class InteractiveMapProvider with ChangeNotifier {
     }
   }
 
-  Future<void> fetchSpots() async {
+  Future<void> fetchSpots({LatLngBounds? bounds}) async {
+    if (bounds == null) {
+      clearSpots(); 
+      return;
+    }
+
     _isLoading = true;
     _errorMessage = null;
     notifyListeners();
     try {
-      final resp = await _locationRepository.fetchSpots();
+      final resp = await _locationRepository.fetchSpots(bounds: bounds, limit: null);
       _spots = resp;
     } catch (e) {
       _errorMessage = 'Error al cargar spots: $e';
@@ -82,5 +88,12 @@ class InteractiveMapProvider with ChangeNotifier {
       notifyListeners();
     }
     return {'city': city, 'country': country};
+  }
+
+  void clearSpots() {
+    if (_spots.isEmpty) return;
+    
+    _spots = [];
+    notifyListeners();
   }
 }

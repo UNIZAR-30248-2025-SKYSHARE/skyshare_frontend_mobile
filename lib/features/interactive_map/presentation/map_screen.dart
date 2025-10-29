@@ -1,7 +1,13 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:provider/provider.dart';
+import 'package:skyshare_frontend_mobile/features/interactive_map/data/repositories/location_repository.dart';
+import 'package:skyshare_frontend_mobile/features/interactive_map/data/repositories/spot_repository.dart';
+import 'package:skyshare_frontend_mobile/features/interactive_map/presentation/spot_detail_screen.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import '../providers/interactive_map_provider.dart';
 import './widgets/map_widget.dart';
 import './widgets/loading_overlay.dart';
@@ -11,40 +17,119 @@ import './widgets/location_button.dart';
 import './widgets/filter_widget.dart';
 import './widgets/create_spot.dart';
 import '../data/models/spot_model.dart';
+import 'widgets/spot_popup_widget.dart';
 
 class MapScreen extends StatefulWidget {
   final TileProvider? tileProvider;
   final String? urlTemplate;
-  const MapScreen({super.key, this.tileProvider, this.urlTemplate});
+
+  const MapScreen({
+    super.key,
+    this.tileProvider,
+    this.urlTemplate,
+  });
 
   @override
   State<MapScreen> createState() => _MapScreenState();
 }
 
 class _MapScreenState extends State<MapScreen> {
-  final List<Marker> _createdMarkers = [];
   final MapController _mapController = MapController();
   String _filterValue = '';
   FilterType _filterType = FilterType.nombre;
+  Spot? _selectedSpot;
+  LatLng? _selectedSpotLatLng;
+  StreamSubscription? _mapSub;
+  Timer? _debounce;
+  Timer? _initTimer;
+  final double _minLoadZoom = 10.0;
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      final mapProvider = Provider.of<InteractiveMapProvider>(context, listen: false);
+      final mapProvider = Provider.of<InteractiveMapProvider>(
+        context,
+        listen: false,
+      );
       await mapProvider.fetchUserLocation();
-      await mapProvider.fetchSpots();
       if (mapProvider.currentPosition != null) {
         _mapController.move(mapProvider.currentPosition!, 14.5);
       }
+      _initTimer = Timer(const Duration(milliseconds: 500), () {
+        _fetchSpotsForCurrentView();
+      });
     });
+    _mapSub = _mapController.mapEventStream.listen(_onMapEvent);
   }
 
-  void _handleTap(TapPosition tapPosition, LatLng position) => _showLocationConfirmation(position, false);
-  void _handleLongPress(TapPosition tapPosition, LatLng position) => _showLocationConfirmation(position, true);
+  @override
+  void dispose() {
+    _mapSub?.cancel();
+    _debounce?.cancel();
+    _initTimer?.cancel();
+    super.dispose();
+  }
+
+  void _reloadSpots() {
+    _fetchSpotsForCurrentView();
+  }
+
+  void _onMapEvent(MapEvent event) {
+    if (_selectedSpot != null &&
+        (event is MapEventMove ||
+            event is MapEventScrollWheelZoom ||
+            event is MapEventFlingAnimation)) {
+      setState(() {
+        _selectedSpot = null;
+        _selectedSpotLatLng = null;
+      });
+    }
+    if (event is MapEventMoveEnd ||
+        event is MapEventRotateEnd ||
+        event is MapEventScrollWheelZoom) {
+      _debounce?.cancel();
+      _debounce = Timer(const Duration(milliseconds: 500), () {
+        _fetchSpotsForCurrentView();
+      });
+    }
+  }
+
+  void _fetchSpotsForCurrentView() {
+    if (!mounted) return;
+    final mapProvider = Provider.of<InteractiveMapProvider>(context, listen: false);
+    final zoom = _mapController.camera.zoom;
+    if (zoom < _minLoadZoom) {
+      mapProvider.clearSpots();
+      return;
+    }
+    try {
+      final LatLngBounds bounds = _mapController.camera.visibleBounds;
+      mapProvider.fetchSpots(bounds: bounds);
+    } catch (_) {
+      mapProvider.fetchSpots();
+    }
+  }
+
+  void _handleTap(TapPosition tapPosition, LatLng position) {
+    if (_selectedSpot != null) {
+      setState(() {
+        _selectedSpot = null;
+        _selectedSpotLatLng = null;
+      });
+      return;
+    }
+    _showLocationConfirmation(position, false);
+  }
+
+  void _handleLongPress(TapPosition tapPosition, LatLng position) =>
+      _showLocationConfirmation(position, true);
 
   void _showLocationConfirmation(LatLng position, bool isLongPress) async {
-    final mapProvider = Provider.of<InteractiveMapProvider>(context, listen: false);
+    final mapProvider = Provider.of<InteractiveMapProvider>(
+      context,
+      listen: false,
+    );
     _showLoadingDialog();
     final result = await mapProvider.fetchSpotLocation(position);
     if (mounted) Navigator.pop(context);
@@ -77,7 +162,9 @@ class _MapScreenState extends State<MapScreen> {
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (_) => const Center(child: CircularProgressIndicator()),
+      builder: (_) => const Center(
+        child: CircularProgressIndicator(),
+      ),
     );
   }
 
@@ -85,25 +172,23 @@ class _MapScreenState extends State<MapScreen> {
     final result = await Navigator.push<Map<String, dynamic>>(
       context,
       MaterialPageRoute(
-        builder: (context) => CreateSpotScreen(position: position),
+        builder: (context) => CreateSpotScreen(
+          position: position,
+          spotRepository: SpotRepository(),
+          locationRepository: LocationRepository(),
+          imagePicker: ImagePicker(),
+          authClient: Supabase.instance.client.auth,
+        ),
       ),
     );
+
     if (result != null && mounted) {
-      setState(() {
-        _createdMarkers.add(
-          Marker(
-            point: position,
-            width: 40,
-            height: 40,
-            child: const Icon(Icons.location_on, color: Colors.red, size: 40),
-          ),
-        );
-      });
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Spot "${result['nombre']}" creado!')),
+        SnackBar(
+          content: Text('Spot "${result['nombre']}" creado!'),
+        ),
       );
-      final mapProvider = Provider.of<InteractiveMapProvider>(context, listen: false);
-      await mapProvider.fetchSpots();
+      _reloadSpots();
     }
   }
 
@@ -118,7 +203,10 @@ class _MapScreenState extends State<MapScreen> {
   }
 
   void _moveToCurrentLocation() {
-    final mapProvider = Provider.of<InteractiveMapProvider>(context, listen: false);
+    final mapProvider = Provider.of<InteractiveMapProvider>(
+      context,
+      listen: false,
+    );
     if (mapProvider.currentPosition != null) {
       _mapController.move(mapProvider.currentPosition!, 14.5);
     } else {
@@ -141,20 +229,19 @@ class _MapScreenState extends State<MapScreen> {
 
   List<Spot> _filterSpots(List<Spot> spots) {
     if (_filterValue.isEmpty) return spots;
-    
     switch (_filterType) {
       case FilterType.nombre:
-        return spots.where((spot) {
-          return spot.nombre.toLowerCase().contains(_filterValue);
-        }).toList();
-        
+        return spots
+            .where((spot) => spot.nombre.toLowerCase().contains(_filterValue))
+            .toList();
       case FilterType.valoracion:
         final minRating = double.tryParse(_filterValue);
         if (minRating == null) return spots;
-        return spots.where((spot) {
-          if (spot.valoracionMedia == null) return false;
-          return spot.valoracionMedia! >= minRating;
-        }).toList();
+        return spots
+            .where((spot) =>
+                spot.valoracionMedia != null &&
+                spot.valoracionMedia! >= minRating)
+            .toList();
     }
   }
 
@@ -166,81 +253,28 @@ class _MapScreenState extends State<MapScreen> {
   }
 
   List<Marker> _spotsToMarkers(List<Spot> spots) {
-    return spots.map((s) {
-      final color = _getMarkerColor(s);
+    return spots.map((spot) {
+      final color = _getMarkerColor(spot);
       return Marker(
-        point: LatLng(s.lat, s.lng),
+        point: LatLng(spot.lat, spot.lng),
         width: 40,
         height: 40,
         child: GestureDetector(
           onTap: () {
-            showModalBottomSheet(
-              context: context,
-              builder: (_) => Padding(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Text(
-                            s.nombre,
-                            style: const TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                        if (s.valoracionMedia != null)
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 8,
-                              vertical: 4,
-                            ),
-                            decoration: BoxDecoration(
-                              color: Colors.yellow, 
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Icon(Icons.star, color: color, size: 16),
-                                const SizedBox(width: 4),
-                                Text(
-                                  s.valoracionMedia!.toStringAsFixed(1),
-                                  style: TextStyle(
-                                    color: color,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                      ],
-                    ),
-                    const SizedBox(height: 8),
-                    if (s.descripcion != null) ...[
-                      Text(s.descripcion!),
-                      const SizedBox(height: 8),
-                    ],
-                    Text(
-                      'ID: ${s.id} • ${s.totalValoraciones} valoracion${s.totalValoraciones != 1 ? 'es' : ''}',
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: Colors.grey[600],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            );
+            setState(() {
+              if (_selectedSpot != null && _selectedSpot!.id == spot.id) {
+                _selectedSpot = null;
+                _selectedSpotLatLng = null;
+              } else {
+                _selectedSpot = spot;
+                _selectedSpotLatLng = LatLng(spot.lat, spot.lng);
+              }
+            });
           },
           child: Stack(
             children: [
               Icon(Icons.location_on, color: color, size: 36),
-              if (s.valoracionMedia != null)
+              if (spot.valoracionMedia != null)
                 Positioned(
                   top: 2,
                   left: 8,
@@ -248,11 +282,11 @@ class _MapScreenState extends State<MapScreen> {
                   child: Container(
                     padding: const EdgeInsets.symmetric(horizontal: 2),
                     decoration: BoxDecoration(
-                      color: Colors.yellow, 
+                      color: Colors.yellow,
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Text(
-                      s.valoracionMedia!.toStringAsFixed(1),
+                      spot.valoracionMedia!.toStringAsFixed(1),
                       textAlign: TextAlign.center,
                       style: const TextStyle(
                         fontSize: 9,
@@ -271,7 +305,6 @@ class _MapScreenState extends State<MapScreen> {
 
   String _getFilterDescription() {
     if (_filterValue.isEmpty) return '';
-    
     switch (_filterType) {
       case FilterType.nombre:
         return 'nombre contiene "$_filterValue"';
@@ -286,8 +319,8 @@ class _MapScreenState extends State<MapScreen> {
     final mapProvider = Provider.of<InteractiveMapProvider>(context);
     final filteredSpots = _filterSpots(mapProvider.spots);
     final baseMarkers = _spotsToMarkers(filteredSpots);
-    final markers = [...baseMarkers, ..._createdMarkers];
-    
+    final markers = baseMarkers;
+
     return Scaffold(
       body: Stack(
         children: [
@@ -299,25 +332,33 @@ class _MapScreenState extends State<MapScreen> {
             tileProvider: widget.tileProvider,
             urlTemplate: widget.urlTemplate,
           ),
+          if (_selectedSpot != null && _selectedSpotLatLng != null)
+            _buildSpotPopup(context, _selectedSpot!, _selectedSpotLatLng!),
           LoadingOverlay(isLoading: mapProvider.isLoading),
           ErrorBanner(errorMessage: mapProvider.errorMessage),
           FilterWidget(
             onFilterChanged: _onFilterChanged,
             onClear: _onFilterClear,
           ),
-          ZoomControls(onZoomIn: _zoomIn, onZoomOut: _zoomOut),
+          ZoomControls(
+            onZoomIn: _zoomIn,
+            onZoomOut: _zoomOut,
+          ),
           LocationButton(onPressed: _moveToCurrentLocation),
           if (_filterValue.isNotEmpty)
             Positioned(
               top: 106,
               left: 16,
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 8,
+                ),
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(12),
-                  boxShadow: [
-                    const BoxShadow(
+                  boxShadow: const [
+                    BoxShadow(
                       color: Color.fromRGBO(0, 0, 0, 0.1),
                       blurRadius: 4,
                       offset: Offset(0, 2),
@@ -329,7 +370,8 @@ class _MapScreenState extends State<MapScreen> {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
-                      '${filteredSpots.length} spot${filteredSpots.length != 1 ? 's' : ''}',
+                      '${filteredSpots.length} '
+                      'spot${filteredSpots.length != 1 ? 's' : ''}',
                       style: const TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.bold,
@@ -347,6 +389,77 @@ class _MapScreenState extends State<MapScreen> {
               ),
             ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildSpotPopup(
+    BuildContext context,
+    Spot spot,
+    LatLng latLng,
+  ) {
+    const popupWidth = 260.0;
+    const popupHeight = 260.0;
+
+    double left = (MediaQuery.of(context).size.width - popupWidth) / 2;
+    double top = 120.0;
+
+    try {
+      final point = _mapController.camera.latLngToScreenPoint(latLng);
+      final px = point.x.toDouble();
+      final py = point.y.toDouble();
+
+      left = px - popupWidth / 2;
+      top = py - popupHeight - 18;
+
+      left = left.clamp(
+        8.0,
+        MediaQuery.of(context).size.width - popupWidth - 8.0,
+      );
+      top = top.clamp(
+        8.0,
+        MediaQuery.of(context).size.height - popupHeight - 120.0,
+      );
+    } catch (_) {}
+
+    return Positioned(
+      left: left,
+      top: top,
+      width: popupWidth,
+      height: popupHeight + 12,
+      child: GestureDetector(
+        onTap: () {},
+        behavior: HitTestBehavior.translucent,
+        child: SpotPopupWidget(
+          spot: spot,
+          width: popupWidth,
+          onClose: () {
+            setState(() {
+              _selectedSpot = null;
+              _selectedSpotLatLng = null;
+            });
+          },
+          onViewDetails: () {
+            setState(() {
+              _selectedSpot = null;
+              _selectedSpotLatLng = null;
+            });
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => SpotDetailScreen(spot: spot),
+              ),
+            );
+          },
+          onSpotUpdated: () {
+            _reloadSpots();
+            setState(() {
+              _selectedSpot = null;
+              _selectedSpotLatLng = null;
+            });
+          },
+          backgroundColor: const Color(0xFF0F0E14),
+        ),
       ),
     );
   }

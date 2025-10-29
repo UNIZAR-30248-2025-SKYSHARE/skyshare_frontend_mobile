@@ -194,6 +194,38 @@
       ]
     },
     {
+      "name": "test",
+      "version": "1.25.15",
+      "dependencies": [
+        "analyzer",
+        "async",
+        "boolean_selector",
+        "collection",
+        "coverage",
+        "http_multi_server",
+        "io",
+        "js",
+        "matcher",
+        "node_preamble",
+        "package_config",
+        "path",
+        "pool",
+        "shelf",
+        "shelf_packages_handler",
+        "shelf_static",
+        "shelf_web_socket",
+        "source_span",
+        "stack_trace",
+        "stream_channel",
+        "test_api",
+        "test_core",
+        "typed_data",
+        "web_socket_channel",
+        "webkit_inspection_protocol",
+        "yaml"
+      ]
+    },
+    {
       "name": "geocoding",
       "version": "4.0.0",
       "dependencies": [
@@ -768,7 +800,7 @@
     },
     {
       "name": "shared_preferences_android",
-      "version": "2.4.13",
+      "version": "2.4.11",
       "dependencies": [
         "flutter",
         "shared_preferences_platform_interface"
@@ -835,7 +867,7 @@
     },
     {
       "name": "image_picker_android",
-      "version": "0.8.13+1",
+      "version": "0.8.13",
       "dependencies": [
         "flutter",
         "flutter_plugin_android_lifecycle",
@@ -863,6 +895,109 @@
       "version": "2.6.2",
       "dependencies": [
         "meta"
+      ]
+    },
+    {
+      "name": "webkit_inspection_protocol",
+      "version": "1.2.1",
+      "dependencies": [
+        "logging"
+      ]
+    },
+    {
+      "name": "typed_data",
+      "version": "1.4.0",
+      "dependencies": [
+        "collection"
+      ]
+    },
+    {
+      "name": "test_core",
+      "version": "0.6.8",
+      "dependencies": [
+        "analyzer",
+        "args",
+        "async",
+        "boolean_selector",
+        "collection",
+        "coverage",
+        "frontend_server_client",
+        "glob",
+        "io",
+        "meta",
+        "package_config",
+        "path",
+        "pool",
+        "source_map_stack_trace",
+        "source_maps",
+        "source_span",
+        "stack_trace",
+        "stream_channel",
+        "test_api",
+        "vm_service",
+        "yaml"
+      ]
+    },
+    {
+      "name": "shelf_static",
+      "version": "1.1.3",
+      "dependencies": [
+        "convert",
+        "http_parser",
+        "mime",
+        "path",
+        "shelf"
+      ]
+    },
+    {
+      "name": "shelf_packages_handler",
+      "version": "3.0.2",
+      "dependencies": [
+        "path",
+        "shelf",
+        "shelf_static"
+      ]
+    },
+    {
+      "name": "pool",
+      "version": "1.5.2",
+      "dependencies": [
+        "async",
+        "stack_trace"
+      ]
+    },
+    {
+      "name": "package_config",
+      "version": "2.2.0",
+      "dependencies": [
+        "path"
+      ]
+    },
+    {
+      "name": "node_preamble",
+      "version": "2.0.2",
+      "dependencies": []
+    },
+    {
+      "name": "js",
+      "version": "0.7.2",
+      "dependencies": []
+    },
+    {
+      "name": "coverage",
+      "version": "1.15.0",
+      "dependencies": [
+        "args",
+        "cli_config",
+        "glob",
+        "logging",
+        "meta",
+        "package_config",
+        "path",
+        "source_maps",
+        "stack_trace",
+        "vm_service",
+        "yaml"
       ]
     },
     {
@@ -1042,20 +1177,6 @@
       ]
     },
     {
-      "name": "package_config",
-      "version": "2.2.0",
-      "dependencies": [
-        "path"
-      ]
-    },
-    {
-      "name": "typed_data",
-      "version": "1.4.0",
-      "dependencies": [
-        "collection"
-      ]
-    },
-    {
       "name": "built_value",
       "version": "8.12.0",
       "dependencies": [
@@ -1070,14 +1191,6 @@
       "version": "1.0.2",
       "dependencies": [
         "json_annotation"
-      ]
-    },
-    {
-      "name": "pool",
-      "version": "1.5.2",
-      "dependencies": [
-        "async",
-        "stack_trace"
       ]
     },
     {
@@ -1214,7 +1327,7 @@
     },
     {
       "name": "file_selector_macos",
-      "version": "0.9.4+4",
+      "version": "0.9.4+3",
       "dependencies": [
         "cross_file",
         "file_selector_platform_interface",
@@ -1232,7 +1345,7 @@
     },
     {
       "name": "flutter_plugin_android_lifecycle",
-      "version": "2.0.31",
+      "version": "2.0.29",
       "dependencies": [
         "flutter"
       ]
@@ -1247,6 +1360,30 @@
       "version": "2.0.0",
       "dependencies": [
         "unicode"
+      ]
+    },
+    {
+      "name": "source_maps",
+      "version": "0.10.13",
+      "dependencies": [
+        "source_span"
+      ]
+    },
+    {
+      "name": "source_map_stack_trace",
+      "version": "2.1.2",
+      "dependencies": [
+        "path",
+        "source_maps",
+        "stack_trace"
+      ]
+    },
+    {
+      "name": "cli_config",
+      "version": "0.2.0",
+      "dependencies": [
+        "args",
+        "yaml"
       ]
     },
     {
@@ -1303,7 +1440,7 @@
     },
     {
       "name": "path_provider_foundation",
-      "version": "2.4.2",
+      "version": "2.4.1",
       "dependencies": [
         "flutter",
         "path_provider_platform_interface"
@@ -1311,7 +1448,7 @@
     },
     {
       "name": "path_provider_android",
-      "version": "2.2.19",
+      "version": "2.2.17",
       "dependencies": [
         "flutter",
         "path_provider_platform_interface"
@@ -1345,7 +1482,7 @@
     },
     {
       "name": "url_launcher_macos",
-      "version": "3.2.3",
+      "version": "3.2.2",
       "dependencies": [
         "flutter",
         "url_launcher_platform_interface"
@@ -1361,7 +1498,7 @@
     },
     {
       "name": "url_launcher_ios",
-      "version": "6.3.4",
+      "version": "6.3.3",
       "dependencies": [
         "flutter",
         "url_launcher_platform_interface"
@@ -1369,7 +1506,7 @@
     },
     {
       "name": "url_launcher_android",
-      "version": "6.3.20",
+      "version": "6.3.17",
       "dependencies": [
         "flutter",
         "url_launcher_platform_interface"
@@ -1563,143 +1700,6 @@
       "dependencies": [
         "collection",
         "meta"
-      ]
-    },
-    {
-      "name": "webkit_inspection_protocol",
-      "version": "1.2.1",
-      "dependencies": [
-        "logging"
-      ]
-    },
-    {
-      "name": "shelf_static",
-      "version": "1.1.3",
-      "dependencies": [
-        "convert",
-        "http_parser",
-        "mime",
-        "path",
-        "shelf"
-      ]
-    },
-    {
-      "name": "shelf_packages_handler",
-      "version": "3.0.2",
-      "dependencies": [
-        "path",
-        "shelf",
-        "shelf_static"
-      ]
-    },
-    {
-      "name": "node_preamble",
-      "version": "2.0.2",
-      "dependencies": []
-    },
-    {
-      "name": "js",
-      "version": "0.7.2",
-      "dependencies": []
-    },
-    {
-      "name": "coverage",
-      "version": "1.15.0",
-      "dependencies": [
-        "args",
-        "cli_config",
-        "glob",
-        "logging",
-        "meta",
-        "package_config",
-        "path",
-        "source_maps",
-        "stack_trace",
-        "vm_service",
-        "yaml"
-      ]
-    },
-    {
-      "name": "source_maps",
-      "version": "0.10.13",
-      "dependencies": [
-        "source_span"
-      ]
-    },
-    {
-      "name": "cli_config",
-      "version": "0.2.0",
-      "dependencies": [
-        "args",
-        "yaml"
-      ]
-    },
-    {
-      "name": "test",
-      "version": "1.25.15",
-      "dependencies": [
-        "analyzer",
-        "async",
-        "boolean_selector",
-        "collection",
-        "coverage",
-        "http_multi_server",
-        "io",
-        "js",
-        "matcher",
-        "node_preamble",
-        "package_config",
-        "path",
-        "pool",
-        "shelf",
-        "shelf_packages_handler",
-        "shelf_static",
-        "shelf_web_socket",
-        "source_span",
-        "stack_trace",
-        "stream_channel",
-        "test_api",
-        "test_core",
-        "typed_data",
-        "web_socket_channel",
-        "webkit_inspection_protocol",
-        "yaml"
-      ]
-    },
-    {
-      "name": "test_core",
-      "version": "0.6.8",
-      "dependencies": [
-        "analyzer",
-        "args",
-        "async",
-        "boolean_selector",
-        "collection",
-        "coverage",
-        "frontend_server_client",
-        "glob",
-        "io",
-        "meta",
-        "package_config",
-        "path",
-        "pool",
-        "source_map_stack_trace",
-        "source_maps",
-        "source_span",
-        "stack_trace",
-        "stream_channel",
-        "test_api",
-        "vm_service",
-        "yaml"
-      ]
-    },
-    {
-      "name": "source_map_stack_trace",
-      "version": "2.1.2",
-      "dependencies": [
-        "path",
-        "source_maps",
-        "stack_trace"
       ]
     }
   ],
