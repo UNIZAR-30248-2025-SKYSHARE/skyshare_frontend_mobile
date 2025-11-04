@@ -7,7 +7,11 @@ class ImagenPrincipal extends StatelessWidget {
   Widget _errorIcon() => Container(
         color: Colors.white10,
         child: const Center(
-          child: Icon(Icons.image_not_supported, size: 50, color: Colors.white70),
+          child: Icon(
+            Icons.image_not_supported,
+            size: 50,
+            color: Colors.white70,
+          ),
         ),
       );
 
@@ -24,7 +28,7 @@ class ImagenPrincipal extends StatelessWidget {
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.3),
+              color: Colors.black.withValues(alpha: 0.3),
               blurRadius: 10,
               offset: const Offset(0, 4),
             ),
@@ -35,11 +39,15 @@ class ImagenPrincipal extends StatelessWidget {
           child: img.isEmpty
               ? _errorIcon()
               : img.startsWith('http')
-                  ? Image.network(img, fit: BoxFit.contain, errorBuilder: (_, __, ___) => _errorIcon())
+                  ? Image.network(
+                      img,
+                      fit: BoxFit.contain,
+                      errorBuilder: (context, error, stackTrace) => _errorIcon(),
+                    )
                   : Image.asset(
                       'public/resources/$img',
                       fit: BoxFit.contain,
-                      errorBuilder: (_, __, ___) => _errorIcon(),
+                      errorBuilder: (context, error, stackTrace) => _errorIcon(),
                     ),
         ),
       ),

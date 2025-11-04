@@ -2,7 +2,11 @@ import 'package:flutter/material.dart';
 
 class BannerConstelacionDelegate extends SliverPersistentHeaderDelegate {
   final dynamic guia;
+
+  @override
   final double minExtent;
+
+  @override
   final double maxExtent;
 
   BannerConstelacionDelegate({
@@ -30,9 +34,9 @@ class BannerConstelacionDelegate extends SliverPersistentHeaderDelegate {
           decoration: BoxDecoration(
             gradient: LinearGradient(
               colors: [
-                Colors.black.withOpacity(0.6),
+                Colors.black.withValues(alpha: 0.6),
                 Colors.transparent,
-                Colors.black.withOpacity(0.5),
+                Colors.black.withValues(alpha: 0.5),
               ],
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
@@ -64,5 +68,5 @@ class BannerConstelacionDelegate extends SliverPersistentHeaderDelegate {
   }
 
   @override
-  bool shouldRebuild(_) => true;
+  bool shouldRebuild(covariant SliverPersistentHeaderDelegate oldDelegate) => true;
 }
