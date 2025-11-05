@@ -28,6 +28,9 @@ import 'package:skyshare_frontend_mobile/features/interactive_map/providers/inte
 import 'features/alerts_configurable/providers/alert_provider.dart';
 import 'features/alerts_configurable/data/repository/alerts_repository.dart';
 import 'features/alerts_configurable/presentation/alerts_list_screen.dart';
+import 'features/observation-chats/data/repositories/observation_chats_repository.dart'; 
+import 'features/observation-chats/providers/observation_chats_provider.dart'; 
+import 'features/observation-chats/presentation/observation_chats_screen.dart'; 
 
 
 Future<void> main() async {
@@ -147,8 +150,18 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider<AlertProvider>(
           create: (ctx) => AlertProvider(
             repository: ctx.read<AlertRepository>(),
-          )..loadAlerts(), // Cargar alertas al inicio
+          )..loadAlerts(),
         ),
+        
+        Provider<ObservationChatsRepository>( 
+          create: (ctx) => ObservationChatsRepository(ctx.read<SupabaseClient>()),
+        ),
+        ChangeNotifierProvider<ObservationChatsProvider>( 
+          create: (ctx) => ObservationChatsProvider(
+            ctx.read<ObservationChatsRepository>(),
+          ),
+        ),
+
       ],
       child: MaterialApp(
         title: 'Skyshare',
@@ -215,12 +228,14 @@ class _RootAppState extends State<RootApp> {
   Widget build(BuildContext context) {
     final provider = context.watch<DashboardProvider>();
     final locationCount = provider.savedLocations.length;
+    
     final pages = <Widget>[
-      const DashboardScreen(),                   
-      const PhaseLunarScreen(),
-      const AlertsListScreen(),
-      const MapScreen(),
-      const Center(child: Text('Perfil - placeholder'))
+      const DashboardScreen(),           
+      const PhaseLunarScreen(),       
+      const AlertsListScreen(),       
+      const MapScreen(),              
+      const ObservationChatsScreen(),  
+      const Center(child: Text('Perfil - placeholder')) 
     ];
 
     return Scaffold(
