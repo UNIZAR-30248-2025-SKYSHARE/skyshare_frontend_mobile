@@ -3,7 +3,6 @@ import '../data/models/chat_preview_model.dart';
 import '../data/models/group_info_model.dart'; 
 import '../data/repositories/observation_chats_repository.dart';
 
-// Enum para saber qué filtro está activo
 enum ChatFilter { misGrupos, todos }
 
 class ObservationChatsProvider extends ChangeNotifier {
@@ -58,6 +57,50 @@ class ObservationChatsProvider extends ChangeNotifier {
   Future<void> fetchDiscoverableGroups() async {
     if (_discoverableGroups.isEmpty) {
       _discoverableGroups = await _repository.getDiscoverableGroups();
+    }
+  }
+
+  Future<bool> createGroup(String name, String description) async {
+    try {
+      await _repository.createGroup(name, description);
+      
+      _groupChats = []; 
+      
+      await fetchMyGroups(); 
+      
+      _currentFilter = ChatFilter.misGrupos;
+      
+      notifyListeners(); 
+      return true;
+
+    } catch (e) {
+      print('Error creando grupo: $e');
+      return false;
+    }
+  }
+
+  Future<bool> joinGroup(int groupId) async {
+    _isLoading = true;
+    notifyListeners();
+    
+    try {
+      await _repository.joinGroup(groupId);
+      
+      _groupChats = [];
+      _discoverableGroups = [];
+      await fetchMyGroups(); 
+
+      _currentFilter = ChatFilter.misGrupos;
+      
+      _isLoading = false;
+      notifyListeners();
+      return true;
+
+    } catch (e) {
+      print('Error al unirse al grupo: $e');
+      _isLoading = false;
+      notifyListeners();
+      return false;
     }
   }
 }

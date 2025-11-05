@@ -1,17 +1,69 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import '../providers/observation_chats_provider.dart';
 import 'widgets/chat_list_item.dart'; 
-import '../data/models/group_info_model.dart'; // <-- AÑADIDO
+import '../data/models/group_info_model.dart'; 
+import 'widgets/create_group_bottom_sheet.dart'; 
+import 'chat_detail_screen.dart';
+import '../providers/chat_detail_provider.dart';
+import '../data/repositories/observation_chats_repository.dart';
 
 class ObservationChatsScreen extends StatelessWidget {
   const ObservationChatsScreen({Key? key}) : super(key: key);
 
+  void _showCreateGroupSheet(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true, 
+      backgroundColor: const Color(0xFF1E1E2F),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(24),
+          topRight: Radius.circular(24),
+        ),
+      ),
+      builder: (ctx) {
+        return CreateGroupBottomSheet(); 
+      },
+    );
+  }
+
+  void _showJoinGroupDialog(BuildContext context, GroupInfo groupInfo) {
+    final providerActions = context.read<ObservationChatsProvider>();
+
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: const Color(0xFF2A2A3D),
+        title: const Text('Confirmar', style: TextStyle(color: Colors.white)),
+        content: Text(
+          '¿Quieres unirte al grupo "${groupInfo.nombre}"?',
+          style: const TextStyle(color: Colors.white70),
+        ),
+        actions: [
+          TextButton(
+            child: const Text('Cancelar', style: TextStyle(color: Colors.white54)),
+            onPressed: () => Navigator.of(ctx).pop(),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFF6A4D9C),
+            ),
+            child: const Text('Unirme', style: TextStyle(color: Colors.white)),
+            onPressed: () {
+              Navigator.of(ctx).pop(); 
+              providerActions.joinGroup(groupInfo.idGrupo); 
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    // 'watch' re-dibuja la UI cuando hay cambios
     final provider = context.watch<ObservationChatsProvider>();
-    // 'read' se usa para llamar a funciones sin re-dibujar
     final providerActions = context.read<ObservationChatsProvider>();
 
     return Scaffold(
@@ -23,7 +75,7 @@ class ObservationChatsScreen extends StatelessWidget {
           IconButton(
             icon: const Icon(Icons.add_circle, size: 30, color: Colors.white),
             onPressed: () {
-              // Lógica para crear nuevo grupo
+              _showCreateGroupSheet(context); 
             },
           ),
         ],
@@ -45,20 +97,18 @@ class ObservationChatsScreen extends StatelessWidget {
               ),
             ),
           ),
-          
-          // 2. Filtros (¡AHORA SON INTERACTIVOS!)
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               ActionChip(
                 label: const Text("Mis Grupos"),
                 backgroundColor: provider.currentFilter == ChatFilter.misGrupos
-                    ? const Color(0xFF6A4D9C) // Color activo
-                    : const Color(0xFF3A2D4C), // Color inactivo
+                    ? const Color(0xFF6A4D9C) 
+                    : const Color(0xFF3A2D4C), 
                 onPressed: () => providerActions.setFilter(ChatFilter.misGrupos),
               ),
               ActionChip(
-                label: const Text("Buscar Grupos"), // Texto cambiado
+                label: const Text("Buscar Grupos"), 
                 backgroundColor: provider.currentFilter == ChatFilter.todos
                     ? const Color(0xFF6A4D9C)
                     : const Color(0xFF3A2D4C),
@@ -66,22 +116,18 @@ class ObservationChatsScreen extends StatelessWidget {
               ),
             ],
           ),
-          
           const SizedBox(height: 16),
-
-          // 3. Lista de Chats (¡AHORA ES DINÁMICA!)
           Expanded(
             child: provider.isLoading
                 ? const Center(child: CircularProgressIndicator())
-                : _buildFilteredList(provider), // Usamos un widget helper
+                : _buildFilteredList(context, provider),
           ),
         ],
       ),
     );
   }
 
-  // Widget helper para decidir qué lista mostrar
-  Widget _buildFilteredList(ObservationChatsProvider provider) {
+  Widget _buildFilteredList(BuildContext context, ObservationChatsProvider provider) {
     switch (provider.currentFilter) {
       
       case ChatFilter.misGrupos:
@@ -92,7 +138,26 @@ class ObservationChatsScreen extends StatelessWidget {
           itemCount: provider.groupChats.length,
           itemBuilder: (context, index) {
             final chat = provider.groupChats[index];
-            return ChatListItem(chat: chat); // Tu widget existente
+            
+            return GestureDetector(
+              onTap: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => ChangeNotifierProvider(
+                      create: (_) => ChatDetailProvider(
+                        repository: context.read<ObservationChatsRepository>(),
+                        supabaseClient: context.read<SupabaseClient>(),
+                        groupId: chat.idGrupo,
+                      ),
+                      child: ChatDetailScreen(
+                        groupName: chat.nombreGrupo,
+                      ),
+                    ),
+                  ),
+                );
+              },
+              child: ChatListItem(key: ValueKey(chat.idGrupo), chat: chat),
+            );
           },
         );
 
@@ -104,7 +169,6 @@ class ObservationChatsScreen extends StatelessWidget {
           itemCount: provider.discoverableGroups.length,
           itemBuilder: (context, index) {
             final GroupInfo groupInfo = provider.discoverableGroups[index];
-            // Widget temporal para mostrar la info de los grupos a descubrir
             return Card(
               color: const Color(0xFF3A2D4C),
               margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 16),
@@ -114,8 +178,8 @@ class ObservationChatsScreen extends StatelessWidget {
                 subtitle: Text(groupInfo.descripcion ?? "Sin descripción", style: const TextStyle(color: Colors.white70)),
                 trailing: ElevatedButton(
                   child: const Text("Unirse"),
-                  onPressed: () { 
-                    // Lógica futura para unirse al grupo
+                  onPressed: () {
+                    _showJoinGroupDialog(context, groupInfo);
                   },
                 ),
               ),
