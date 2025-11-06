@@ -134,4 +134,13 @@ class SpotRepository {
     if (resp == null) return null;
     return Spot.fromMap(Map<String, dynamic>.from(resp));
   }
+
+  Future<List<Map<String, dynamic>>> getSpotsByUser(String userId) async {
+    final resp = await client
+        .from('spot')
+        .select('*, ubicacion(*)')
+        .eq('id_usuario_creador', userId);
+
+    return (resp as List).map((e) => Map<String, dynamic>.from(e)).toList();
+  }
 }
