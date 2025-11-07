@@ -28,9 +28,30 @@ class StarFieldPainter extends CustomPainter {
   static const double radius = 25.0;
   static const double focal = 200.0;
 
-  double _correctAz(double rawAz) {
+  double correctAz(double rawAz) {
     if (initialHeading == null) return rawAz;
     return (rawAz - initialHeading!) % 360;
+  }
+
+  Offset project(vm.Vector3 p, Offset center) {
+    const eps = 0.0001;
+    final z = p.z.abs() < eps ? (p.z < 0 ? -eps : eps) : p.z;
+    return Offset(center.dx + (p.x / -z) * focal, center.dy + (p.y / -z) * focal);
+  }
+
+  List<Map<String, double>> generateConstellationPattern(String name, double azDeg, double altDeg) {
+    final seed = name.hashCode;
+    final random = math.Random(seed);
+    final starCount = 4 + (seed.abs() % 3);
+    final pattern = <Map<String, double>>[];
+    pattern.add({'az': azDeg, 'alt': altDeg, 'mag': 1.5, 'isMain': 1.0});
+    for (int i = 1; i < starCount; i++) {
+      final azOffset = (random.nextDouble() - 0.5) * 45;
+      final altOffset = (random.nextDouble() - 0.5) * 45;
+      final mag = 2.5 + random.nextDouble() * 2.0;
+      pattern.add({'az': azDeg + azOffset, 'alt': altDeg + altOffset, 'mag': mag, 'isMain': 0.0});
+    }
+    return pattern;
   }
 
   @override
@@ -60,7 +81,7 @@ class StarFieldPainter extends CustomPainter {
     canvas.drawRect(Rect.fromLTWH(0, 0, size.width, size.height), Paint()..shader = gradient);
     for (final star in backgroundStars) {
       star.update(timestamp);
-      final az = _correctAz(star.az) * math.pi / 180.0;
+      final az = correctAz(star.az) * math.pi / 180.0;
       final alt = star.alt * math.pi / 180.0;
       final wx = math.cos(alt) * math.sin(az);
       final wy = -math.sin(alt);
@@ -68,7 +89,7 @@ class StarFieldPainter extends CustomPainter {
       final world = vm.Vector3(wx * radius, wy * radius, wz * radius);
       final rotated = rot * world;
       if (rotated.z >= 0) continue;
-      final proj = _project(rotated, center);
+      final proj = project(rotated, center);
       if (proj.dx < -50 || proj.dx > size.width + 50 || proj.dy < -50 || proj.dy > size.height + 50) continue;
       final alpha = (star.brightness * 255).toInt().clamp(30, 180);
       final color = Color.fromARGB(alpha, 255, 255, 255);
@@ -104,7 +125,7 @@ class StarFieldPainter extends CustomPainter {
         final world = vm.Vector3(x, groundY, z);
         final rotated = rot * world;
         if (rotated.z >= 0) continue;
-        final proj = _project(rotated, center);
+        final proj = project(rotated, center);
         if (firstPointX) {
           pathX.moveTo(proj.dx, proj.dy);
           firstPointX = false;
@@ -120,7 +141,7 @@ class StarFieldPainter extends CustomPainter {
         final world = vm.Vector3(z, groundY, x);
         final rotated = rot * world;
         if (rotated.z >= 0) continue;
-        final proj = _project(rotated, center);
+        final proj = project(rotated, center);
         if (firstPointZ) {
           pathZ.moveTo(proj.dx, proj.dy);
           firstPointZ = false;
@@ -139,7 +160,7 @@ class StarFieldPainter extends CustomPainter {
       {'az': 60.0, 'alt': -10.0, 'radius': 50.0, 'color': const Color(0x10081A2A)},
     ];
     for (final nebula in nebulae) {
-      final az = _correctAz(nebula['az'] as double) * math.pi / 180.0;
+      final az = correctAz(nebula['az'] as double) * math.pi / 180.0;
       final alt = (nebula['alt'] as double) * math.pi / 180.0;
       final radius = nebula['radius'] as double;
       final color = nebula['color'] as Color;
@@ -149,7 +170,7 @@ class StarFieldPainter extends CustomPainter {
       final world = vm.Vector3(wx * radius, wy * radius, wz * radius);
       final rotated = rot * world;
       if (rotated.z >= 0) continue;
-      final proj = _project(rotated, center);
+      final proj = project(rotated, center);
       final nebulaGradient = ui.Gradient.radial(proj, radius, [color, Colors.transparent], [0.0, 1.0]);
       canvas.drawCircle(proj, radius, Paint()..shader = nebulaGradient..blendMode = BlendMode.plus);
     }
@@ -163,9 +184,9 @@ class StarFieldPainter extends CustomPainter {
       try {
         if (constellation['is_visible'] != true) continue;
         final name = constellation['name'] as String? ?? 'Unknown';
-        final azDeg = _correctAz((constellation['az'] as num?)?.toDouble() ?? 0.0);
+        final azDeg = correctAz((constellation['az'] as num?)?.toDouble() ?? 0.0);
         final altDeg = (constellation['alt'] as num?)?.toDouble() ?? 0.0;
-        final pattern = _generateConstellationPattern(name, azDeg, altDeg);
+        final pattern = generateConstellationPattern(name, azDeg, altDeg);
         final projections = <Offset>[];
         for (final star in pattern) {
           final az = star['az']! * math.pi / 180.0;
@@ -176,7 +197,7 @@ class StarFieldPainter extends CustomPainter {
           final world = vm.Vector3(wx * radius, wy * radius, wz * radius);
           final rotated = rot * world;
           if (rotated.z < 0) {
-            final proj = _project(rotated, center);
+            final proj = project(rotated, center);
             if (proj.dx >= -50 && proj.dx <= size.width + 50 && proj.dy >= -50 && proj.dy <= size.height + 50) projections.add(proj);
           }
         }
@@ -235,7 +256,7 @@ class StarFieldPainter extends CustomPainter {
     for (final obj in celestialObjects) {
       try {
         if (obj['is_visible'] != true) continue;
-        final azDeg = _correctAz((obj['az'] as num?)?.toDouble() ?? 0.0);
+        final azDeg = correctAz((obj['az'] as num?)?.toDouble() ?? 0.0);
         final altDeg = (obj['alt'] as num?)?.toDouble() ?? 0.0;
         final mag = (obj['mag'] as num?)?.toDouble() ?? 3.0;
         final name = obj['name'] as String? ?? 'Unknown';
@@ -247,7 +268,7 @@ class StarFieldPainter extends CustomPainter {
         final world = vm.Vector3(wx * radius, wy * radius, wz * radius);
         final rotated = rot * world;
         if (rotated.z >= 0) continue;
-        final proj = _project(rotated, center);
+        final proj = project(rotated, center);
         if (proj.dx < -100 || proj.dx > size.width + 100 || proj.dy < -100 || proj.dy > size.height + 100) continue;
         final cacheKey = 'star_${obj['id']}_$name';
         projectionCache[cacheKey] = proj;
@@ -313,27 +334,6 @@ class StarFieldPainter extends CustomPainter {
       )..layout();
       tp.paint(canvas, Offset(proj.dx - tp.width / 2, proj.dy + size + 10));
     }
-  }
-
-  List<Map<String, double>> _generateConstellationPattern(String name, double azDeg, double altDeg) {
-    final seed = name.hashCode;
-    final random = math.Random(seed);
-    final starCount = 4 + (seed.abs() % 3);
-    final pattern = <Map<String, double>>[];
-    pattern.add({'az': azDeg, 'alt': altDeg, 'mag': 1.5, 'isMain': 1.0});
-    for (int i = 1; i < starCount; i++) {
-      final azOffset = (random.nextDouble() - 0.5) * 45;
-      final altOffset = (random.nextDouble() - 0.5) * 45;
-      final mag = 2.5 + random.nextDouble() * 2.0;
-      pattern.add({'az': azDeg + azOffset, 'alt': altDeg + altOffset, 'mag': mag, 'isMain': 0.0});
-    }
-    return pattern;
-  }
-
-  Offset _project(vm.Vector3 p, Offset center) {
-    const eps = 0.0001;
-    final z = p.z.abs() < eps ? (p.z < 0 ? -eps : eps) : p.z;
-    return Offset(center.dx + (p.x / -z) * focal, center.dy + (p.y / -z) * focal);
   }
 
   @override

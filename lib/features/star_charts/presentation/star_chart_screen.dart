@@ -4,15 +4,18 @@ import 'package:skyshare_frontend_mobile/features/star_charts/presentation/widge
 import 'package:skyshare_frontend_mobile/features/star_charts/providers/star_chart_provider.dart';
 import 'package:skyshare_frontend_mobile/features/star_charts/presentation/widgets/calibration_guide.dart';
 import 'package:skyshare_frontend_mobile/features/star_charts/presentation/widgets/custom_back_button.dart';
+import 'package:skyshare_frontend_mobile/features/star_charts/utils/sensor_wrapper.dart';
 
 class StarChartScreen extends StatefulWidget {
   final double latitude;
   final double longitude;
+  final SensorWrapper? sensorWrapper;
 
   const StarChartScreen({
     super.key,
     required this.latitude,
     required this.longitude,
+    this.sensorWrapper,
   });
 
   @override
@@ -36,6 +39,7 @@ class _StarChartScreenState extends State<StarChartScreen> {
     if (_showCalGuide) {
       return CalibrationGuide(
         onContinue: () => setState(() => _showCalGuide = false),
+        sensorWrapper: widget.sensorWrapper,
       );
     }
 

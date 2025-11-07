@@ -291,4 +291,8 @@ class _StarChartContentState extends State<StarChartContent> {
       center.dy + (p.y / -z) * focal,
     );
   }
+
+  @visibleForTesting
+  Map<String, dynamic>? getSelectedObjectForTest(_StarChartContentState state) =>
+      state._selectedObject;
 }

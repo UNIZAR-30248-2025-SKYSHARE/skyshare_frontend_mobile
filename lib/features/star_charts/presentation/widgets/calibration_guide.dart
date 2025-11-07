@@ -1,19 +1,26 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:sensors_plus/sensors_plus.dart';
+import 'package:skyshare_frontend_mobile/features/star_charts/utils/sensor_wrapper.dart';
 import 'custom_back_button.dart';
 
 class CalibrationGuide extends StatelessWidget {
   final VoidCallback onContinue;
+  final SensorWrapper? sensorWrapper;
 
-  const CalibrationGuide({super.key, required this.onContinue});
+  const CalibrationGuide({
+    super.key,
+    required this.onContinue,
+    this.sensorWrapper,
+    
+  });
 
   @override
   Widget build(BuildContext context) {
     return Stack(
       children: [
         StreamBuilder<AccelerometerEvent>(
-          stream: accelerometerEventStream(),
+          stream: (sensorWrapper ?? SensorWrapper()).accelerometerEvents,
           builder: (context, snapshot) {
             if (!snapshot.hasData) {
               return _buildLoading(context);
@@ -79,6 +86,7 @@ class CalibrationGuide extends StatelessWidget {
             ),
             const SizedBox(height: 32),
             ElevatedButton.icon(
+              key: const Key('continue-button'),
               onPressed: ok ? onContinue : null,
               icon: const Icon(Icons.arrow_forward),
               label: const Text('CONTINUAR'),
