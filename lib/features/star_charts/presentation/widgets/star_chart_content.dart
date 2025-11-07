@@ -24,7 +24,6 @@ class StarChartContent extends StatefulWidget {
 class _StarChartContentState extends State<StarChartContent> {
   final List<StreamSubscription<dynamic>> _subs = [];
   vm.Quaternion _deviceOrientation = vm.Quaternion.identity();
-  bool _isLoading = true;
   Map<String, dynamic>? _selectedObject;
   final Map<String, Offset> _projectionCache = {};
   final int _frameCount = 0;
@@ -33,6 +32,7 @@ class _StarChartContentState extends State<StarChartContent> {
   static const int _backgroundStarCount = 200;
   double? _initialHeading;
   int _lastGyroTs = 0;
+  bool _compassReady = false;
 
   @override
   void initState() {
@@ -41,14 +41,23 @@ class _StarChartContentState extends State<StarChartContent> {
     _waitForFirstCompassReading();
   }
 
+  @override
+  void didUpdateWidget(StarChartContent oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.starChartProvider != widget.starChartProvider) {
+      _selectedObject = null;
+      _projectionCache.clear();
+    }
+  }
+
   void _waitForFirstCompassReading() {
     FlutterCompass.events?.first.then((event) {
       if (!mounted) return;
       setState(() {
         _initialHeading = event.heading ?? 0.0;
+        _compassReady = true;
       });
       _initSensors();
-      _loadCelestialData();
     });
   }
 
@@ -105,22 +114,6 @@ class _StarChartContentState extends State<StarChartContent> {
     }
   }
 
-  Future<void> _loadCelestialData({
-    double latitude = 40.4168,
-    double longitude = -3.7038,
-  }) async {
-    if (!mounted) return;
-    setState(() => _isLoading = true);
-    try {
-      await widget.starChartProvider.fetchCelestialBodies(
-        latitude: latitude, 
-        longitude: longitude
-      );
-    } finally {
-      if (mounted) setState(() => _isLoading = false);
-    }
-  }
-
   void _onStarTapped(Map<String, dynamic> object) {
     setState(() => _selectedObject = object);
   }
@@ -148,6 +141,7 @@ class _StarChartContentState extends State<StarChartContent> {
   @override
   Widget build(BuildContext context) {
     final stars = widget.starChartProvider.visibleBodies;
+    final isLoading = widget.starChartProvider.isLoading || !_compassReady;
 
     return LayoutBuilder(builder: (context, cons) {
       final size = Size(cons.maxWidth, cons.maxHeight);
@@ -176,7 +170,7 @@ class _StarChartContentState extends State<StarChartContent> {
               ),
             ),
           ),
-          if (_isLoading) _buildLoadingOverlay(),
+          if (isLoading) _buildLoadingOverlay(),
           if (_selectedObject != null)
             ConstellationInfoPanel(
               object: _selectedObject!,

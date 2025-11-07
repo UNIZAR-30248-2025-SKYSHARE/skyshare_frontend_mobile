@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class StarChartRepository {
@@ -10,18 +11,27 @@ class StarChartRepository {
     required double longitude,
   }) async {
     try {
-      final response = await _client.functions.invoke('astronomy-positions', body: {
-        'latitude': latitude,
-        'longitude': longitude,
-      });
+      final response = await _client.functions.invoke('astronomy-positions', 
+        body: {
+          'latitude': latitude,
+          'longitude': longitude,
+        }
+      ).timeout(const Duration(seconds: 30));
 
       if (response.status != 200) {
-        throw Exception('Failed to fetch celestial bodies: ${response.status}');
+        throw Exception('Edge Function failed with status: ${response.status}');
+      }
+
+      if (response.data == null) {
+        throw Exception('Edge Function returned null data');
       }
 
       return response.data;
+
+    } on TimeoutException {
+      throw Exception('La solicitud a la Edge Function tardó demasiado');
     } catch (e) {
-      throw Exception('Failed to fetch celestial bodies: $e');
+      throw Exception('Error al llamar a la Edge Function: $e');
     }
   }
 
@@ -32,12 +42,21 @@ class StarChartRepository {
           .select()
           .order('timestamp', ascending: false)
           .limit(1)
-          .single();
+          .maybeSingle()
+          .timeout(const Duration(seconds: 10));
+
+      if (response == null) {
+        return [];
+      }
 
       final data = response['data'] as Map<String, dynamic>?;
       if (data != null) {
-        return extractCelestialBodiesFromData(data);
+        final extracted = extractCelestialBodiesFromData(data);
+        return extracted;
       }
+      
+      return [];
+    } on TimeoutException {
       return [];
     } catch (e) {
       return [];
@@ -53,41 +72,45 @@ class StarChartRepository {
       final rows = table?['rows'] as List<dynamic>? ?? [];
 
       for (final row in rows) {
-        final entry = row['entry'] as Map<String, dynamic>? ?? {};
-        final cells = row['cells'] as List<dynamic>? ?? [];
+        try {
+          final entry = row['entry'] as Map<String, dynamic>? ?? {};
+          final cells = row['cells'] as List<dynamic>? ?? [];
 
-        for (final cell in cells) {
-          final position = cell['position'] as Map<String, dynamic>? ?? {};
-          final horizontal = position['horizontal'] as Map<String, dynamic>? ?? position['horizonal'] as Map<String, dynamic>? ?? {};
-          final altitude = horizontal['altitude'] as Map<String, dynamic>? ?? {};
-          final azimuth = horizontal['azimuth'] as Map<String, dynamic>? ?? {};
-          final constellation = position['constellation'] as Map<String, dynamic>? ?? {};
-          final extraInfo = cell['extraInfo'] as Map<String, dynamic>? ?? {};
+          for (final cell in cells) {
+            final position = cell['position'] as Map<String, dynamic>? ?? {};
+            final horizontal = position['horizontal'] as Map<String, dynamic>? ?? position['horizonal'] as Map<String, dynamic>? ?? {};
+            final altitude = horizontal['altitude'] as Map<String, dynamic>? ?? {};
+            final azimuth = horizontal['azimuth'] as Map<String, dynamic>? ?? {};
+            final constellation = position['constellation'] as Map<String, dynamic>? ?? {};
+            final extraInfo = cell['extraInfo'] as Map<String, dynamic>? ?? {};
 
-          final celestialBody = {
-            'id': entry['id'] ?? cell['id'],
-            'name': entry['name'] ?? cell['name'],
-            'az': double.tryParse(azimuth['degrees']?.toString() ?? '0') ?? 0.0,
-            'alt': double.tryParse(altitude['degrees']?.toString() ?? '0') ?? 0.0,
-            'mag': extraInfo['magnitude'] is double 
-                ? extraInfo['magnitude'] 
-                : double.tryParse(extraInfo['magnitude']?.toString() ?? '0') ?? 0.0,
-            'type': _determineType((entry['id'] ?? cell['id'])?.toString() ?? ''),
-            'constellation': constellation['name'] ?? '',
-            'constellation_id': constellation['id'] ?? '',
-            'is_visible': (double.tryParse(altitude['degrees']?.toString() ?? '0') ?? 0.0) > 0,
-          };
+            final celestialBody = {
+              'id': entry['id'] ?? cell['id'],
+              'name': entry['name'] ?? cell['name'],
+              'az': double.tryParse(azimuth['degrees']?.toString() ?? '0') ?? 0.0,
+              'alt': double.tryParse(altitude['degrees']?.toString() ?? '0') ?? 0.0,
+              'mag': extraInfo['magnitude'] is double 
+                  ? extraInfo['magnitude'] 
+                  : double.tryParse(extraInfo['magnitude']?.toString() ?? '0') ?? 0.0,
+              'type': _determineType((entry['id'] ?? cell['id'])?.toString() ?? ''),
+              'constellation': constellation['name'] ?? '',
+              'constellation_id': constellation['id'] ?? '',
+              'is_visible': (double.tryParse(altitude['degrees']?.toString() ?? '0') ?? 0.0) > 0,
+            };
 
-          result.add(celestialBody);
+            result.add(celestialBody);
 
-          final constellationName = constellation['name'];
-          final constellationId = constellation['id'];
-          if (constellationName != null && constellationName.isNotEmpty) {
-            if (!constellations.containsKey(constellationId)) {
-              constellations[constellationId] = [];
+            final constellationName = constellation['name'];
+            final constellationId = constellation['id'];
+            if (constellationName != null && constellationName.isNotEmpty) {
+              if (!constellations.containsKey(constellationId)) {
+                constellations[constellationId] = [];
+              }
+              constellations[constellationId]!.add(celestialBody);
             }
-            constellations[constellationId]!.add(celestialBody);
           }
+        } catch (e) {
+          // Ignorar errores en el procesamiento de filas individuales
         }
       }
 
@@ -118,7 +141,7 @@ class StarChartRepository {
         }
       }
     } catch (e) {
-      print('Error extracting celestial bodies: $e');
+      // Manejar error general de extracción
     }
 
     return result;

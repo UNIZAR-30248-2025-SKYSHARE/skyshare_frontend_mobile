@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:skyshare_frontend_mobile/features/star_charts/data/repositories/star_chart_repository.dart';
 
@@ -30,19 +31,16 @@ class StarChartProvider with ChangeNotifier {
     
     _isLoading = true;
     _error = null;
-    
-    if (_isInitialized) {
-      notifyListeners();
-    }
+    notifyListeners();
 
     try {
-      final data = await _astronomyRepository.getCelestialBodies(
-        latitude: latitude,
-        longitude: longitude,
-      );
+      final storedData = await _astronomyRepository.getStoredCelestialData();
+      if (storedData.isNotEmpty) {
+        _celestialBodies = storedData;
+      } else {
+        await _callEdgeFunctionWithRetry(latitude, longitude);
+      }
       
-      _celestialBodies = _astronomyRepository.extractCelestialBodiesFromData(data);
-      print("CELESTIAL BODIES: ${_celestialBodies.toString()}");
       _error = null;
       
     } catch (e) {
@@ -55,40 +53,51 @@ class StarChartProvider with ChangeNotifier {
     }
   }
 
+  Future<void> _callEdgeFunctionWithRetry(double latitude, double longitude) async {
+    const int maxRetries = 3;
+    const Duration initialDelay = Duration(seconds: 3);
+    
+    for (int attempt = 1; attempt <= maxRetries; attempt++) {
+      try {
+        if (attempt == 1) {
+          await Future.delayed(initialDelay);
+        } else {
+          await Future.delayed(Duration(seconds: attempt * 2));
+        }
+
+        final data = await _astronomyRepository.getCelestialBodies(
+          latitude: latitude,
+          longitude: longitude,
+        );
+        
+        final extractedData = _astronomyRepository.extractCelestialBodiesFromData(data);
+        
+        if (extractedData.isNotEmpty) {
+          _celestialBodies = extractedData;
+          return;
+        }
+        
+      } catch (e) {
+        if (attempt == maxRetries) {
+          throw Exception("No se pudieron obtener datos después de $maxRetries intentos: $e");
+        }
+      }
+    }
+    
+    throw Exception("No se pudieron cargar los datos celestes después de $maxRetries intentos");
+  }
+
   Future<List<Map<String, dynamic>>> _getStoredData() async {
     try {
       final storedData = await _astronomyRepository.getStoredCelestialData();
+
       if (storedData.isNotEmpty) {
         return storedData;
+      } else {
+        return [];
       }
-      return _getDemoData();
     } catch (e) {
-      return _getDemoData();
+      return [];
     }
-  }
-
-  List<Map<String, dynamic>> _getDemoData() {
-    return [
-      {
-        'id': 'sirius',
-        'name': 'Sirius',
-        'az': 180.0,
-        'alt': 25.0,
-        'mag': -1.46,
-        'type': 'star',
-        'constellation': 'Canis Major',
-        'is_visible': true,
-      },
-      {
-        'id': 'vega',
-        'name': 'Vega',
-        'az': 45.0,
-        'alt': 60.2,
-        'mag': 0.03,
-        'type': 'star',
-        'constellation': 'Lyra',
-        'is_visible': true,
-      },
-    ];
   }
 }

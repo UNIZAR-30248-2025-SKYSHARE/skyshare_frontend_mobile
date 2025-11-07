@@ -30,7 +30,6 @@ import 'features/alerts_configurable/data/repository/alerts_repository.dart';
 import 'features/alerts_configurable/presentation/alerts_list_screen.dart';
 import 'features/star_charts/data/repositories/star_chart_repository.dart';
 import 'features/star_charts/providers/star_chart_provider.dart';
-import 'features/star_charts/presentation/star_chart_screen.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -167,9 +166,6 @@ class MyApp extends StatelessWidget {
           scaffoldBackgroundColor: const Color(0xFF0A0E27),
         ),
         home: const AuthWrapper(),
-        routes: {
-          '/star_chart_3d': (context) => const StarChartScreen(),
-        },
       ),
     );
   }
