@@ -97,7 +97,7 @@ class StarFieldPainter extends CustomPainter {
       canvas.drawCircle(proj, star.size, paint);
       if (star.brightness > 0.6) {
         final haloPaint = Paint()
-          ..color = color.withOpacity(0.2)
+          ..color = color.withAlpha(51)
           ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 1.0);
         canvas.drawCircle(proj, star.size * 2.0, haloPaint);
       }
@@ -111,7 +111,7 @@ class StarFieldPainter extends CustomPainter {
     const double groundY = 100.0;
     const int gridLines = 20;
     final wireframePaint = Paint()
-      ..color = Colors.white.withOpacity(0.15)
+      ..color = Colors.white.withAlpha(38)
       ..strokeWidth = 1.0
       ..style = PaintingStyle.stroke;
     final gridStep = groundSize / gridLines;
@@ -206,27 +206,31 @@ class StarFieldPainter extends CustomPainter {
           final linePaint = Paint()
             ..style = PaintingStyle.stroke
             ..strokeWidth = isSelected ? 2.0 : 1.5
-            ..color = (isSelected ? const Color(0xFF6366F1) : const Color(0xFF4A9EFF)).withOpacity(0.5);
-          for (int i = 1; i < projections.length; i++) canvas.drawLine(projections[0], projections[i], linePaint);
+            ..color = (isSelected ? const Color(0xFF6366F1) : const Color(0xFF4A9EFF)).withAlpha(127);
+          for (int i = 1; i < projections.length; i++) {
+            canvas.drawLine(projections[0], projections[i], linePaint);
+          }
           if (projections.length >= 3) {
-            for (int i = 2; i < projections.length; i++) if (i % 2 == 0) canvas.drawLine(projections[i - 1], projections[i], linePaint);
+            for (int i = 2; i < projections.length; i++) {
+              if (i % 2 == 0) canvas.drawLine(projections[i - 1], projections[i], linePaint);
+            }
           }
         }
         for (int i = 0; i < pattern.length && i < projections.length; i++) {
           final mag = pattern[i]['mag']!;
           final isMain = pattern[i]['isMain']! > 0.5;
           final baseSize = isMain ? 3.5 : math.max(1.5, 3.0 - mag * 0.3);
-          final color = isMain ? Colors.white.withOpacity(0.9) : const Color(0xFF8AB4F8).withOpacity(0.7);
+          final color = isMain ? Colors.white.withAlpha(229) : const Color(0xFF8AB4F8).withAlpha(178);
           if (isMain) {
             final haloPaint = Paint()
-              ..color = color.withOpacity(0.2)
+              ..color = color.withAlpha(51)
               ..maskFilter = MaskFilter.blur(BlurStyle.normal, baseSize * 1.2);
             canvas.drawCircle(projections[i], baseSize * 1.8, haloPaint);
           }
           final starPaint = Paint()..color = color..style = PaintingStyle.fill;
           canvas.drawCircle(projections[i], baseSize, starPaint);
           if (isMain) {
-            final glowPaint = Paint()..color = Colors.white.withOpacity(0.6)..style = PaintingStyle.fill;
+            final glowPaint = Paint()..color = Colors.white.withAlpha(153)..style = PaintingStyle.fill;
             canvas.drawCircle(projections[i], baseSize * 0.5, glowPaint);
           }
         }
@@ -238,7 +242,7 @@ class StarFieldPainter extends CustomPainter {
                 color: isSelected ? const Color(0xFF6366F1) : const Color(0xFF4A9EFF),
                 fontSize: 13,
                 fontWeight: FontWeight.w600,
-                shadows: [Shadow(color: Colors.black.withOpacity(0.9), blurRadius: 10, offset: Offset(2, 2))],
+                shadows: [const Shadow(color: Color(0xE6000000), blurRadius: 10, offset: Offset(2, 2))],
               ),
             ),
             textDirection: TextDirection.ltr,
@@ -247,7 +251,9 @@ class StarFieldPainter extends CustomPainter {
           final labelY = projections[0].dy - 35;
           if (labelX >= 0 && labelX + tp.width <= size.width && labelY >= 0 && labelY + tp.height <= size.height) tp.paint(canvas, Offset(labelX, labelY));
         }
-      } catch (e) {}
+      } catch (e) {
+        debugPrint('Error drawing constellation: $e');
+      }
     }
   }
 
@@ -273,7 +279,9 @@ class StarFieldPainter extends CustomPainter {
         final cacheKey = 'star_${obj['id']}_$name';
         projectionCache[cacheKey] = proj;
         _drawSingleStar(canvas, proj, mag, name, obj);
-      } catch (e) {}
+      } catch (e) {
+        debugPrint('Error drawing star: $e');
+      }
     }
   }
 
@@ -303,20 +311,20 @@ class StarFieldPainter extends CustomPainter {
     }
     if (isSelected) {
       final selectionHalo = Paint()
-        ..color = const Color(0xFF6366F1).withOpacity(0.4)
+        ..color = const Color(0xFF6366F1).withAlpha(102)
         ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 25);
       canvas.drawCircle(proj, size * 4, selectionHalo);
     }
     final haloPaint = Paint()
-      ..color = color.withOpacity(0.2)
+      ..color = color.withAlpha(51)
       ..maskFilter = MaskFilter.blur(BlurStyle.normal, size * 1.3);
     canvas.drawCircle(proj, size * 2.2, haloPaint);
     final starPaint = Paint()
-      ..color = color.withOpacity(0.9)
+      ..color = color.withAlpha(229)
       ..style = PaintingStyle.fill;
     canvas.drawCircle(proj, size, starPaint);
     final glowPaint = Paint()
-      ..color = Colors.white.withOpacity(0.7)
+      ..color = Colors.white.withAlpha(178)
       ..style = PaintingStyle.fill;
     canvas.drawCircle(proj, size * 0.4, glowPaint);
     if (mag < 2.0) {
@@ -324,10 +332,10 @@ class StarFieldPainter extends CustomPainter {
         text: TextSpan(
           text: name,
           style: TextStyle(
-            color: isSelected ? const Color(0xFF6366F1) : Colors.white.withOpacity(0.95),
+            color: isSelected ? const Color(0xFF6366F1) : Colors.white.withAlpha(242),
             fontSize: 11,
             fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
-            shadows: [Shadow(color: Colors.black.withOpacity(0.9), blurRadius: 8, offset: Offset(2, 2))],
+            shadows: [const Shadow(color: Color(0xE6000000), blurRadius: 8, offset: Offset(2, 2))],
           ),
         ),
         textDirection: TextDirection.ltr,

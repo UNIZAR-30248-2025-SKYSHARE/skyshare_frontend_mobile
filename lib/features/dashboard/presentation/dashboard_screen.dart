@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:skyshare_frontend_mobile/features/star_charts/presentation/star_chart_screen.dart';
-import 'package:skyshare_frontend_mobile/features/star_charts/presentation/widgets/ar_button.dart';
 import '../providers/dashboard_provider.dart';
 import 'widgets/location_header.dart';
 import 'widgets/weather_card.dart';
@@ -189,15 +187,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
       child: ListView(
         padding: const EdgeInsets.fromLTRB(16, 20, 16, 120),
         children: [
-          ARCheckButton(
-            onARAvailable: () {
-              Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (context) => StarChartScreen(latitude: provider.selectedLocation!.latitude, longitude: provider.selectedLocation!.longitude),
-                ),
-              );
-            },
-          ),
           const SizedBox(height: 24),
           LocationHeader(cityName: locName, countryName: country),
           const SizedBox(height: 24),

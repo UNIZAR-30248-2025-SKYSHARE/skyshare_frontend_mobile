@@ -272,7 +272,9 @@ class _StarChartContentState extends State<StarChartContent> {
             closestObject = obj;
           }
         }
-      } catch (e) {}
+      } catch (e) {
+        debugPrint('Error finding tapped star: $e');
+      }
     }
     
     if (closestObject != null) {

@@ -19,15 +19,15 @@ class ConstellationInfoPanel extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: Colors.black.withOpacity(0.85),
+          color: Colors.black.withAlpha(216),
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: const Color(0xFF6366F1).withOpacity(0.6), 
+            color: const Color(0xFF6366F1).withAlpha(153),
             width: 2
           ),
           boxShadow: [
             BoxShadow(
-              color: const Color(0xFF6366F1).withOpacity(0.3),
+              color: const Color(0xFF6366F1).withAlpha(76),
               blurRadius: 15,
               spreadRadius: 2,
             ),
@@ -86,7 +86,7 @@ class ConstellationInfoPanel extends StatelessWidget {
             child: Text(
               '$label:',
               style: TextStyle(
-                color: Colors.white.withOpacity(0.7),
+                color: Colors.white.withAlpha(178),
                 fontSize: 14,
                 fontWeight: FontWeight.w500,
               ),
