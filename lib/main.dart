@@ -28,14 +28,14 @@ import 'package:skyshare_frontend_mobile/features/interactive_map/providers/inte
 import 'features/alerts_configurable/providers/alert_provider.dart';
 import 'features/alerts_configurable/data/repository/alerts_repository.dart';
 import 'features/alerts_configurable/presentation/alerts_list_screen.dart';
-
+import 'features/star_charts/data/repositories/star_chart_repository.dart';
+import 'features/star_charts/providers/star_chart_provider.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await dotenv.load();
   await SupabaseService.instance.init();
   final supabase = SupabaseService.instance.client;
-
 
   if(!kIsWeb){ 
     await OneSignalService().init();
@@ -64,14 +64,10 @@ Future<void> main() async {
             print('[DEBUG] Enviando playerId a Supabase tras login dev...');
             await OneSignalService().sendPlayerId(supabase, uid);
           }
-        } else {
-          print('[DEBUG] No se pudo autenticar el usuario dev (respuesta sin user).');
         }
       } catch (e, st) {
         print('[DEBUG] Error al iniciar sesión en Supabase: $e\n$st');
       }
-    } else {
-      print('[DEBUG] DEV_EMAIL o DEV_PASSWORD no están definidas en el .env. Comprueba el fichero .env');
     }
   }
   
@@ -147,7 +143,15 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider<AlertProvider>(
           create: (ctx) => AlertProvider(
             repository: ctx.read<AlertRepository>(),
-          )..loadAlerts(), // Cargar alertas al inicio
+          )..loadAlerts(),
+        ),
+        Provider<StarChartRepository>(
+          create: (ctx) => StarChartRepository(client: ctx.read<SupabaseClient>()),
+        ),
+        ChangeNotifierProvider<StarChartProvider>(
+          create: (ctx) => StarChartProvider(
+            astronomyRepository: ctx.read<StarChartRepository>(),
+          ),
         ),
       ],
       child: MaterialApp(

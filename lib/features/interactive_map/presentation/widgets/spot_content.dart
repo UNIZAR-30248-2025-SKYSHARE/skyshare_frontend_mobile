@@ -142,11 +142,13 @@ class _SpotContentState extends State<SpotContent> {
     if (success) {
       await _reloadSpot();
       await _loadUserRating();
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Valoración enviada correctamente!'), backgroundColor: Colors.green));
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Valoración enviada correctamente!'), backgroundColor: Colors.green));
+      }
     } else {
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Error al enviar valoración'), backgroundColor: Colors.red));
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Error al enviar valoración'), backgroundColor: Colors.red));
+      }
     }
     if (!mounted) return;
     setState(() {
@@ -158,8 +160,9 @@ class _SpotContentState extends State<SpotContent> {
     final text = _commentController.text.trim();
     final user = _authProvider.currentUser;
     if (user == null) {
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Necesitas iniciar sesión para comentar'), backgroundColor: Colors.red));
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Necesitas iniciar sesión para comentar'), backgroundColor: Colors.red));
+      }
       return;
     }
     if (text.isEmpty) return;
@@ -183,12 +186,16 @@ class _SpotContentState extends State<SpotContent> {
     if (!mounted) return;
     if (success) {
       await _loadComments();
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Comentario publicado'), backgroundColor: Colors.green));
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Comentario publicado'), backgroundColor: Colors.green));
+      }
     } else {
       setState(() {
         _comments.removeWhere((c) => c.id == tempId);
       });
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Error al publicar comentario'), backgroundColor: Colors.red));
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Error al publicar comentario'), backgroundColor: Colors.red));
+      }
     }
     if (!mounted) return;
     setState(() {
@@ -199,8 +206,9 @@ class _SpotContentState extends State<SpotContent> {
   Future<void> _deleteComment(Comment comment) async {
     final user = _authProvider.currentUser;
     if (user == null) {
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Necesitas iniciar sesión'), backgroundColor: Colors.red));
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Necesitas iniciar sesión'), backgroundColor: Colors.red));
+      }
       return;
     }
     final canDelete = comment.userId == user.id || _spot.esMio;
@@ -222,14 +230,18 @@ class _SpotContentState extends State<SpotContent> {
     }
     if (!mounted) return;
     if (success) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Comentario eliminado'), backgroundColor: Colors.green));
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Comentario eliminado'), backgroundColor: Colors.green));
+      }
     } else {
       if (backup != null) {
         setState(() {
           _comments.insert(backupIndex, backup!);
         });
       }
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Error al eliminar comentario'), backgroundColor: Colors.red));
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Error al eliminar comentario'), backgroundColor: Colors.red));
+      }
     }
   }
 
