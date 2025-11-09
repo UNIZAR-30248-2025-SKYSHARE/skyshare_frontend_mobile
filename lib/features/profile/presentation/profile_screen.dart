@@ -2,13 +2,14 @@ import 'package:flutter/material.dart';
 import '../../../../core/models/user_model.dart';
 import '../data/repositories/my_profile_repository.dart';
 import '../data/repositories/follows_repository.dart';
-import './widgets/profile_header.dart';
-import './widgets/profile_stats.dart';
-import './widgets/info_card.dart';
+import 'widgets/profile_header_widget.dart';
+import 'widgets/profile_stats_widget.dart';
+import 'widgets/info_card_widget.dart';
 import 'followers_screen.dart';
 import 'spots_screen.dart';
-import './discover_new_users_screen.dart';
+import 'discover_new_users_screen.dart';
 import '../../../../features/auth/data/repositories/auth_repository.dart';
+import '../../../../features/interactive_map/data/repositories/spot_repository.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../core/widgets/star_background.dart';
 
@@ -188,6 +189,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         builder: (_) => FollowersScreen(
                           userId: _user!.id,
                           showFollowers: true,
+                          followsRepository:  FollowsRepository(),
+                          profileRepository: MyProfileRepository()
                         ),
                       ),
                     );
@@ -199,6 +202,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         builder: (_) => FollowersScreen(
                           userId: _user!.id,
                           showFollowers: false,
+                          followsRepository:  FollowsRepository(),
+                          profileRepository: MyProfileRepository()
                         ),
                       ),
                     );
@@ -209,6 +214,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       MaterialPageRoute(
                         builder: (_) => SpotsScreen(
                           userId: _user!.id,
+                          repository: SpotRepository()
                         ),
                       ),
                     );
