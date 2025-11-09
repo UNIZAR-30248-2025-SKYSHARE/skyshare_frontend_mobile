@@ -15,8 +15,11 @@ import '../../../core/widgets/star_background.dart';
 
 class ProfileScreen extends StatefulWidget {
   final String? userId;
+  final MyProfileRepository? profileRepository;
+  final FollowsRepository? followsRepository;
+  final SpotRepository? spotRepository;
 
-  const ProfileScreen({super.key, this.userId});
+  const ProfileScreen({super.key, this.userId, this.profileRepository, this.followsRepository, this.spotRepository});
 
   @override
   State<ProfileScreen> createState() => _ProfileScreenState();
@@ -46,6 +49,7 @@ Future<void> _signOut(BuildContext context) async {
 class _ProfileScreenState extends State<ProfileScreen> {
   late final MyProfileRepository _repository;
   late final FollowsRepository _followsRepo;
+  late final SpotRepository _spotRepo;
 
   AppUser? _user;
   AppUser? _currentUser;
@@ -59,8 +63,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   void initState() {
     super.initState();
-    _repository = MyProfileRepository();
-    _followsRepo = FollowsRepository();
+    _repository = widget.profileRepository ?? MyProfileRepository();
+    _followsRepo = widget.followsRepository ?? FollowsRepository();
+    _spotRepo = widget.spotRepository ?? SpotRepository();
     _loadData();
   }
 
@@ -160,6 +165,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
                 if (!_isMyProfile) ...[
                   ElevatedButton.icon(
+                    key: const Key('followButton'),
                     onPressed: _toggleFollow,
                     icon: Icon(_isFollowing ? Icons.check : Icons.person_add),
                     label: Text(_isFollowing ? 'Following' : 'Follow'),
