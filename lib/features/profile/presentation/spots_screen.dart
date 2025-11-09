@@ -25,8 +25,9 @@ class _SpotsScreenState extends State<SpotsScreen> {
   @override
   void initState() {
     super.initState();
+        _repository = widget.repository;
+
     _loadCurrentUser();
-    _repository = widget.repository;
   }
 
   Future<void> _loadCurrentUser() async {
