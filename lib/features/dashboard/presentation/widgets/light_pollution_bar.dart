@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:skyshare_frontend_mobile/core/i18n/app_localizations.dart';
 
 class LightPollutionBar extends StatelessWidget {
   final double value;
@@ -26,11 +27,11 @@ class LightPollutionBar extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
-        const Padding(
-          padding: EdgeInsets.symmetric(horizontal: 4),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 4),
           child: Text(
-            'Contaminación Lumínica',
-            style: TextStyle(
+            AppLocalizations.of(context)?.t('dashboard.light_pollution') ?? 'Contaminación Lumínica',
+            style: const TextStyle(
               color: Color.fromRGBO(255, 255, 255, 0.85),
               fontSize: 14,
             ),
@@ -109,11 +110,11 @@ class LightPollutionBar extends StatelessWidget {
           },
         ),
         const SizedBox(height: 10),
-        const Row(
+        Row(
           children: <Widget>[
-            Text('1', style: TextStyle(color: Colors.white70)),
-            Spacer(),
-            Text('9', style: TextStyle(color: Colors.white70)),
+            Text(AppLocalizations.of(context)?.t('dashboard.scale_min') ?? '1', style: const TextStyle(color: Colors.white70)),
+            const Spacer(),
+            Text(AppLocalizations.of(context)?.t('dashboard.scale_max') ?? '9', style: const TextStyle(color: Colors.white70)),
           ],
         ),
       ],

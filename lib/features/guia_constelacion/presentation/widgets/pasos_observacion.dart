@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:skyshare_frontend_mobile/core/i18n/app_localizations.dart';
 
 class PasosObservacion extends StatelessWidget {
   final dynamic guia;
@@ -28,24 +29,24 @@ class PasosObservacion extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.05), 
+        color: const Color.fromRGBO(255, 255, 255, 0.05), 
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
-          color: Colors.white.withValues(alpha: 0.1), 
+          color: const Color.fromRGBO(255, 255, 255, 0.1), 
           width: 2,
         ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Row(
+          Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(Icons.visibility, color: Colors.lightBlueAccent, size: 28),
-              SizedBox(width: 12),
+              const Icon(Icons.visibility, color: Colors.lightBlueAccent, size: 28),
+              const SizedBox(width: 12),
               Text(
-                'Pasos para Observar',
-                style: TextStyle(
+                AppLocalizations.of(context)?.t('pasos_para_observar') ?? 'Pasos para Observar',
+                style: const TextStyle(
                   color: Colors.lightBlueAccent,
                   fontWeight: FontWeight.bold,
                   fontSize: 18,
@@ -61,11 +62,11 @@ class PasosObservacion extends StatelessWidget {
               return Container(
                 margin: const EdgeInsets.symmetric(vertical: 8),
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.08), 
+                  decoration: BoxDecoration(
+                  color: const Color.fromRGBO(255, 255, 255, 0.08), 
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
-                    color: Colors.lightBlueAccent.withValues(alpha: 0.3), 
+                    color: Colors.lightBlueAccent.withAlpha((0.3 * 255).round()), 
                     width: 2,
                   ),
                 ),

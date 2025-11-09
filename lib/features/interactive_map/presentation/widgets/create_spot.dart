@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:skyshare_frontend_mobile/core/i18n/app_localizations.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
@@ -48,7 +49,7 @@ class _CreateSpotScreenState extends State<CreateSpotScreen> {
           children: [
             ListTile(
               leading: const Icon(Icons.camera_alt),
-              title: const Text('Camera'),
+              title: Text(AppLocalizations.of(context)?.t('spot.create.camera') ?? 'Camera'),
               onTap: () async {
                 Navigator.pop(context);
                 final XFile? foto = await _picker.pickImage(
@@ -64,7 +65,7 @@ class _CreateSpotScreenState extends State<CreateSpotScreen> {
             ),
             ListTile(
               leading: const Icon(Icons.photo_library),
-              title: const Text('Gallery'),
+              title: Text(AppLocalizations.of(context)?.t('spot.create.gallery') ?? 'Gallery'),
               onTap: () async {
                 Navigator.pop(context);
                 final XFile? foto = await _picker.pickImage(
@@ -88,7 +89,7 @@ class _CreateSpotScreenState extends State<CreateSpotScreen> {
     if (!_formKey.currentState!.validate()) return;
     if (_imagen == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Por favor, añade una foto')),
+        SnackBar(content: Text(AppLocalizations.of(context)?.t('spot.create.add_photo') ?? 'Por favor, añade una foto')),
       );
       return;
     }
@@ -98,7 +99,7 @@ class _CreateSpotScreenState extends State<CreateSpotScreen> {
     final user = _authClient.currentUser;
     if (user == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Error: Usuario no autenticado')),
+        SnackBar(content: Text(AppLocalizations.of(context)?.t('spot.create.not_authenticated') ?? 'Error: Usuario no autenticado')),
       );
       setState(() => _isLoading = false);
       return;
@@ -128,7 +129,7 @@ class _CreateSpotScreenState extends State<CreateSpotScreen> {
 
       if (exito) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Spot creado correctamente')),
+          SnackBar(content: Text(AppLocalizations.of(context)?.t('spot.create.created_success') ?? 'Spot creado correctamente')),
         );
 
         Navigator.pop(context, {
@@ -139,13 +140,13 @@ class _CreateSpotScreenState extends State<CreateSpotScreen> {
         });
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Error al crear el spot')),
+          SnackBar(content: Text(AppLocalizations.of(context)?.t('spot.create.create_error') ?? 'Error al crear el spot')),
         );
       }
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error: $e')),
+        SnackBar(content: Text((AppLocalizations.of(context)?.t('spot.create.error_prefix') ?? 'Error: {err}').replaceAll('{err}', e.toString()))),
       );
     } finally {
       if (mounted) {
@@ -214,8 +215,8 @@ class _CreateSpotScreenState extends State<CreateSpotScreen> {
                                 children: [
                                   Icon(Icons.image, size: 46, color: Colors.grey.shade400),
                                   const SizedBox(height: 6),
-                                  Text('Add photo',
-                                      style: TextStyle(color: Colors.grey.shade400)),
+                  Text(AppLocalizations.of(context)?.t('spot.create.add_photo_short') ?? 'Add photo',
+                    style: TextStyle(color: Colors.grey.shade400)),
                                 ],
                               ),
                             Positioned(
@@ -244,7 +245,7 @@ class _CreateSpotScreenState extends State<CreateSpotScreen> {
                       enabled: !_isLoading,
                       style: const TextStyle(color: Colors.white),
                       decoration: InputDecoration(
-                        hintText: 'Name of the spot',
+                        hintText: AppLocalizations.of(context)?.t('spot.name') ?? 'Name of the spot',
                         hintStyle: const TextStyle(color: Colors.white54),
                         filled: true,
                         fillColor: Colors.white.withAlpha((0.03 * 255).round()),
@@ -266,8 +267,8 @@ class _CreateSpotScreenState extends State<CreateSpotScreen> {
                         ),
                         contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 14),
                       ),
-                      validator: (value) =>
-                          value == null || value.trim().isEmpty ? 'El nombre es obligatorio' : null,
+            validator: (value) =>
+              value == null || value.trim().isEmpty ? (AppLocalizations.of(context)?.t('spot.name_required') ?? 'El nombre es obligatorio') : null,
                     ),
 
                     const SizedBox(height: 16),
@@ -277,7 +278,7 @@ class _CreateSpotScreenState extends State<CreateSpotScreen> {
                       enabled: !_isLoading,
                       style: const TextStyle(color: Colors.white),
                       decoration: InputDecoration(
-                        hintText: 'Description',
+                        hintText: AppLocalizations.of(context)?.t('spot.description') ?? 'Description',
                         hintStyle: const TextStyle(color: Colors.white54),
                         filled: true,
                         fillColor: Colors.white.withAlpha((0.03 * 255).round()),
@@ -299,10 +300,10 @@ class _CreateSpotScreenState extends State<CreateSpotScreen> {
                         ),
                         contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 14),
                       ),
-                      maxLines: 5,
-                      validator: (value) => value == null || value.trim().isEmpty
-                          ? 'La descripción es obligatoria'
-                          : null,
+            maxLines: 5,
+            validator: (value) => value == null || value.trim().isEmpty
+              ? (AppLocalizations.of(context)?.t('spot.description_required') ?? 'La descripción es obligatoria')
+              : null,
                     ),
 
                     const SizedBox(height: 16),

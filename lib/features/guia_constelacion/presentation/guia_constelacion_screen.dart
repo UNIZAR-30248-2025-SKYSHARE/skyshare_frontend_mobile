@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:skyshare_frontend_mobile/core/widgets/star_background.dart';
+import 'package:skyshare_frontend_mobile/core/i18n/app_localizations.dart';
 import 'package:skyshare_frontend_mobile/features/guia_constelacion/providers/guia_constelacion_provider.dart';
 import 'package:skyshare_frontend_mobile/features/guia_constelacion/presentation/widgets/banner_constelacion.dart';
 import 'package:skyshare_frontend_mobile/features/guia_constelacion/presentation/widgets/descripcion_constelacion.dart';
@@ -51,20 +52,25 @@ class _GuiaConstelacionScreenState extends State<GuiaConstelacionScreen> {
       );
     }
 
-    if (provider.error != null) {
+    if (provider.error != null || provider.errorKey != null) {
+      final message = provider.errorKey != null
+          ? (AppLocalizations.of(context)?.t(provider.errorKey!) ?? provider.errorKey!)
+          : provider.error ?? '';
+
       return Scaffold(
         body: Center(
           child: Text(
-            provider.error!,
+            message,
             style: const TextStyle(color: Colors.red),
+            textAlign: TextAlign.center,
           ),
         ),
       );
     }
 
     if (guia == null) {
-      return const Scaffold(
-        body: Center(child: Text('No se encontró la guía')),
+      return Scaffold(
+        body: Center(child: Text(AppLocalizations.of(context)?.t('no_se_encontro_la_guia') ?? 'No se encontró la guía')),
       );
     }
 

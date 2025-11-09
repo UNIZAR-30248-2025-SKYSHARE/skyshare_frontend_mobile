@@ -4,6 +4,7 @@ import 'package:skyshare_frontend_mobile/features/guia_constelacion/data/reposit
 import 'package:skyshare_frontend_mobile/features/guia_constelacion/presentation/guia_constelacion_screen.dart';
 import 'package:skyshare_frontend_mobile/features/guia_constelacion/providers/guia_constelacion_provider.dart';
 
+import 'package:skyshare_frontend_mobile/core/i18n/app_localizations.dart';
 import '../../data/models/visible_sky_model.dart';
 import 'constellation_card.dart';
 
@@ -46,11 +47,11 @@ class VisibleSkySection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Padding(
-          padding: EdgeInsets.only(left: 4, bottom: 12),
+        Padding(
+          padding: const EdgeInsets.only(left: 4, bottom: 12),
           child: Text(
-            'Cielo Visible',
-            style: TextStyle(
+            AppLocalizations.of(context)?.t('cielo_visible') ?? 'Cielo Visible',
+            style: const TextStyle(
               color: Colors.white,
               fontSize: 22,
               fontWeight: FontWeight.bold,
@@ -93,9 +94,9 @@ class VisibleSkySection extends StatelessWidget {
                           ),
                         ),
                         onPressed: () => _navigateToGuia(context, item.name),
-                        child: const Text(
-                          'Ir a guía',
-                          style: TextStyle(fontSize: 13, fontWeight: FontWeight.w500),
+                        child: Text(
+                          AppLocalizations.of(context)?.t('go_to_guide') ?? 'Ir a guía',
+                          style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500),
                         ),
                       ),
                     ),

@@ -2,6 +2,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:sensors_plus/sensors_plus.dart';
 import 'package:skyshare_frontend_mobile/features/star_charts/utils/sensor_wrapper.dart';
+import 'package:skyshare_frontend_mobile/core/i18n/app_localizations.dart';
 import 'custom_back_button.dart';
 
 class CalibrationGuide extends StatelessWidget {
@@ -53,7 +54,7 @@ class CalibrationGuide extends StatelessWidget {
             const CircularProgressIndicator(),
             const SizedBox(height: 24),
             Text(
-              'Inicializando sensores...',
+              AppLocalizations.of(context)?.t('calib.initializing_sensors') ?? 'Inicializando sensores...',
               style: Theme.of(context).textTheme.titleLarge?.copyWith(color: Colors.white),
             ),
           ],
@@ -76,12 +77,12 @@ class CalibrationGuide extends StatelessWidget {
             ),
             const SizedBox(height: 24),
             Text(
-              'Coloca el móvil recto y mirando al frente',
+              AppLocalizations.of(context)?.t('calib.place_phone_straight') ?? 'Coloca el móvil recto y mirando al frente',
               style: Theme.of(context).textTheme.titleLarge?.copyWith(color: Colors.white),
             ),
             const SizedBox(height: 8),
             Text(
-              'Inclinación: ${pitch.toStringAsFixed(1)}°',
+              (AppLocalizations.of(context)?.t('calib.inclination') ?? 'Inclinación: {value}°').replaceAll('{value}', pitch.toStringAsFixed(1)),
               style: const TextStyle(color: Colors.white70),
             ),
             const SizedBox(height: 32),
@@ -89,7 +90,7 @@ class CalibrationGuide extends StatelessWidget {
               key: const Key('continue-button'),
               onPressed: ok ? onContinue : null,
               icon: const Icon(Icons.arrow_forward),
-              label: const Text('CONTINUAR'),
+              label: Text(AppLocalizations.of(context)?.t('continue') ?? 'CONTINUAR'),
               style: ElevatedButton.styleFrom(
                 backgroundColor: ok ? Colors.indigo : Colors.grey,
                 foregroundColor: Colors.white,

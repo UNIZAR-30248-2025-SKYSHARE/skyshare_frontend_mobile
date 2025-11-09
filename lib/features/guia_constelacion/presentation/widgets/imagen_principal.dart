@@ -26,11 +26,11 @@ class ImagenPrincipal extends StatelessWidget {
         constraints: const BoxConstraints(maxWidth: 400, maxHeight: 300),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(16),
-          boxShadow: [
+            boxShadow: const [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.3),
+              color: Color.fromRGBO(0, 0, 0, 0.3),
               blurRadius: 10,
-              offset: const Offset(0, 4),
+              offset: Offset(0, 4),
             ),
           ],
         ),

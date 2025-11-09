@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:skyshare_frontend_mobile/features/phase_lunar/providers/lunar_phase_provider.dart';
 import 'package:skyshare_frontend_mobile/features/phase_lunar/data/models/lunar_phase_model.dart';
 import 'package:skyshare_frontend_mobile/features/dashboard/providers/dashboard_provider.dart';
+import 'package:skyshare_frontend_mobile/core/i18n/app_localizations.dart';
 import 'widgets/moon_phase_widget.dart';
 import 'widgets/lunar_phase_item.dart';
 import '../../../core/widgets/star_background.dart';
@@ -30,14 +31,24 @@ class _PhaseLunarScreenState extends State<PhaseLunarScreen> {
       "${d.day.toString().padLeft(2, '0')}/${d.month.toString().padLeft(2, '0')}/${d.year}";
 
   String _weekdayName(DateTime d) {
-    const names = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+    // Use localized weekday short names when available, fall back to English
+    final loc = AppLocalizations.of(context);
+    final names = [
+      loc?.t('weekday.mon') ?? 'Mon',
+      loc?.t('weekday.tue') ?? 'Tue',
+      loc?.t('weekday.wed') ?? 'Wed',
+      loc?.t('weekday.thu') ?? 'Thu',
+      loc?.t('weekday.fri') ?? 'Fri',
+      loc?.t('weekday.sat') ?? 'Sat',
+      loc?.t('weekday.sun') ?? 'Sun',
+    ];
     return names[d.weekday - 1];
   }
 
   void _navigateToDetail(LunarPhase phase, int index) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('Opening ${phase.fase} details...'),
+        content: Text((AppLocalizations.of(context)?.t('opening_details') ?? 'Opening {name} details...').replaceAll('{name}', phase.fase)),
         duration: const Duration(milliseconds: 800),
       ),
     );
@@ -89,7 +100,7 @@ class _PhaseLunarScreenState extends State<PhaseLunarScreen> {
                         onPressed: () {
                           lunarProvider.loadNext7Days();
                         },
-                        child: const Text('Reintentar'),
+                        child: Text(AppLocalizations.of(context)?.t('retry') ?? 'Reintentar'),
                       ),
                     ],
                   ),
@@ -103,9 +114,9 @@ class _PhaseLunarScreenState extends State<PhaseLunarScreen> {
                     children: [
                       const Icon(Icons.nightlight_round, color: Colors.orange, size: 48),
                       const SizedBox(height: 16),
-                      const Text(
-                        'Las fases lunares están tardando en cargar',
-                        style: TextStyle(color: Colors.white70),
+                      Text(
+                        AppLocalizations.of(context)?.t('phases_loading_slow') ?? 'Las fases lunares están tardando en cargar',
+                        style: const TextStyle(color: Colors.white70),
                       ),
                       const SizedBox(height: 16),
                       ElevatedButton(
@@ -127,9 +138,9 @@ class _PhaseLunarScreenState extends State<PhaseLunarScreen> {
                     children: [
                       const Icon(Icons.nightlight_round, color: Colors.grey, size: 48),
                       const SizedBox(height: 16),
-                      const Text(
-                        'No hay datos de fases lunares disponibles',
-                        style: TextStyle(color: Colors.white70),
+                      Text(
+                        AppLocalizations.of(context)?.t('no_lunar_data') ?? 'No hay datos de fases lunares disponibles',
+                        style: const TextStyle(color: Colors.white70),
                       ),
                       const SizedBox(height: 16),
                       ElevatedButton(
@@ -157,9 +168,9 @@ class _PhaseLunarScreenState extends State<PhaseLunarScreen> {
                           size: 120,
                         ),
                         const SizedBox(height: 12),
-                        const Text(
-                          'Next 7 days',
-                          style: TextStyle(
+                        Text(
+                          AppLocalizations.of(context)?.t('next_7_days') ?? 'Next 7 days',
+                          style: const TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.w600,
                           ),

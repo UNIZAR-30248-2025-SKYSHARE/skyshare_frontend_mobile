@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'alert_form_field.dart';
 import 'alert_input_field.dart';
+import 'package:skyshare_frontend_mobile/core/i18n/app_localizations.dart';
 
 class AlertCommonFields extends StatelessWidget {
   final TextEditingController dateController;
@@ -24,13 +25,13 @@ class AlertCommonFields extends StatelessWidget {
           children: [
             Expanded(
               child: AlertFormField(
-                label: 'DATE',
+                  label: AppLocalizations.of(context)?.t('alerts.form.date') ?? 'Date',
                 child: GestureDetector(
                   key: const Key('date_field'),
                   onTap: onSelectDate,
                   child: AbsorbPointer(
                     child: AlertInputField(
-                      hintText: 'MM/DD/YYYY',
+                        hintText: AppLocalizations.of(context)?.t('alerts.form.date_hint') ?? 'DD/MM/YYYY',
                       controller: dateController,
                       readOnly: true,
                       suffixIcon: const Icon(
@@ -45,13 +46,13 @@ class AlertCommonFields extends StatelessWidget {
             const SizedBox(width: 16),
             Expanded(
               child: AlertFormField(
-                label: 'TIME',
+                  label: AppLocalizations.of(context)?.t('alerts.form.time') ?? 'Time',
                 child: GestureDetector(
                   key: const Key('time_field'),
                   onTap: onSelectTime,
                   child: AbsorbPointer(
                     child: AlertInputField(
-                      hintText: 'HH:MM',
+                        hintText: AppLocalizations.of(context)?.t('alerts.form.time_hint') ?? 'HH:MM',
                       controller: timeController,
                       readOnly: true,
                       suffixIcon: const Icon(
