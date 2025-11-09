@@ -8,16 +8,16 @@ import '../../../core/widgets/star_background.dart';
 
 class SpotsScreen extends StatefulWidget {
   final String userId;
-  final SpotRepository repository;
+  final SpotRepository spotRepository;
   final String? currentUserId;
-  const SpotsScreen({super.key, required this.userId, required this.repository, this.currentUserId});
+  const SpotsScreen({super.key, required this.userId, required this.spotRepository, this.currentUserId});
 
   @override
   State<SpotsScreen> createState() => _SpotsScreenState();
 }
 
 class _SpotsScreenState extends State<SpotsScreen> {
-  late final SpotRepository _repository;
+  late final SpotRepository _spotRepository;
   List<Map<String, dynamic>> _spots = [];
   bool _isLoading = true;
   String? _currentUserId; 
@@ -25,7 +25,7 @@ class _SpotsScreenState extends State<SpotsScreen> {
   @override
   void initState() {
     super.initState();
-        _repository = widget.repository;
+        _spotRepository = widget.spotRepository;
 
     _loadCurrentUser();
   }
@@ -43,7 +43,7 @@ class _SpotsScreenState extends State<SpotsScreen> {
 
   Future<void> _loadSpots() async {
     setState(() => _isLoading = true);
-    final result = await _repository.getSpotsByUser(widget.userId);
+    final result = await _spotRepository.getSpotsByUser(widget.userId);
     setState(() {
       _spots = result;
       _isLoading = false;
@@ -72,7 +72,7 @@ class _SpotsScreenState extends State<SpotsScreen> {
 
     if (confirm == true) {
       try {
-        await _repository.deleteSpot(int.parse(idSpot));
+        await _spotRepository.deleteSpot(int.parse(idSpot));
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Spot successfully deleted')),
         );
