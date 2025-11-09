@@ -220,7 +220,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       MaterialPageRoute(
                         builder: (_) => SpotsScreen(
                           userId: _user!.id,
-                          repository: SpotRepository()
+                          spotRepository: SpotRepository()
                         ),
                       ),
                     );
