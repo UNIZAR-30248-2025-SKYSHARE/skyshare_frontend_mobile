@@ -11,6 +11,7 @@ import 'package:skyshare_frontend_mobile/features/interactive_map/data/repositor
 import 'package:skyshare_frontend_mobile/features/interactive_map/data/repositories/spot_repository.dart';
 import 'package:skyshare_frontend_mobile/features/phase_lunar/presentation/phase_lunar_screen.dart';
 import 'package:skyshare_frontend_mobile/features/push_notifications/services/one_signal_service.dart';
+import 'package:skyshare_frontend_mobile/features/profile/presentation/profile_screen.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'features/dashboard/providers/dashboard_provider.dart';
 import 'features/dashboard/presentation/dashboard_screen.dart';
@@ -224,7 +225,7 @@ class _RootAppState extends State<RootApp> {
       const PhaseLunarScreen(),
       const AlertsListScreen(),
       const MapScreen(),
-      const Center(child: Text('Perfil - placeholder'))
+      const ProfileScreen(),
     ];
 
     return Scaffold(
