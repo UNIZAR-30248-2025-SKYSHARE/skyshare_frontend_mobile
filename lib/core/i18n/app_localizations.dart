@@ -15,6 +15,8 @@ class AppLocalizations {
 
   static const LocalizationsDelegate<AppLocalizations> delegate = _AppLocalizationsDelegate();
 
+  static Iterable<LocalizationsDelegate>? localizationsDelegates;
+
   static Future<AppLocalizations> load(Locale locale) async {
     final localizations = AppLocalizations(locale);
     final jsonString = await rootBundle.loadString('lib/core/i18n/translations/${locale.languageCode}.json');
@@ -23,7 +25,6 @@ class AppLocalizations {
     return localizations;
   }
 
-  /// Translate [key]. Optionally pass [args] to replace placeholders like {name}.
   String t(String key, [Map<String, String>? args]) {
     String value = _strings[key] ?? key;
     if (args != null && args.isNotEmpty) {
