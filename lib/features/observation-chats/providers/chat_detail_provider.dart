@@ -46,6 +46,7 @@ class ChatDetailProvider extends ChangeNotifier {
       }).toList();
 
     } catch (e) {
+      // ignore: avoid_print
       print("Error fatal al cargar mensajes: $e");
       _messages = [];
     }
@@ -106,6 +107,7 @@ class ChatDetailProvider extends ChangeNotifier {
       await _repository.sendMessage(_groupId, text.trim());
       
     } catch (e) {
+      // ignore: avoid_print
       print('Error enviando mensaje: $e');
     }
   }

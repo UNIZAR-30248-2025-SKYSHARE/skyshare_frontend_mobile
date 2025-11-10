@@ -44,6 +44,7 @@ class _ChatInputBarState extends State<ChatInputBar> {
                   style: const TextStyle(color: Colors.white),
                   decoration: InputDecoration(
                     hintText: 'Escribe un mensaje...',
+                    // ignore: deprecated_member_use
                     hintStyle: TextStyle(color: Colors.white.withOpacity(0.5)),
                     border: InputBorder.none, 
                   ),

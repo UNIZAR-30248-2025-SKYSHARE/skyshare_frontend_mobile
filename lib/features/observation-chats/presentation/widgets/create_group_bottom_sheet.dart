@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 import '../../providers/observation_chats_provider.dart';
 
 class CreateGroupBottomSheet extends StatefulWidget {
-  const CreateGroupBottomSheet({Key? key}) : super(key: key);
+  const CreateGroupBottomSheet({super.key});
 
   @override
   State<CreateGroupBottomSheet> createState() => _CreateGroupBottomSheetState();
@@ -158,7 +158,9 @@ class _CreateGroupBottomSheetState extends State<CreateGroupBottomSheet> {
   }) {
     return InputDecoration(
       hintText: hintText,
+      // ignore: deprecated_member_use
       hintStyle: TextStyle(color: Colors.white.withOpacity(0.5)),
+      // ignore: deprecated_member_use
       prefixIcon: Icon(icon, color: Colors.white.withOpacity(0.7)),
       filled: true,
       fillColor: fillColor,

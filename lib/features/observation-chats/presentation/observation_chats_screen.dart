@@ -10,7 +10,7 @@ import '../providers/chat_detail_provider.dart';
 import '../data/repositories/observation_chats_repository.dart';
 
 class ObservationChatsScreen extends StatelessWidget {
-  const ObservationChatsScreen({Key? key}) : super(key: key);
+  const ObservationChatsScreen({super.key});
 
   void _showCreateGroupSheet(BuildContext context) {
     showModalBottomSheet(
@@ -24,7 +24,7 @@ class ObservationChatsScreen extends StatelessWidget {
         ),
       ),
       builder: (ctx) {
-        return CreateGroupBottomSheet(); 
+        return const CreateGroupBottomSheet(); 
       },
     );
   }

@@ -7,7 +7,7 @@ import 'widgets/chat_input_bar.dart';
 class ChatDetailScreen extends StatelessWidget {
   final String groupName; 
   
-  const ChatDetailScreen({Key? key, required this.groupName}) : super(key: key);
+  const ChatDetailScreen({super.key, required this.groupName});
 
   @override
   Widget build(BuildContext context) {

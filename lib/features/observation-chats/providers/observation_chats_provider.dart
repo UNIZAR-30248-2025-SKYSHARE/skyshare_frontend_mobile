@@ -49,6 +49,7 @@ class ObservationChatsProvider extends ChangeNotifier {
           break;
       }
     } catch (e) {
+      // ignore: avoid_print
       print("Error al cambiar de filtro: $e");
     }
 
@@ -77,6 +78,7 @@ class ObservationChatsProvider extends ChangeNotifier {
       notifyListeners();
       return true;
     } catch (e) {
+      // ignore: avoid_print
       print('Error creando grupo: $e');
       return false;
     }
@@ -96,6 +98,7 @@ class ObservationChatsProvider extends ChangeNotifier {
       notifyListeners();
       return true;
     } catch (e) {
+      // ignore: avoid_print
       print('Error al unirse al grupo: $e');
       _isLoading = false;
       notifyListeners();

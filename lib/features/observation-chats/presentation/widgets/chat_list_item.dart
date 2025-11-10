@@ -4,7 +4,7 @@ import '../../data/models/chat_preview_model.dart';
 class ChatListItem extends StatelessWidget {
   final ChatPreview chat;
   
-  const ChatListItem({Key? key, required this.chat}) : super(key: key);
+  const ChatListItem({super.key, required this.chat});
 
   @override
   Widget build(BuildContext context) {
