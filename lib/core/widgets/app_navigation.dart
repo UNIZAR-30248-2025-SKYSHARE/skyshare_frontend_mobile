@@ -65,10 +65,19 @@ class AppNavigation extends StatelessWidget {
                 onPressed: () => onTap(3),
                 icon: Icon(Icons.map, color: selectedIndex == 3 ? Colors.white : Colors.white70),
               ),
+              
               IconButton(
                 onPressed: () => onTap(4),
-                icon: Icon(Icons.person, color: selectedIndex == 4 ? Colors.white : Colors.white70),
+                icon: Icon(Icons.group, color: selectedIndex == 4 ? Colors.white : Colors.white70),
+                tooltip: 'Chats',
               ),
+              
+              IconButton(
+                onPressed: () => onTap(5), 
+                icon: Icon(Icons.person, color: selectedIndex == 5 ? Colors.white : Colors.white70), 
+              ),
+              
+              
               const SizedBox(width: 6),
             ],
           ),

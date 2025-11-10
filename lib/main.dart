@@ -31,6 +31,8 @@ import 'features/alerts_configurable/data/repository/alerts_repository.dart';
 import 'features/alerts_configurable/presentation/alerts_list_screen.dart';
 import 'features/star_charts/data/repositories/star_chart_repository.dart';
 import 'features/star_charts/providers/star_chart_provider.dart';
+import 'features/observation-chats/data/repositories/observation_chats_repository.dart'; 
+import 'features/observation-chats/providers/observation_chats_provider.dart'; 
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -153,7 +155,18 @@ class MyApp extends StatelessWidget {
           create: (ctx) => StarChartProvider(
             astronomyRepository: ctx.read<StarChartRepository>(),
           ),
+
         ),
+        
+        Provider<ObservationChatsRepository>( 
+          create: (ctx) => ObservationChatsRepository(ctx.read<SupabaseClient>()),
+        ),
+        ChangeNotifierProvider<ObservationChatsProvider>( 
+          create: (ctx) => ObservationChatsProvider(
+            ctx.read<ObservationChatsRepository>(),
+          ),
+        ),
+
       ],
       child: MaterialApp(
         title: 'Skyshare',
@@ -220,6 +233,7 @@ class _RootAppState extends State<RootApp> {
   Widget build(BuildContext context) {
     final provider = context.watch<DashboardProvider>();
     final locationCount = provider.savedLocations.length;
+    
     final pages = <Widget>[
       const DashboardScreen(),                   
       const PhaseLunarScreen(),
