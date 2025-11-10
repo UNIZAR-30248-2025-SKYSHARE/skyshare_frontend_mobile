@@ -38,46 +38,56 @@ class AppNavigation extends StatelessWidget {
           child: Row(
             children: <Widget>[
               const SizedBox(width: 6),
-              IconButton(
-                onPressed: () => onTap(0),
-                icon: Icon(Icons.dashboard, color: selectedIndex == 0 ? Colors.white : Colors.white70),
-              ),
-              IconButton(
-                onPressed: () => onTap(1),
-                icon: Icon(Icons.nights_stay, color: selectedIndex == 1 ? Colors.white : Colors.white70),
-              ),
               Expanded(
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    IconButton(
-                      onPressed: () => onTap(2),
-                      icon: Icon(
-                        Icons.notifications,
-                        color: selectedIndex == 2 ? Colors.white : Colors.white70,
-                      ),
-                      tooltip: 'Alertas',
-                    ),
-                  ],
+                child: Center(
+                  child: IconButton(
+                    onPressed: () => onTap(0),
+                    icon: Icon(Icons.dashboard, color: selectedIndex == 0 ? Colors.white : Colors.white70),
+                  ),
                 ),
               ),
-              IconButton(
-                onPressed: () => onTap(3),
-                icon: Icon(Icons.map, color: selectedIndex == 3 ? Colors.white : Colors.white70),
+              Expanded(
+                child: Center(
+                  child: IconButton(
+                    onPressed: () => onTap(1),
+                    icon: Icon(Icons.nights_stay, color: selectedIndex == 1 ? Colors.white : Colors.white70),
+                  ),
+                ),
               ),
-              
-              IconButton(
-                onPressed: () => onTap(4),
-                icon: Icon(Icons.group, color: selectedIndex == 4 ? Colors.white : Colors.white70),
-                tooltip: 'Chats',
+              Expanded(
+                child: Center(
+                  child: IconButton(
+                    onPressed: () => onTap(2),
+                    icon: Icon(Icons.notifications, color: selectedIndex == 2 ? Colors.white : Colors.white70),
+                    tooltip: 'Alertas',
+                  ),
+                ),
               ),
-              
-              IconButton(
-                onPressed: () => onTap(5), 
-                icon: Icon(Icons.person, color: selectedIndex == 5 ? Colors.white : Colors.white70), 
+              Expanded(
+                child: Center(
+                  child: IconButton(
+                    onPressed: () => onTap(3),
+                    icon: Icon(Icons.map, color: selectedIndex == 3 ? Colors.white : Colors.white70),
+                  ),
+                ),
               ),
-              
-              
+              Expanded(
+                child: Center(
+                  child: IconButton(
+                    onPressed: () => onTap(4),
+                    icon: Icon(Icons.group, color: selectedIndex == 4 ? Colors.white : Colors.white70),
+                    tooltip: 'Chats',
+                  ),
+                ),
+              ),
+              Expanded(
+                child: Center(
+                  child: IconButton(
+                    onPressed: () => onTap(5),
+                    icon: Icon(Icons.person, color: selectedIndex == 5 ? Colors.white : Colors.white70),
+                  ),
+                ),
+              ),
               const SizedBox(width: 6),
             ],
           ),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:skyshare_frontend_mobile/features/star_charts/presentation/widgets/ar_button.dart';
 import '../providers/dashboard_provider.dart';
 import 'widgets/location_header.dart';
 import 'widgets/weather_card.dart';
@@ -7,6 +8,7 @@ import 'widgets/light_pollution_bar.dart';
 import 'widgets/visible_sky_section.dart';
 import 'widgets/sky_indicator.dart';
 import '../../../core/widgets/star_background.dart';
+import 'package:skyshare_frontend_mobile/features/star_charts/presentation/star_chart_screen.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -190,27 +192,34 @@ class _DashboardScreenState extends State<DashboardScreen> {
           const SizedBox(height: 24),
           LocationHeader(cityName: locName, countryName: country),
           const SizedBox(height: 24),
-          
-          provider.weather != null 
+          provider.weather != null
               ? WeatherCard(weather: provider.weather!)
               : _buildNoDataCard('Datos meteorológicos no disponibles'),
-          
           const SizedBox(height: 24),
-          
-          if (provider.weather?.lightPollution != null) 
+          if (provider.weather?.lightPollution != null)
             LightPollutionBar(value: provider.weather!.lightPollution!.toDouble()),
-          
           const SizedBox(height: 24),
-          
-          provider.constellations.isNotEmpty 
+          provider.constellations.isNotEmpty
               ? VisibleSkySection(constellations: provider.constellations)
               : _buildNoDataCard('No hay datos de constelaciones visibles'),
-          
           const SizedBox(height: 24),
-          
-          if (provider.skyIndicator != null) 
-            SkyIndicator(value: provider.skyIndicator!.value),
-        ].where((widget) => widget != const SizedBox(height: 0)).toList(),
+          if (provider.skyIndicator != null) SkyIndicator(value: provider.skyIndicator!.value),
+          const SizedBox(height: 72),
+          ARCheckButton(
+            onARAvailable: () {
+              final loc = provider.selectedLocation;
+              if (loc == null) return;
+              final lat = (loc.latitude);
+              final lon = (loc.longitude);
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => StarChartScreen(latitude: lat, longitude: lon),
+                ),
+              );
+            },
+          ),
+        ],
       ),
     );
   }
@@ -283,8 +292,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Contaminación lumínica', 
-                style: TextStyle(color: Colors.white70, fontSize: 16)),
+            Text('Contaminación lumínica', style: TextStyle(color: Colors.white70, fontSize: 16)),
             SizedBox(height: 8),
             LinearProgressIndicator(
               valueColor: AlwaysStoppedAnimation<Color>(Colors.white24),
@@ -304,8 +312,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Cielo visible', 
-                style: TextStyle(color: Colors.white70, fontSize: 16)),
+            Text('Cielo visible', style: TextStyle(color: Colors.white70, fontSize: 16)),
           ],
         ),
       ),
@@ -320,8 +327,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Condiciones del cielo', 
-                style: TextStyle(color: Colors.white70, fontSize: 16)),
+            Text('Condiciones del cielo', style: TextStyle(color: Colors.white70, fontSize: 16)),
             SizedBox(height: 8),
             LinearProgressIndicator(
               valueColor: AlwaysStoppedAnimation<Color>(Colors.white24),

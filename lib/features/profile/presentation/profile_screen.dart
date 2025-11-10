@@ -28,13 +28,10 @@ class ProfileScreen extends StatefulWidget {
 Future<void> _signOut(BuildContext context) async {
   final navigator = Navigator.of(context);
   final messenger = ScaffoldMessenger.of(context);
-
   try {
     final client = Supabase.instance.client;
     final authRepo = AuthRepository(client: client);
-
     await authRepo.signOut();
-
     navigator.pushNamedAndRemoveUntil('/login', (route) => false);
   } catch (e) {
     messenger.showSnackBar(
@@ -69,27 +66,22 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Future<void> _loadData() async {
     setState(() => _isLoading = true);
-
     final currentUser = await _repository.getCurrentUserProfile();
     _currentUser = currentUser;
     if (currentUser == null) {
       setState(() => _isLoading = false);
       return;
     }
-
     final viewedUserId = widget.userId ?? currentUser.id;
     _isMyProfile = (viewedUserId == currentUser.id);
-
     final user = await _repository.getUserProfileById(viewedUserId);
     if (user != null) {
       final data = await _repository.getFollowersData(viewedUserId);
       final spots = await _repository.getSpotsCount(viewedUserId);
-
       if (!_isMyProfile) {
         _isFollowing =
             await _followsRepo.isFollowing(currentUser.id, viewedUserId);
       }
-
       setState(() {
         _user = user;
         _followers = data['followers'] ?? 0;
@@ -97,16 +89,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
         _spots = spots;
       });
     }
-
     setState(() => _isLoading = false);
   }
 
   Future<void> _toggleFollow() async {
     if (_currentUser == null || _user == null) return;
-
     final followerId = _currentUser!.id;
     final followedId = _user!.id;
-
     if (_isFollowing) {
       await _followsRepo.unfollowUser(followerId, followedId);
       setState(() {
@@ -124,8 +113,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
     if (_isLoading) {
       return const Scaffold(
         body: Center(child: CircularProgressIndicator()),
@@ -138,14 +125,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
       );
     }
 
+    final ButtonStyle actionBtnStyle = ElevatedButton.styleFrom(
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      elevation: 0,
+    );
+
     return StarBackground(
       child: Scaffold(
         backgroundColor: Colors.transparent,
         appBar: AppBar(
           title: Text(
-            _isMyProfile
-                ? 'My Profile'
-                : '${_user!.username ?? ''}\'s Profile',
+            _isMyProfile ? 'My Profile' : '${_user!.username ?? ''}\'s Profile',
           ),
           backgroundColor: Colors.transparent,
           elevation: 0,
@@ -160,7 +151,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
               children: [
                 ProfileHeader(user: _user!),
                 const SizedBox(height: 25),
-
                 if (!_isMyProfile) ...[
                   ElevatedButton.icon(
                     key: const Key('followButton'),
@@ -181,7 +171,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ),
                   const SizedBox(height: 25),
                 ],
-
                 ProfileStats(
                   spots: _spots,
                   followers: _followers,
@@ -193,8 +182,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         builder: (_) => FollowersScreen(
                           userId: _user!.id,
                           showFollowers: true,
-                          followsRepository:  FollowsRepository(),
-                          profileRepository: MyProfileRepository()
+                          followsRepository: FollowsRepository(),
+                          profileRepository: MyProfileRepository(),
                         ),
                       ),
                     );
@@ -206,8 +195,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         builder: (_) => FollowersScreen(
                           userId: _user!.id,
                           showFollowers: false,
-                          followsRepository:  FollowsRepository(),
-                          profileRepository: MyProfileRepository()
+                          followsRepository: FollowsRepository(),
+                          profileRepository: MyProfileRepository(),
                         ),
                       ),
                     );
@@ -218,59 +207,55 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       MaterialPageRoute(
                         builder: (_) => SpotsScreen(
                           userId: _user!.id,
-                          spotRepository: SpotRepository()
+                          spotRepository: SpotRepository(),
                         ),
                       ),
                     );
                   },
                 ),
                 const SizedBox(height: 30),
-
                 InfoCard(user: _user!),
                 const SizedBox(height: 20),
-
                 if (_isMyProfile) ...[
-                  ElevatedButton.icon(
-                    onPressed: _loadData,
-                    icon: const Icon(Icons.refresh),
-                    label: const Text('Refresh Profile'),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: theme.colorScheme.primary,
-                      foregroundColor: Colors.white,
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  ElevatedButton.icon(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => const DiscoverUsersScreen(),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: ElevatedButton.icon(
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => const DiscoverUsersScreen(),
+                              ),
+                            );
+                          },
+                          icon: const Icon(Icons.explore),
+                          label: const Text('Discover Users'),
+                          style: actionBtnStyle.copyWith(
+                            backgroundColor:
+                                WidgetStateProperty.all(Colors.green),
+                            foregroundColor:
+                                WidgetStateProperty.all(Colors.white),
+                          ),
                         ),
-                      );
-                    },
-                    icon: const Icon(Icons.explore),
-                    label: const Text('Discover Users'),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.green,
-                      foregroundColor: Colors.white,
-                    ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: ElevatedButton.icon(
+                          onPressed: () => _signOut(context),
+                          icon: const Icon(Icons.logout),
+                          label: const Text('Sign Out'),
+                          style: actionBtnStyle.copyWith(
+                            backgroundColor:
+                                WidgetStateProperty.all(Colors.redAccent),
+                            foregroundColor:
+                                WidgetStateProperty.all(Colors.white),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                   const SizedBox(height: 12),
-                  ElevatedButton.icon(
-                    onPressed: () => _signOut(context),
-                    icon: const Icon(Icons.logout),
-                    label: const Text('Sign Out'),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.redAccent,
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 20, vertical: 12),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                  ),
                 ],
               ],
             ),
@@ -280,4 +265,3 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 }
-

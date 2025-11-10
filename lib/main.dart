@@ -33,6 +33,7 @@ import 'features/star_charts/data/repositories/star_chart_repository.dart';
 import 'features/star_charts/providers/star_chart_provider.dart';
 import 'features/observation-chats/data/repositories/observation_chats_repository.dart'; 
 import 'features/observation-chats/providers/observation_chats_provider.dart'; 
+import 'features/observation-chats/presentation/observation_chats_screen.dart'; 
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -239,6 +240,7 @@ class _RootAppState extends State<RootApp> {
       const PhaseLunarScreen(),
       const AlertsListScreen(),
       const MapScreen(),
+      const ObservationChatsScreen(),
       const ProfileScreen(),
     ];
 
