@@ -51,18 +51,19 @@ class _EditSpotScreenState extends State<EditSpotScreen> {
       nuevaImagen: _newImage,
     );
 
-    setState(() => _saving = false);
+     if (!mounted) return;
+      setState(() => _saving = false);
 
-    if (ok) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Spot updated successfully ✅')),
-      );
-      Navigator.pop(context, true);
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Error updating the spot ❌')),
-      );
-    }
+      if (ok) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Spot updated successfully')),
+        );
+        Navigator.pop(context, true);
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Error updating the spot')),
+        );
+      }
   }
 
   @override

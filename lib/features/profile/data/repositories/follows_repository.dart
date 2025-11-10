@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../../core/models/user_model.dart';
 import '../../../../core/services/supabase_service.dart';
@@ -24,7 +25,9 @@ class FollowsRepository {
               ))
           .toList();
     } catch (e) {
-      print('Error al obtener todos los usuarios: $e');
+      if (kDebugMode) {
+        print('Error al obtener todos los usuarios: $e');
+      }
       return [];
     }
   }
@@ -59,7 +62,9 @@ class FollowsRepository {
               ))
           .toList();
     } catch (e) {
-      print('Error al obtener usuarios seguidos: $e');
+      if (kDebugMode) {
+        print('Error al obtener usuarios seguidos: $e');
+      }
       return [];
     }
   }
@@ -95,7 +100,9 @@ class FollowsRepository {
               ))
           .toList();
     } catch (e) {
-      print('Error al obtener usuarios seguidos: $e');
+      if (kDebugMode) {
+        print('Error al obtener usuarios seguidos: $e');
+      }
       return [];
     }
   }
@@ -108,7 +115,9 @@ class FollowsRepository {
         'fecha_seguimiento': DateTime.now().toIso8601String(),
       });
     } catch (e) {
-      print('Error al seguir usuario: $e');
+      if (kDebugMode) {
+        print('Error al seguir usuario: $e');
+      }
       rethrow;
     }
   }
@@ -121,7 +130,9 @@ class FollowsRepository {
           .eq('id_seguidor', idSeguidor)
           .eq('id_seguido', idSeguido);
     } catch (e) {
-      print('Error al dejar de seguir: $e');
+      if (kDebugMode) {
+        print('Error al dejar de seguir: $e');
+      }
       rethrow;
     }
   }
@@ -137,7 +148,9 @@ class FollowsRepository {
 
       return response != null;
     } catch (e) {
-      print('Error al verificar si está siguiendo: $e');
+      if (kDebugMode) {
+        print('Error al verificar si está siguiendo: $e');
+      }
       return false;
     }
   }

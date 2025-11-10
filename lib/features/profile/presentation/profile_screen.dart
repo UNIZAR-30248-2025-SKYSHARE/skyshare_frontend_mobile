@@ -26,18 +26,18 @@ class ProfileScreen extends StatefulWidget {
 }
 
 Future<void> _signOut(BuildContext context) async {
+  final navigator = Navigator.of(context);
+  final messenger = ScaffoldMessenger.of(context);
+
   try {
     final client = Supabase.instance.client;
     final authRepo = AuthRepository(client: client);
 
     await authRepo.signOut();
 
-    if (context.mounted) {
-      Navigator.of(context)
-          .pushNamedAndRemoveUntil('/login', (route) => false);
-    }
+    navigator.pushNamedAndRemoveUntil('/login', (route) => false);
   } catch (e) {
-    ScaffoldMessenger.of(context).showSnackBar(
+    messenger.showSnackBar(
       SnackBar(
         content: Text('Error signing out: $e'),
         backgroundColor: Colors.red,
