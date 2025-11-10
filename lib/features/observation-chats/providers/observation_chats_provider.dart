@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../data/models/chat_preview_model.dart';
-import '../data/models/group_info_model.dart'; 
+import '../data/models/group_info_model.dart';
 import '../data/repositories/observation_chats_repository.dart';
 
 enum ChatFilter { misGrupos, todos }
@@ -9,23 +9,31 @@ class ObservationChatsProvider extends ChangeNotifier {
   final ObservationChatsRepository _repository;
 
   ObservationChatsProvider(this._repository) {
-    fetchMyGroups();
+    _initialize();
   }
 
   ChatFilter _currentFilter = ChatFilter.misGrupos;
   ChatFilter get currentFilter => _currentFilter;
 
-  bool _isLoading = false;
+  bool _isLoading = true;
   bool get isLoading => _isLoading;
 
   List<ChatPreview> _groupChats = [];
-  List<ChatPreview> get groupChats => _groupChats; 
+  List<ChatPreview> get groupChats => _groupChats;
 
   List<GroupInfo> _discoverableGroups = [];
   List<GroupInfo> get discoverableGroups => _discoverableGroups;
 
+  Future<void> _initialize() async {
+    await fetchMyGroups();
+
+    _isLoading = false;
+
+    notifyListeners();
+  }
+
   Future<void> setFilter(ChatFilter filter) async {
-    if (_currentFilter == filter) return; 
+    if (_currentFilter == filter) return;
 
     _currentFilter = filter;
     _isLoading = true;
@@ -49,7 +57,7 @@ class ObservationChatsProvider extends ChangeNotifier {
   }
 
   Future<void> fetchMyGroups() async {
-    if (_groupChats.isEmpty) { 
+    if (_groupChats.isEmpty) {
       _groupChats = await _repository.getMyGroupPreviews();
     }
   }
@@ -63,16 +71,11 @@ class ObservationChatsProvider extends ChangeNotifier {
   Future<bool> createGroup(String name, String description) async {
     try {
       await _repository.createGroup(name, description);
-      
-      _groupChats = []; 
-      
-      await fetchMyGroups(); 
-      
+      _groupChats = [];
+      await fetchMyGroups();
       _currentFilter = ChatFilter.misGrupos;
-      
-      notifyListeners(); 
+      notifyListeners();
       return true;
-
     } catch (e) {
       print('Error creando grupo: $e');
       return false;
@@ -82,20 +85,16 @@ class ObservationChatsProvider extends ChangeNotifier {
   Future<bool> joinGroup(int groupId) async {
     _isLoading = true;
     notifyListeners();
-    
+
     try {
       await _repository.joinGroup(groupId);
-      
       _groupChats = [];
       _discoverableGroups = [];
-      await fetchMyGroups(); 
-
+      await fetchMyGroups();
       _currentFilter = ChatFilter.misGrupos;
-      
       _isLoading = false;
       notifyListeners();
       return true;
-
     } catch (e) {
       print('Error al unirse al grupo: $e');
       _isLoading = false;
