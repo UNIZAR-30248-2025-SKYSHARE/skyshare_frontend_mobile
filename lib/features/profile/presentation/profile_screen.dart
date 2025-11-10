@@ -49,7 +49,6 @@ Future<void> _signOut(BuildContext context) async {
 class _ProfileScreenState extends State<ProfileScreen> {
   late final MyProfileRepository _repository;
   late final FollowsRepository _followsRepo;
-  late final SpotRepository _spotRepo;
 
   AppUser? _user;
   AppUser? _currentUser;
@@ -65,7 +64,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
     super.initState();
     _repository = widget.profileRepository ?? MyProfileRepository();
     _followsRepo = widget.followsRepository ?? FollowsRepository();
-    _spotRepo = widget.spotRepository ?? SpotRepository();
     _loadData();
   }
 

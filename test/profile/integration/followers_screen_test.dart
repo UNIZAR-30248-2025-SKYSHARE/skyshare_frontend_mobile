@@ -5,7 +5,6 @@ import 'package:skyshare_frontend_mobile/features/profile/presentation/followers
 import 'package:skyshare_frontend_mobile/core/models/user_model.dart';
 import 'package:skyshare_frontend_mobile/features/profile/data/repositories/follows_repository.dart';
 import 'package:skyshare_frontend_mobile/features/profile/data/repositories/my_profile_repository.dart';
-import 'package:skyshare_frontend_mobile/features/profile/presentation/profile_screen.dart';
 
 class MockFollowsRepository extends Mock implements FollowsRepository {}
 class MockMyProfileRepository extends Mock implements MyProfileRepository {}

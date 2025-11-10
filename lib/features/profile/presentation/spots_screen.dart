@@ -73,11 +73,16 @@ class _SpotsScreenState extends State<SpotsScreen> {
     if (confirm == true) {
       try {
         await _spotRepository.deleteSpot(int.parse(idSpot));
+
+        if (!mounted) return; // ✅ Verifica que el widget siga en el árbol
+
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Spot successfully deleted')),
         );
+
         _loadSpots(); 
       } catch (e) {
+        if (!mounted) return; 
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Error deleting spot: $e')),
         );
