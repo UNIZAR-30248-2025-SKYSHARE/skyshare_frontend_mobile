@@ -53,13 +53,13 @@ class VisibleSkySection extends StatelessWidget {
             AppLocalizations.of(context)?.t('cielo_visible') ?? 'Cielo Visible',
             style: const TextStyle(
               color: Colors.white,
-              fontSize: 22,
+              fontSize: 16,
               fontWeight: FontWeight.bold,
             ),
           ),
         ),
         SizedBox(
-          height: 230,
+          height: 200,
           child: ListView.builder(
             scrollDirection: Axis.horizontal,
             itemCount: constellations.length,
@@ -70,37 +70,11 @@ class VisibleSkySection extends StatelessWidget {
                 padding: EdgeInsets.only(
                   right: index < constellations.length - 1 ? 16 : 0,
                 ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Expanded(
-                      child: ConstellationCard(
-                        constellation: item,
-                        onTap: () {
-                          // Mantén este tap si quieres que también funcione al tocar la tarjeta completa
-                        },
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    SizedBox(
-                      height: 30,
-                      child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.blueAccent,
-                          foregroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(horizontal: 12),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                        ),
-                        onPressed: () => _navigateToGuia(context, item.name),
-                        child: Text(
-                          AppLocalizations.of(context)?.t('go_to_guide') ?? 'Ir a guía',
-                          style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500),
-                        ),
-                      ),
-                    ),
-                  ],
+                child: ConstellationCard(
+                  constellation: item,
+                  onTap: () => _navigateToGuia(context, item.name),
+                  showButton: true,
+                  buttonText: AppLocalizations.of(context)?.t('go_to_guide') ?? 'Ir a guía',
                 ),
               );
             },

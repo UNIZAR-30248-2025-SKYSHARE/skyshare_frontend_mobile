@@ -4,10 +4,14 @@ import '../../data/models/visible_sky_model.dart';
 class ConstellationCard extends StatelessWidget {
   final VisibleSkyItem constellation;
   final VoidCallback onTap;
+  final bool showButton;
+  final String buttonText;
 
   const ConstellationCard({
     required this.constellation,
     required this.onTap,
+    this.showButton = false,
+    this.buttonText = 'Ir a guía',
     super.key,
   });
 
@@ -33,37 +37,68 @@ class ConstellationCard extends StatelessWidget {
         decoration: BoxDecoration(
           color: const Color.fromRGBO(0, 0, 0, 0.3),
           borderRadius: BorderRadius.circular(14),
-          border: Border.all(color:const Color.fromRGBO(255, 255, 255, 0.12), width: 1.2),
+          border: Border.all(color: const Color.fromRGBO(255, 255, 255, 0.12), width: 1.2),
           boxShadow: [const BoxShadow(color: Color.fromRGBO(0, 0, 0, 0.35), blurRadius: 10, offset: Offset(0, 6))],
         ),
-        child: Row(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween, // Añadido para distribuir el espacio
           children: <Widget>[
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Text(
-                    constellation.name,
-                    style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w600),
+            // Contenido original en una fila
+            Row(
+              children: <Widget>[
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Text(
+                        constellation.name,
+                        style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w600),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        ts,
+                        style: const TextStyle(color: Color.fromRGBO(255, 255, 255, 0.6), fontSize: 13),
+                      ),
+                    ],
                   ),
-                  const SizedBox(height: 8),
-                  Text(
-                    ts,
-                    style: const TextStyle(color: Color.fromRGBO(255, 255, 255, 0.6), fontSize: 13),
+                ),
+                const SizedBox(width: 12),
+                Container(
+                  width: 40,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10),
+                    color: const Color.fromRGBO(255, 255, 255, 0.03),
                   ),
-                ],
-              ),
+                  child: const Icon(Icons.star, color: Colors.lightBlueAccent, size: 32),
+                ),
+              ],
             ),
-            const SizedBox(width: 12),
-            Container(
-              width: 56,
-              height: 56,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(10),
-                color: const Color.fromRGBO(255, 255, 255, 0.03),
+            
+            // Botón en la parte inferior
+            if (showButton)
+              SizedBox(
+                width: double.infinity,
+                height: 36,
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blueAccent,
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                  onPressed: onTap,
+                  child: Text(
+                    buttonText,
+                    style: const TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ),
               ),
-              child: const Icon(Icons.star, color: Colors.lightBlueAccent, size: 32),
-            ),
           ],
         ),
       ),
