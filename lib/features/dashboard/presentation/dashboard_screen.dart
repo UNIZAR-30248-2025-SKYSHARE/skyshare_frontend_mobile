@@ -10,6 +10,8 @@ import 'widgets/sky_indicator.dart';
 import '../../../core/widgets/star_background.dart';
 import 'package:skyshare_frontend_mobile/core/i18n/app_localizations.dart';
 import 'package:skyshare_frontend_mobile/core/i18n/language_switcher.dart';
+import 'package:skyshare_frontend_mobile/features/star_charts/presentation/star_chart_screen.dart';
+
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
