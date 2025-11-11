@@ -28,7 +28,7 @@ class AlertDropdown<T> extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 12.0),
         child: DropdownButtonFormField<T>(
-          initialValue: value,
+          value: value,
           items: items,
           onChanged: enabled ? onChanged : null,
           validator: validator,
