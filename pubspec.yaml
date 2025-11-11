@@ -41,6 +41,7 @@ dependencies:
   #Supabase 
   supabase_flutter: ^2.10.2
   flutter_dotenv: ^6.0.0
+  realtime_client: ^2.0.0
 
   #Geolocator
   geocoding: ^4.0.0

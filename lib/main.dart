@@ -11,6 +11,7 @@ import 'package:skyshare_frontend_mobile/features/interactive_map/data/repositor
 import 'package:skyshare_frontend_mobile/features/interactive_map/data/repositories/spot_repository.dart';
 import 'package:skyshare_frontend_mobile/features/phase_lunar/presentation/phase_lunar_screen.dart';
 import 'package:skyshare_frontend_mobile/features/push_notifications/services/one_signal_service.dart';
+import 'package:skyshare_frontend_mobile/features/profile/presentation/profile_screen.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'features/dashboard/providers/dashboard_provider.dart';
 import 'features/dashboard/presentation/dashboard_screen.dart';
@@ -33,6 +34,9 @@ import 'features/star_charts/providers/star_chart_provider.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:skyshare_frontend_mobile/core/i18n/app_localizations.dart';
 import 'package:skyshare_frontend_mobile/core/i18n/locale_provider.dart';
+import 'features/observation-chats/data/repositories/observation_chats_repository.dart'; 
+import 'features/observation-chats/providers/observation_chats_provider.dart'; 
+import 'features/observation-chats/presentation/observation_chats_screen.dart'; 
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -156,7 +160,18 @@ class MyApp extends StatelessWidget {
           create: (ctx) => StarChartProvider(
             astronomyRepository: ctx.read<StarChartRepository>(),
           ),
+
         ),
+        
+        Provider<ObservationChatsRepository>( 
+          create: (ctx) => ObservationChatsRepository(ctx.read<SupabaseClient>()),
+        ),
+        ChangeNotifierProvider<ObservationChatsProvider>( 
+          create: (ctx) => ObservationChatsProvider(
+            ctx.read<ObservationChatsRepository>(),
+          ),
+        ),
+
       ],
       child: Consumer<LocaleProvider>(
         builder: (context, localeProvider, _) => MaterialApp(
@@ -233,12 +248,14 @@ class _RootAppState extends State<RootApp> {
   Widget build(BuildContext context) {
     final provider = context.watch<DashboardProvider>();
     final locationCount = provider.savedLocations.length;
+    
     final pages = <Widget>[
       const DashboardScreen(),                   
       const PhaseLunarScreen(),
       const AlertsListScreen(),
       const MapScreen(),
-  Center(child: Text(AppLocalizations.of(context)?.t('perfil_placeholder') ?? 'Perfil - placeholder'))
+      const ObservationChatsScreen(),
+      const ProfileScreen(),
     ];
 
     return Scaffold(
