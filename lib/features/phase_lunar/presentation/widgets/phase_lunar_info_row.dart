@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:skyshare_frontend_mobile/core/i18n/app_localizations.dart';
 
 class PhaseLunarInfoRow extends StatelessWidget {
   final String rise;
@@ -18,21 +19,21 @@ class PhaseLunarInfoRow extends StatelessWidget {
             children: [
               const Icon(Icons.nights_stay, size: 20),
               const SizedBox(height: 6),
-              Text('Rise\n$rise', textAlign: TextAlign.center),
+              Text((AppLocalizations.of(context)?.t('phase_lunar.rise') ?? 'Rise\n{time}').replaceAll('{time}', rise), textAlign: TextAlign.center),
             ],
           ),
           Column(
             children: [
               const Icon(Icons.wb_twighlight, size: 20),
               const SizedBox(height: 6),
-              Text('Set\n$set', textAlign: TextAlign.center),
+              Text((AppLocalizations.of(context)?.t('phase_lunar.set') ?? 'Set\n{time}').replaceAll('{time}', set), textAlign: TextAlign.center),
             ],
           ),
           Column(
             children: [
               const Icon(Icons.light_mode, size: 20),
               const SizedBox(height: 6),
-              Text('Illum.\n$illumination', textAlign: TextAlign.center),
+              Text((AppLocalizations.of(context)?.t('phase_lunar.illum') ?? 'Illum.\n{value}').replaceAll('{value}', illumination), textAlign: TextAlign.center),
             ],
           ),
         ],

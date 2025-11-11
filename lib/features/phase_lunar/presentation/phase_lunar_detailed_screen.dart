@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:skyshare_frontend_mobile/features/phase_lunar/providers/lunar_phase_provider.dart';
 import 'package:skyshare_frontend_mobile/features/phase_lunar/data/models/lunar_phase_model.dart';
 import '../../../core/widgets/star_background.dart';
+import '../../../core/i18n/app_localizations.dart';
 import 'widgets/moon_phase_widget.dart';
 
 class PhaseLunarDetailedScreen extends StatefulWidget {
@@ -44,7 +45,7 @@ class _PhaseLunarDetailedScreenState extends State<PhaseLunarDetailedScreen> {
     return StarBackground(
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('Moon Details'),
+          title: Text(AppLocalizations.of(context)?.t('phase_lunar.moon_details') ?? 'Moon Details'),
           backgroundColor: Colors.transparent,
           elevation: 0,
         ),
@@ -57,13 +58,13 @@ class _PhaseLunarDetailedScreenState extends State<PhaseLunarDetailedScreen> {
               return const Center(child: CircularProgressIndicator());
             }
             if (snapshot.hasError) {
-              return Center(child: Text('Error: ${snapshot.error}'));
+              return Center(child: Text((AppLocalizations.of(context)?.t('error_generic') ?? 'Error: {err}').replaceAll('{err}', snapshot.error.toString())));
             }
 
             final phase = snapshot.data;
             if (phase == null) {
-              return const Center(
-                  child: Text('No data available for this date'));
+              return Center(
+                  child: Text(AppLocalizations.of(context)?.t('phase_lunar.no_data_for_date') ?? 'No data available for this date'));
             }
 
             final iluminacion = (phase.porcentajeIluminacion ?? 0).round();
@@ -93,13 +94,13 @@ class _PhaseLunarDetailedScreenState extends State<PhaseLunarDetailedScreen> {
                     ),
                     const SizedBox(height: 24),
                     _InfoCard(
-                      title: 'Current Lunar Phase',
+                      title: AppLocalizations.of(context)?.t('phase_lunar.current_lunar_phase') ?? 'Current Lunar Phase',
                       icon: Icons.nightlight_round,
                       children: [
-                        _InfoRow(label: 'Phase', value: phase.fase),
-                        _InfoRow(label: 'Illumination', value: '$iluminacion%'),
+                        _InfoRow(label: AppLocalizations.of(context)?.t('phase_lunar.phase') ?? 'Phase', value: phase.fase),
+                        _InfoRow(label: AppLocalizations.of(context)?.t('phase_lunar.illumination') ?? 'Illumination', value: '$iluminacion%'),
                         _InfoRow(
-                            label: 'Lunar age',
+                            label: AppLocalizations.of(context)?.t('phase_lunar.lunar_age') ?? 'Lunar age',
                             value: phase.edadLunar != null
                                 ? '${phase.edadLunar!.toStringAsFixed(1)} days'
                                 : '—'),
@@ -107,13 +108,13 @@ class _PhaseLunarDetailedScreenState extends State<PhaseLunarDetailedScreen> {
                     ),
                     const SizedBox(height: 16),
                     _InfoCard(
-                      title: 'Times',
+                      title: AppLocalizations.of(context)?.t('phase_lunar.times') ?? 'Times',
                       icon: Icons.access_time,
                       children: [
-                        _InfoRow(label: 'Moonrise', value: phase.horaSalida ?? '—'),
-                        _InfoRow(label: 'Moonset', value: phase.horaPuesta ?? '—'),
+                        _InfoRow(label: AppLocalizations.of(context)?.t('phase_lunar.moonrise') ?? 'Moonrise', value: phase.horaSalida ?? '—'),
+                        _InfoRow(label: AppLocalizations.of(context)?.t('phase_lunar.moonset') ?? 'Moonset', value: phase.horaPuesta ?? '—'),
                         _InfoRow(
-                            label: 'Current altitude',
+                            label: AppLocalizations.of(context)?.t('phase_lunar.current_altitude') ?? 'Current altitude',
                             value: phase.altitudActual != null
                                 ? '${phase.altitudActual!.toStringAsFixed(1)}°'
                                 : '—'),
@@ -121,11 +122,11 @@ class _PhaseLunarDetailedScreenState extends State<PhaseLunarDetailedScreen> {
                     ),
                     const SizedBox(height: 16),
                     _InfoCard(
-                      title: 'Additional info',
+                      title: AppLocalizations.of(context)?.t('phase_lunar.additional_info') ?? 'Additional info',
                       icon: Icons.info_outline,
                       children: [
                         _InfoRow(
-                            label: 'Next important phase',
+                            label: AppLocalizations.of(context)?.t('phase_lunar.next_important_phase') ?? 'Next important phase',
                             value: phase.proximaFase ?? '—'),
                       ],
                     ),

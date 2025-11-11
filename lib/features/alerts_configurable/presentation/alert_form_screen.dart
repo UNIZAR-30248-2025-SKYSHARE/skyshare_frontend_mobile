@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:skyshare_frontend_mobile/core/i18n/app_localizations.dart';
 import '../../../core/widgets/star_background.dart';
 import '../data/model/alert_model.dart';
 import '../providers/alert_provider.dart';
@@ -126,24 +127,24 @@ class _AlertFormScreenState extends State<AlertFormScreen> {
 
   bool _validateForm() {
     if (_currentType == 'fase lunar' && _lunarPhase == null) {
-      _showError('Please select a lunar phase');
+      _showError(AppLocalizations.of(context)?.t('alerts.select_lunar_phase') ?? 'Please select a lunar phase');
       return false;
     }
     
     if (_currentType == 'meteorologica') {
       if (_weatherMetric == null) {
-        _showError('Please select a weather parameter');
+        _showError(AppLocalizations.of(context)?.t('alerts.select_weather_parameter') ?? 'Please select a weather parameter');
         return false;
       }
     }
     
     if (_currentType == 'estrellas' && _starEventType == null) {
-      _showError('Please select a constellation or event');
+      _showError(AppLocalizations.of(context)?.t('alerts.select_constellation') ?? 'Please select a constellation or event');
       return false;
     }
 
     if (_dateController.text.isEmpty) {
-      _showError('Please select a date');
+      _showError(AppLocalizations.of(context)?.t('alerts.form.select_date') ?? 'Please select a date');
       return false;
     }
 
@@ -261,7 +262,7 @@ class _AlertFormScreenState extends State<AlertFormScreen> {
         
         if (mounted) {
           if (kDebugMode) print('DEBUG Form: Alert updated successfully');
-          _showSuccess('Alert updated successfully');
+          _showSuccess(AppLocalizations.of(context)?.t('alerts.form.updated_success') ?? 'Alert updated successfully');
           Navigator.of(context).pop(true);
         }
       } else {
@@ -271,7 +272,7 @@ class _AlertFormScreenState extends State<AlertFormScreen> {
         
         if (mounted) {
           if (kDebugMode) print('DEBUG Form: Alert created successfully');
-          _showSuccess('Alert created successfully');
+          _showSuccess(AppLocalizations.of(context)?.t('alerts.form.created_success') ?? 'Alert created successfully');
           Navigator.of(context).pop(true);
         }
       }
@@ -347,15 +348,15 @@ class _AlertFormScreenState extends State<AlertFormScreen> {
     return Column(
       children: [
         AlertFormField(
-          label: 'LUNAR PHASE',
-          child: AlertDropdown<String>(
-            hintText: 'Select lunar phase',
+          label: AppLocalizations.of(context)?.t('alerts.form.lunar') ?? 'Lunar phase',
+            child: AlertDropdown<String>(
+            hintText: AppLocalizations.of(context)?.t('alerts.select_lunar_phase') ?? 'Select lunar phase',
             value: _lunarPhase,
-            items: const [
-              DropdownMenuItem(value: 'New Moon', child: Text('New Moon')),
-              DropdownMenuItem(value: 'First Quarter', child: Text('First Quarter')),
-              DropdownMenuItem(value: 'Full Moon', child: Text('Full Moon')),
-              DropdownMenuItem(value: 'Last Quarter', child: Text('Last Quarter')),
+            items: [
+              DropdownMenuItem(value: 'New Moon', child: Text(AppLocalizations.of(context)?.t('alerts.lunar.new_moon') ?? 'New Moon')),
+              DropdownMenuItem(value: 'First Quarter', child: Text(AppLocalizations.of(context)?.t('alerts.lunar.first_quarter') ?? 'First Quarter')),
+              DropdownMenuItem(value: 'Full Moon', child: Text(AppLocalizations.of(context)?.t('alerts.lunar.full_moon') ?? 'Full Moon')),
+              DropdownMenuItem(value: 'Last Quarter', child: Text(AppLocalizations.of(context)?.t('alerts.lunar.last_quarter') ?? 'Last Quarter')),
             ],
             onChanged: (value) {
               setState(() {
@@ -388,7 +389,7 @@ class _AlertFormScreenState extends State<AlertFormScreen> {
     return Column(
       children: [
         AlertChipSelector(
-          label: 'WEATHER PARAMETER',
+          label: AppLocalizations.of(context)?.t('alerts.form.weather') ?? 'Weather parameter',
           options: const ['Cloudiness', 'Light pollution', 'Sky indicator'],
           selectedValue: metric,
           onChanged: (value) {
@@ -398,13 +399,13 @@ class _AlertFormScreenState extends State<AlertFormScreen> {
           },
         ),
         AlertFormField(
-          label: 'MINIMUM VALUE',
+          label: AppLocalizations.of(context)?.t('alerts.form.min_value') ?? 'Minimum value',
           child: TextFormField(
             controller: _valorMinController,
             keyboardType: const TextInputType.numberWithOptions(decimal: true),
             style: const TextStyle(color: Colors.white),
             decoration: InputDecoration(
-              hintText: 'Minimum value (optional)',
+              hintText: AppLocalizations.of(context)?.t('alerts.form.min_value_hint') ?? 'Minimum value (optional)',
               hintStyle: const TextStyle(color: Colors.white54),
               contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               border: OutlineInputBorder(
@@ -424,13 +425,13 @@ class _AlertFormScreenState extends State<AlertFormScreen> {
           ),
         ),
         AlertFormField(
-          label: 'MAXIMUM VALUE',
+          label: AppLocalizations.of(context)?.t('alerts.form.max_value') ?? 'Maximum value',
           child: TextFormField(
             controller: _valorMaxController,
             keyboardType: const TextInputType.numberWithOptions(decimal: true),
             style: const TextStyle(color: Colors.white),
             decoration: InputDecoration(
-              hintText: 'Maximum value (optional)',
+              hintText: AppLocalizations.of(context)?.t('alerts.form.max_value_hint') ?? 'Maximum value (optional)',
               hintStyle: const TextStyle(color: Colors.white54),
               contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               border: OutlineInputBorder(
@@ -457,19 +458,19 @@ class _AlertFormScreenState extends State<AlertFormScreen> {
     return Column(
       children: [
         AlertFormField(
-          label: 'CONSTELLATION',
-          child: AlertDropdown<String>(
-            hintText: 'Select constellation',
+          label: AppLocalizations.of(context)?.t('alerts.form.constellation') ?? 'Constellation',
+            child: AlertDropdown<String>(
+            hintText: AppLocalizations.of(context)?.t('alerts.select_constellation') ?? 'Select constellation',
             value: _starEventType,
-            items: const [
-              DropdownMenuItem(value: 'Virgo', child: Text('Virgo')),
-              DropdownMenuItem(value: 'Libra', child: Text('Libra')),
-              DropdownMenuItem(value: 'Vela', child: Text('Vela')),
-              DropdownMenuItem(value: 'Gemini', child: Text('Gemini')),
-              DropdownMenuItem(value: 'Aquarius', child: Text('Aquarius')),
-              DropdownMenuItem(value: 'Taurus', child: Text('Taurus')),
-              DropdownMenuItem(value: 'Pisces', child: Text('Pisces')),
-              DropdownMenuItem(value: 'Capricornius', child: Text('Capricornius')),
+            items: [
+              DropdownMenuItem(value: 'Virgo', child: Text(AppLocalizations.of(context)?.t('alerts.constellation.virgo') ?? 'Virgo')),
+              DropdownMenuItem(value: 'Libra', child: Text(AppLocalizations.of(context)?.t('alerts.constellation.libra') ?? 'Libra')),
+              DropdownMenuItem(value: 'Vela', child: Text(AppLocalizations.of(context)?.t('alerts.constellation.vela') ?? 'Vela')),
+              DropdownMenuItem(value: 'Gemini', child: Text(AppLocalizations.of(context)?.t('alerts.constellation.gemini') ?? 'Gemini')),
+              DropdownMenuItem(value: 'Aquarius', child: Text(AppLocalizations.of(context)?.t('alerts.constellation.aquarius') ?? 'Aquarius')),
+              DropdownMenuItem(value: 'Taurus', child: Text(AppLocalizations.of(context)?.t('alerts.constellation.taurus') ?? 'Taurus')),
+              DropdownMenuItem(value: 'Pisces', child: Text(AppLocalizations.of(context)?.t('alerts.constellation.pisces') ?? 'Pisces')),
+              DropdownMenuItem(value: 'Capricornius', child: Text(AppLocalizations.of(context)?.t('alerts.constellation.capricornius') ?? 'Capricornius')),
             ],
             onChanged: (value) {
               setState(() {
@@ -497,9 +498,9 @@ class _AlertFormScreenState extends State<AlertFormScreen> {
 
   String _getAlertTypeTitle() {
     switch (_currentType) {
-      case 'fase lunar': return 'LUNAR';
-      case 'meteorologica': return 'WEATHER';
-      case 'estrellas': return 'STARS';
+      case 'fase lunar': return AppLocalizations.of(context)?.t('alerts.form.lunar_short')?.toUpperCase() ?? 'LUNAR';
+      case 'meteorologica': return AppLocalizations.of(context)?.t('alerts.form.weather_short')?.toUpperCase() ?? 'WEATHER';
+      case 'estrellas': return AppLocalizations.of(context)?.t('alerts.form.stars_short')?.toUpperCase() ?? 'STARS';
       default: return _currentType.toUpperCase();
     }
   }
@@ -509,18 +510,18 @@ class _AlertFormScreenState extends State<AlertFormScreen> {
       context: context,
       builder: (context) => AlertDialog(
         backgroundColor: const Color(0xFF1a1a2e),
-        title: const Text(
-          'Delete Alert',
-          style: TextStyle(color: Colors.white),
+        title: Text(
+          AppLocalizations.of(context)?.t('alerts.form.delete_confirmation_title') ?? 'Delete Alert',
+          style: const TextStyle(color: Colors.white),
         ),
-        content: const Text(
-          'Are you sure you want to delete this alert? This action cannot be undone.',
-          style: TextStyle(color: Colors.white70),
+        content: Text(
+          AppLocalizations.of(context)?.t('alerts.form.delete_confirmation_message') ?? 'Are you sure you want to delete this alert? This action cannot be undone.',
+          style: const TextStyle(color: Colors.white70),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text('CANCEL', style: TextStyle(color: Colors.white70)),
+            child: Text(AppLocalizations.of(context)?.t('alerts.form.cancel') ?? 'CANCEL', style: const TextStyle(color: Colors.white70)),
           ),
           TextButton(
             onPressed: () async {
@@ -536,21 +537,21 @@ class _AlertFormScreenState extends State<AlertFormScreen> {
         await provider.deleteAlert(widget.existingAlert!.idAlerta);
 
         if (mounted) {
-          messenger.showSnackBar(const SnackBar(
-            content: Text('Alert deleted successfully'),
+          messenger.showSnackBar(SnackBar(
+            content: Text(AppLocalizations.of(context)?.t('alerts.deleted_success') ?? 'Alert deleted successfully'),
             backgroundColor: Colors.green,
-            duration: Duration(seconds: 2),
+            duration: const Duration(seconds: 2),
           ));
           navigator.pop(true);
         }
               } catch (e) {
                 if (mounted) {
                   setState(() => _isSaving = false);
-                  _showError('Error deleting alert: $e');
+                  _showError((AppLocalizations.of(context)?.t('alerts.delete_error') ?? 'Error deleting alert') + ': $e');
                 }
               }
             },
-            child: const Text('DELETE', style: TextStyle(color: Colors.red)),
+            child: Text(AppLocalizations.of(context)?.t('alerts.form.delete') ?? 'DELETE', style: const TextStyle(color: Colors.red)),
           ),
         ],
       ),
@@ -572,7 +573,7 @@ class _AlertFormScreenState extends State<AlertFormScreen> {
             onPressed: () => Navigator.of(context).pop(),
           ),
           title: Text(
-            '${isEditing ? 'EDIT' : 'CREATE'} ALERT ${_getAlertTypeTitle()}',
+            '${isEditing ? (AppLocalizations.of(context)?.t('edit') ?? 'EDIT') : (AppLocalizations.of(context)?.t('create') ?? 'CREATE')} ${AppLocalizations.of(context)?.t('alerts.form.alert') ?? 'ALERT'} ${_getAlertTypeTitle()}',
             style: const TextStyle(
               color: Colors.white,
               fontSize: 18,
@@ -675,7 +676,7 @@ class _AlertFormScreenState extends State<AlertFormScreen> {
                                       ),
                                     )
                                   : Text(
-                                      isEditing ? 'Save changes' : 'Create alert',
+                                      isEditing ? (AppLocalizations.of(context)?.t('alerts.form.save') ?? 'Save changes') : (AppLocalizations.of(context)?.t('alerts.form.create') ?? 'Create alert'),
                                       style: const TextStyle(
                                         fontSize: 16,
                                         fontWeight: FontWeight.bold,
@@ -696,9 +697,9 @@ class _AlertFormScreenState extends State<AlertFormScreen> {
                                     borderRadius: BorderRadius.circular(8),
                                   ),
                                 ),
-                                child: const Text(
-                                  'Delete',
-                                  style: TextStyle(
+                                child: Text(
+                                  AppLocalizations.of(context)?.t('alerts.form.delete') ?? 'Delete',
+                                  style: const TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.bold,
                                   ),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../core/widgets/star_background.dart';
+import 'package:skyshare_frontend_mobile/core/i18n/app_localizations.dart';
 import '../providers/alert_provider.dart';
 import 'widgets/alert_card_widget.dart';
 import 'widgets/empty_alerts_widget.dart';
@@ -57,11 +58,11 @@ class _AlertsListScreenState extends State<AlertsListScreen> {
           try {
             await provider.deleteAlert(alertId);
             if (mounted) {
-              _showSuccessMessage('Alert deleted successfully');
+              _showSuccessMessage(AppLocalizations.of(context)?.t('alerts.deleted_success') ?? 'Alert deleted successfully');
             }
           } catch (e) {
             if (mounted) {
-              _showErrorMessage('Error deleting alert');
+              _showErrorMessage(AppLocalizations.of(context)?.t('alerts.delete_error') ?? 'Error deleting alert');
             }
           }
         },
@@ -140,9 +141,9 @@ class _AlertsListScreenState extends State<AlertsListScreen> {
     return AppBar(
       backgroundColor: Colors.transparent,
       elevation: 0,
-      title: const Text(
-        'My Alerts',
-        style: TextStyle(
+      title: Text(
+        AppLocalizations.of(context)?.t('alerts.my_alerts') ?? 'My Alerts',
+        style: const TextStyle(
           fontSize: 20,
           fontWeight: FontWeight.bold,
           color: Colors.white,
@@ -156,7 +157,7 @@ class _AlertsListScreenState extends State<AlertsListScreen> {
             final provider = Provider.of<AlertProvider>(context, listen: false);
             provider.loadAlerts();
           },
-          tooltip: 'Reload alerts',
+          tooltip: AppLocalizations.of(context)?.t('alerts.reload') ?? 'Reload alerts',
         ),
       ],
     );
@@ -178,12 +179,12 @@ class _AlertsListScreenState extends State<AlertsListScreen> {
                 await provider.toggleAlert(alertId, value);
                 if (mounted) {
                   _showSuccessMessage(
-                    value ? 'Alert activated' : 'Alert deactivated'
+                    value ? (AppLocalizations.of(context)?.t('alerts.activated') ?? 'Alert activated') : (AppLocalizations.of(context)?.t('alerts.deactivated') ?? 'Alert deactivated')
                   );
                 }
               } catch (e) {
                 if (mounted) {
-                  _showErrorMessage('Error changing alert status');
+                  _showErrorMessage(AppLocalizations.of(context)?.t('alerts.change_status_error') ?? 'Error changing alert status');
                 }
               }
             },
@@ -199,7 +200,7 @@ class _AlertsListScreenState extends State<AlertsListScreen> {
       heroTag: null,
       onPressed: _handleCreateAlert,
       backgroundColor: kAlertAccent,
-      tooltip: 'Nueva alerta',
+  tooltip: AppLocalizations.of(context)?.t('alerts.new_alert_tooltip') ?? 'New alert',
       child: const Icon(Icons.add, color: Colors.white),
     );
   }

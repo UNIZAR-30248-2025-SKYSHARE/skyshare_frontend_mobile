@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:skyshare_frontend_mobile/core/i18n/app_localizations.dart';
 import '../../data/models/spot_model.dart';
 import '../../data/repositories/spot_repository.dart';
 
@@ -54,7 +55,7 @@ class _SpotEditDialogState extends State<SpotEditDialog> {
     final newDescripcion = _descripcionController.text.trim();
 
     if (newNombre.isEmpty) {
-      _showSnackbar('El nombre no puede estar vacío.', Colors.red);
+      _showSnackbar(AppLocalizations.of(context)?.t('spot.name_required') ?? 'El nombre no puede estar vacío.', Colors.red);
       return;
     }
 
@@ -73,13 +74,13 @@ class _SpotEditDialogState extends State<SpotEditDialog> {
 
       if (success) {
         widget.onSpotUpdated();
-        _showSnackbar('Spot actualizado correctamente!', Colors.green);
+        _showSnackbar(AppLocalizations.of(context)?.t('spot.updated_success') ?? 'Spot actualizado correctamente!', Colors.green);
       } else {
-        _showSnackbar('Error al actualizar el spot.', Colors.red);
+        _showSnackbar(AppLocalizations.of(context)?.t('spot.update_error') ?? 'Error al actualizar el spot.', Colors.red);
       }
     } catch (e) {
       if (!mounted) return;
-      _showSnackbar('Error al guardar cambios: $e', Colors.red);
+      _showSnackbar((AppLocalizations.of(context)?.t('spot.save_error') ?? 'Error al guardar cambios: {err}').replaceAll('{err}', e.toString()), Colors.red);
     }
   }
   
@@ -98,12 +99,12 @@ class _SpotEditDialogState extends State<SpotEditDialog> {
       context: context,
       builder: (confirmContext) {
         return AlertDialog(
-          title: const Text('Confirmar Eliminación'),
-          content: const Text('¿Estás seguro de que quieres eliminar este spot de forma permanente?'),
+          title: Text(AppLocalizations.of(context)?.t('spot.confirm_delete') ?? 'Confirmar Eliminación'),
+          content: Text(AppLocalizations.of(context)?.t('spot.confirm_delete_content') ?? '¿Estás seguro de que quieres eliminar este spot de forma permanente?'),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(confirmContext),
-              child: const Text('Cancelar'),
+              child: Text(AppLocalizations.of(context)?.t('cancel') ?? 'Cancelar'),
             ),
             FilledButton(
               onPressed: () async {
@@ -111,7 +112,7 @@ class _SpotEditDialogState extends State<SpotEditDialog> {
                 await _handleDelete();
               },
               style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-              child: const Text('Eliminar', style: TextStyle(color: Colors.white)),
+              child: Text(AppLocalizations.of(context)?.t('spot.delete') ?? 'Eliminar', style: const TextStyle(color: Colors.white)),
             ),
           ],
         );
@@ -137,7 +138,7 @@ class _SpotEditDialogState extends State<SpotEditDialog> {
     return AlertDialog(
       backgroundColor: const Color(0xFF1E1E2E),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      title: const Text('Editar Spot', style: TextStyle(color: Colors.white)),
+  title: Text(AppLocalizations.of(context)?.t('spot.edit_spot') ?? 'Editar Spot', style: const TextStyle(color: Colors.white)),
       content: SingleChildScrollView(
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -145,18 +146,18 @@ class _SpotEditDialogState extends State<SpotEditDialog> {
           children: [
             TextField(
               controller: _nombreController,
-              decoration: const InputDecoration(labelText: 'Nombre', labelStyle: TextStyle(color: Colors.white70)),
+              decoration: InputDecoration(labelText: AppLocalizations.of(context)?.t('spot.name') ?? 'Nombre', labelStyle: const TextStyle(color: Colors.white70)),
               style: const TextStyle(color: Colors.white),
             ),
             const SizedBox(height: 12),
             TextField(
               controller: _descripcionController,
-              decoration: const InputDecoration(labelText: 'Descripción', labelStyle: TextStyle(color: Colors.white70)),
+              decoration: InputDecoration(labelText: AppLocalizations.of(context)?.t('spot.description') ?? 'Descripción', labelStyle: const TextStyle(color: Colors.white70)),
               maxLines: 3,
               style: const TextStyle(color: Colors.white),
             ),
             const SizedBox(height: 20),
-            const Text('Imagen:', style: TextStyle(color: Colors.white70)),
+            Text(AppLocalizations.of(context)?.t('spot.image_label') ?? 'Imagen:', style: const TextStyle(color: Colors.white70)),
             const SizedBox(height: 8),
             Center(
               child: Container(
@@ -177,14 +178,14 @@ class _SpotEditDialogState extends State<SpotEditDialog> {
             const SizedBox(height: 12),
             TextButton.icon(
               icon: const Icon(Icons.photo, color: Colors.blue),
-              label: Text(_pickedFile != null ? 'Cambiar imagen' : 'Seleccionar nueva imagen', style: const TextStyle(color: Colors.blue)),
+              label: Text(_pickedFile != null ? (AppLocalizations.of(context)?.t('spot.change_image') ?? 'Cambiar imagen') : (AppLocalizations.of(context)?.t('spot.select_new_image') ?? 'Seleccionar nueva imagen'), style: const TextStyle(color: Colors.blue)),
               onPressed: _pickImage,
             ),
             const Divider(color: Colors.white30),
             const SizedBox(height: 10),
             TextButton.icon(
               icon: const Icon(Icons.delete_forever, color: Colors.red),
-              label: const Text('Eliminar Spot (Permanente)', style: TextStyle(color: Colors.red)),
+              label: Text(AppLocalizations.of(context)?.t('spot.delete_spot_permanent') ?? 'Eliminar Spot (Permanente)', style: const TextStyle(color: Colors.red)),
               onPressed: _confirmDelete,
             ),
           ],
@@ -193,11 +194,11 @@ class _SpotEditDialogState extends State<SpotEditDialog> {
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context),
-          child: const Text('Cancelar', style: TextStyle(color: Colors.white70)),
+          child: Text(AppLocalizations.of(context)?.t('cancel') ?? 'Cancelar', style: const TextStyle(color: Colors.white70)),
         ),
         FilledButton(
           onPressed: _handleSaveEdit,
-          child: const Text('Guardar Cambios'),
+          child: Text(AppLocalizations.of(context)?.t('spot.save_changes') ?? 'Guardar Cambios'),
         ),
       ],
     );

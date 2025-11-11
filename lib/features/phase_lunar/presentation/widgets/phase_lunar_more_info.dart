@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:skyshare_frontend_mobile/core/i18n/app_localizations.dart';
 
 class PhaseLunarMoreInfo extends StatelessWidget {
   final double distance = 384.400 ;
@@ -16,14 +17,16 @@ class PhaseLunarMoreInfo extends StatelessWidget {
         children: [
           ElevatedButton(
             onPressed: () {},
-            child: const Padding(
-              padding: EdgeInsets.symmetric(vertical: 14.0),
-              child: Text('More info'),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 14.0),
+              child: Text(AppLocalizations.of(context)?.t('phase_lunar.more_info') ?? 'More info'),
             ),
           ),
           const SizedBox(height: 12),
           Text(
-            'Mock details:\n- Distance: $distance\n- Phase description: $description',
+            (AppLocalizations.of(context)?.t('phase_lunar.mock_details') ?? 'Mock details:\n- Distance: {distance}\n- Phase description: {desc}')
+                .replaceAll('{distance}', distance.toString())
+                .replaceAll('{desc}', description),
             style: const TextStyle(color: Colors.white70),
           ),
         ],
