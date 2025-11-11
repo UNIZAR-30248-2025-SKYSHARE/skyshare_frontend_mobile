@@ -1,5 +1,6 @@
 // widgets/empty_alerts_widget.dart
 import 'package:flutter/material.dart';
+import 'package:skyshare_frontend_mobile/core/i18n/app_localizations.dart';
 
 class EmptyAlertsWidget extends StatelessWidget {
   const EmptyAlertsWidget({super.key});
@@ -21,10 +22,10 @@ class EmptyAlertsWidget extends StatelessWidget {
             ),
             const SizedBox(height: 24),
             
-            const Text(
-              'You don\'t have alerts',
-              key: Key('empty_alerts_title'),
-              style: TextStyle(
+            Text(
+              AppLocalizations.of(context)?.t('alerts.empty_title') ?? 'You don\'t have alerts',
+              key: const Key('empty_alerts_title'),
+              style: const TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
                 color: Colors.white,
@@ -34,7 +35,7 @@ class EmptyAlertsWidget extends StatelessWidget {
             const SizedBox(height: 12),
             
             Text(
-              ' Make your first astronomical alert \nso you don\'t miss any event',
+              AppLocalizations.of(context)?.t('alerts.empty_subtitle') ?? ' Make your first astronomical alert \nso you don\'t miss any event',
               key: const Key('empty_alerts_subtitle'),
               style: TextStyle(
                 fontSize: 16,

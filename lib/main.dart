@@ -31,6 +31,9 @@ import 'features/alerts_configurable/data/repository/alerts_repository.dart';
 import 'features/alerts_configurable/presentation/alerts_list_screen.dart';
 import 'features/star_charts/data/repositories/star_chart_repository.dart';
 import 'features/star_charts/providers/star_chart_provider.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:skyshare_frontend_mobile/core/i18n/app_localizations.dart';
+import 'package:skyshare_frontend_mobile/core/i18n/locale_provider.dart';
 import 'features/observation-chats/data/repositories/observation_chats_repository.dart'; 
 import 'features/observation-chats/providers/observation_chats_provider.dart'; 
 import 'features/observation-chats/presentation/observation_chats_screen.dart'; 
@@ -89,6 +92,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
+        ChangeNotifierProvider<LocaleProvider>(create: (_) => LocaleProvider()),
         Provider<SupabaseClient>.value(value: supabase),
         Provider<WeatherRepository>(
           create: (ctx) => WeatherRepository(client: ctx.read<SupabaseClient>()),
@@ -169,18 +173,28 @@ class MyApp extends StatelessWidget {
         ),
 
       ],
-      child: MaterialApp(
-        title: 'Skyshare',
-        debugShowCheckedModeBanner: false,
-        theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(
-            seedColor: const Color(0xFF6366F1),
-            brightness: Brightness.dark,
+      child: Consumer<LocaleProvider>(
+        builder: (context, localeProvider, _) => MaterialApp(
+          locale: localeProvider.locale,
+          supportedLocales: AppLocalizations.supportedLocales,
+          localizationsDelegates: [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          title: 'Skyshare',
+          debugShowCheckedModeBanner: false,
+          theme: ThemeData(
+            colorScheme: ColorScheme.fromSeed(
+              seedColor: const Color(0xFF6366F1),
+              brightness: Brightness.dark,
+            ),
+            useMaterial3: true,
+            scaffoldBackgroundColor: const Color(0xFF0A0E27),
           ),
-          useMaterial3: true,
-          scaffoldBackgroundColor: const Color(0xFF0A0E27),
+          home: const AuthWrapper(),
         ),
-        home: const AuthWrapper(),
       ),
     );
   }

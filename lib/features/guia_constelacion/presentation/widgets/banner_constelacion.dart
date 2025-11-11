@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:skyshare_frontend_mobile/core/i18n/app_localizations.dart';
 
 class BannerConstelacionDelegate extends SliverPersistentHeaderDelegate {
   final dynamic guia;
@@ -32,11 +33,11 @@ class BannerConstelacionDelegate extends SliverPersistentHeaderDelegate {
         ),
         Container(
           decoration: BoxDecoration(
-            gradient: LinearGradient(
+            gradient: const LinearGradient(
               colors: [
-                Colors.black.withValues(alpha: 0.6),
+                Color.fromRGBO(0, 0, 0, 0.6),
                 Colors.transparent,
-                Colors.black.withValues(alpha: 0.5),
+                Color.fromRGBO(0, 0, 0, 0.5),
               ],
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
@@ -47,7 +48,7 @@ class BannerConstelacionDelegate extends SliverPersistentHeaderDelegate {
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20.0),
             child: Text(
-              'Guía Constelación de ${guia.nombreConstelacion}',
+              (AppLocalizations.of(context)?.t('guia_constelacion_de') ?? 'Guía Constelación de {name}').replaceAll('{name}', guia.nombreConstelacion),
               textAlign: TextAlign.center,
               style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                     color: Colors.white,

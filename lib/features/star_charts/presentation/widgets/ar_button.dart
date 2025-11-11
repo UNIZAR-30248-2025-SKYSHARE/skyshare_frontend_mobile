@@ -1,5 +1,6 @@
 
 import 'package:flutter/material.dart';
+import 'package:skyshare_frontend_mobile/core/i18n/app_localizations.dart';
 
 class ARCheckButton extends StatefulWidget {
   final VoidCallback onARAvailable;
@@ -31,12 +32,12 @@ class _ARCheckButtonState extends State<ARCheckButton> {
           borderRadius: BorderRadius.circular(12),
         ),
       ),
-      child: const Row(
+      child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.view_in_ar, size: 20),
-          SizedBox(width: 8),
-          Text('Ver en AR'),
+          const Icon(Icons.view_in_ar, size: 20),
+          const SizedBox(width: 8),
+          Text(AppLocalizations.of(context)?.t('view_in_ar') ?? 'Ver en AR'),
         ],
       ),
     );

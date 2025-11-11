@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:skyshare_frontend_mobile/core/i18n/app_localizations.dart';
 
 class DescripcionConstelacion extends StatelessWidget {
   final dynamic guia;
@@ -44,7 +45,7 @@ class DescripcionConstelacion extends StatelessWidget {
         ),
         const SizedBox(height: 20),
         Text(
-          '¿Qué es ${guia.nombreConstelacion}?',
+          (AppLocalizations.of(context)?.t('que_es') ?? '¿Qué es {name}?').replaceAll('{name}', guia.nombreConstelacion),
           style: Theme.of(context).textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.bold,
                 color: Colors.white,

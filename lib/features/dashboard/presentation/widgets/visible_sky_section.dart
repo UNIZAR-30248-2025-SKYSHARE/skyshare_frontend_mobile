@@ -4,6 +4,7 @@ import 'package:skyshare_frontend_mobile/features/guia_constelacion/data/reposit
 import 'package:skyshare_frontend_mobile/features/guia_constelacion/presentation/guia_constelacion_screen.dart';
 import 'package:skyshare_frontend_mobile/features/guia_constelacion/providers/guia_constelacion_provider.dart';
 
+import 'package:skyshare_frontend_mobile/core/i18n/app_localizations.dart';
 import '../../data/models/visible_sky_model.dart';
 import 'constellation_card.dart';
 
@@ -46,19 +47,19 @@ class VisibleSkySection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Padding(
-          padding: EdgeInsets.only(left: 4, bottom: 12),
+        Padding(
+          padding: const EdgeInsets.only(left: 4, bottom: 12),
           child: Text(
-            'Cielo Visible',
-            style: TextStyle(
+            AppLocalizations.of(context)?.t('cielo_visible') ?? 'Cielo Visible',
+            style: const TextStyle(
               color: Colors.white,
-              fontSize: 22,
+              fontSize: 16,
               fontWeight: FontWeight.bold,
             ),
           ),
         ),
         SizedBox(
-          height: 230,
+          height: 200,
           child: ListView.builder(
             scrollDirection: Axis.horizontal,
             itemCount: constellations.length,
@@ -69,37 +70,11 @@ class VisibleSkySection extends StatelessWidget {
                 padding: EdgeInsets.only(
                   right: index < constellations.length - 1 ? 16 : 0,
                 ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Expanded(
-                      child: ConstellationCard(
-                        constellation: item,
-                        onTap: () {
-                          // Mantén este tap si quieres que también funcione al tocar la tarjeta completa
-                        },
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    SizedBox(
-                      height: 30,
-                      child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.blueAccent,
-                          foregroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(horizontal: 12),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                        ),
-                        onPressed: () => _navigateToGuia(context, item.name),
-                        child: const Text(
-                          'Ir a guía',
-                          style: TextStyle(fontSize: 13, fontWeight: FontWeight.w500),
-                        ),
-                      ),
-                    ),
-                  ],
+                child: ConstellationCard(
+                  constellation: item,
+                  onTap: () => _navigateToGuia(context, item.name),
+                  showButton: true,
+                  buttonText: AppLocalizations.of(context)?.t('go_to_guide') ?? 'Ir a guía',
                 ),
               );
             },

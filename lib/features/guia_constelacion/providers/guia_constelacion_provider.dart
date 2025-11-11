@@ -10,6 +10,10 @@ class GuiaConstelacionProvider extends ChangeNotifier {
   GuiaConstelacion? guia;
   bool isLoading = false;
   String? error;
+  /// Optional machine-readable error key for UI localization
+  String? errorKey;
+  /// optional arguments for the error (not currently interpolated by AppLocalizations)
+  List<String>? errorArgs;
   bool _dataLoaded = false;
 
   Future<void> fetchGuiaPorNombreYTemporada({
@@ -30,13 +34,22 @@ class GuiaConstelacionProvider extends ChangeNotifier {
       if (fetched != null) {
         guia = fetched;
         _dataLoaded = true;
+        error = null;
+        errorKey = null;
+        errorArgs = null;
       } else {
         guia = null;
-        error = 'No se encontró la guía para $nombreConstelacion ($temporada)';
+        // set an i18n-friendly error key; UI will render a localized message
+        error = null;
+        errorKey = 'no_se_encontro_la_guia';
+        errorArgs = [nombreConstelacion, temporada];
       }
     } catch (e) {
       guia = null;
+      // For unexpected exceptions keep the raw error string
       error = e.toString();
+      errorKey = null;
+      errorArgs = null;
     } finally {
       isLoading = false;
       notifyListeners();
@@ -47,6 +60,8 @@ class GuiaConstelacionProvider extends ChangeNotifier {
   void clear() {
     guia = null;
     error = null;
+    errorKey = null;
+    errorArgs = null;
     isLoading = false;
     _dataLoaded = false;
     notifyListeners();

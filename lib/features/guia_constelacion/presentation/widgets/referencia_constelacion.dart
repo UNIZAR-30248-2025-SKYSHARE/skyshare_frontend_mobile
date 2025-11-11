@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:skyshare_frontend_mobile/core/i18n/app_localizations.dart';
 
 class ReferenciaConstelacion extends StatelessWidget {
   final dynamic guia;
@@ -22,13 +23,13 @@ class ReferenciaConstelacion extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Row(
+        Row(
           children: [
-            Icon(Icons.map, color: Color(0xFF8A2BE2), size: 24),
-            SizedBox(width: 8),
+            const Icon(Icons.map, color: Color(0xFF8A2BE2), size: 24),
+            const SizedBox(width: 8),
             Text(
-              'Referencia',
-              style: TextStyle(
+              AppLocalizations.of(context)?.t('referencia') ?? 'Referencia',
+              style: const TextStyle(
                 color: Color(0xFF8A2BE2),
                 fontWeight: FontWeight.bold,
               ),
@@ -38,11 +39,11 @@ class ReferenciaConstelacion extends StatelessWidget {
         const SizedBox(height: 12),
         Container(
           padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: const Color(0xFF2A1B4A).withValues(alpha: 0.4),
+            decoration: BoxDecoration(
+            color: const Color(0xFF2A1B4A).withAlpha((0.4 * 255).round()),
             borderRadius: BorderRadius.circular(12),
             border: Border.all(
-              color: const Color(0xFF8A2BE2).withValues(alpha: 0.3),
+              color: const Color(0xFF8A2BE2).withAlpha((0.3 * 255).round()),
             ),
           ),
           child: (guia.urlReferencia != null &&

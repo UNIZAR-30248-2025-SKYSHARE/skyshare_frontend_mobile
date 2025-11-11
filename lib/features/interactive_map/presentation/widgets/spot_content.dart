@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:skyshare_frontend_mobile/core/i18n/app_localizations.dart';
 import 'package:provider/provider.dart';
 import '../../data/models/spot_model.dart';
 import '../../data/models/comment_model.dart';
@@ -139,17 +140,17 @@ class _SpotContentState extends State<SpotContent> {
     });
     final rating = Rating(spotId: widget.spot.id, userId: user.id, value: value, createdAt: DateTime.now());
     final success = await _ratingRepo.insertRating(rating);
-    if (success) {
-      await _reloadSpot();
-      await _loadUserRating();
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Valoración enviada correctamente!'), backgroundColor: Colors.green));
+      if (success) {
+        await _reloadSpot();
+        await _loadUserRating();
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(AppLocalizations.of(context)?.t('spot.rating_success') ?? 'Valoración enviada correctamente!'), backgroundColor: Colors.green));
+        }
+      } else {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(AppLocalizations.of(context)?.t('spot.rating_error') ?? 'Error al enviar valoración'), backgroundColor: Colors.red));
+        }
       }
-    } else {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Error al enviar valoración'), backgroundColor: Colors.red));
-      }
-    }
     if (!mounted) return;
     setState(() {
       _ratingLoading = false;
@@ -161,11 +162,9 @@ class _SpotContentState extends State<SpotContent> {
     final user = _authProvider.currentUser;
     final messenger = ScaffoldMessenger.of(context); 
     if (user == null) {
-      if (!mounted) return;
-      messenger.showSnackBar(const SnackBar(
-        content: Text('Necesitas iniciar sesión para comentar'),
-        backgroundColor: Colors.red,
-      ));
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(AppLocalizations.of(context)?.t('spot.need_login_to_comment') ?? 'Necesitas iniciar sesión para comentar'), backgroundColor: Colors.red));
+      }
       return;
     }
     if (text.isEmpty) return;
@@ -206,22 +205,16 @@ class _SpotContentState extends State<SpotContent> {
     if (!mounted) return;
     if (success) {
       await _loadComments();
-
-      if (!mounted) return;
-      messenger.showSnackBar(const SnackBar(
-        content: Text('Comentario publicado'),
-        backgroundColor: Colors.green,
-      ));
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(AppLocalizations.of(context)?.t('spot.comment_published') ?? 'Comentario publicado'), backgroundColor: Colors.green));
+      }
     } else {
       setState(() {
         _comments.removeWhere((c) => c.id == tempId);
       });
-
-      if (!mounted) return;
-      messenger.showSnackBar(const SnackBar(
-        content: Text('Error al publicar comentario'),
-        backgroundColor: Colors.red,
-      ));
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(AppLocalizations.of(context)?.t('spot.comment_publish_error') ?? 'Error al publicar comentario'), backgroundColor: Colors.red));
+      }
     }
 
     if (!mounted) return;
@@ -234,7 +227,7 @@ class _SpotContentState extends State<SpotContent> {
     final user = _authProvider.currentUser;
     if (user == null) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Necesitas iniciar sesión'), backgroundColor: Colors.red));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(AppLocalizations.of(context)?.t('spot.need_login') ?? 'Necesitas iniciar sesión'), backgroundColor: Colors.red));
       }
       return;
     }
@@ -258,7 +251,7 @@ class _SpotContentState extends State<SpotContent> {
     if (!mounted) return;
     if (success) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Comentario eliminado'), backgroundColor: Colors.green));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(AppLocalizations.of(context)?.t('spot.comment_deleted') ?? 'Comentario eliminado'), backgroundColor: Colors.green));
       }
     } else {
       if (backup != null) {
@@ -267,7 +260,7 @@ class _SpotContentState extends State<SpotContent> {
         });
       }
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Error al eliminar comentario'), backgroundColor: Colors.red));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(AppLocalizations.of(context)?.t('spot.comment_delete_error') ?? 'Error al eliminar comentario'), backgroundColor: Colors.red));
       }
     }
   }
@@ -369,9 +362,9 @@ class _SpotContentState extends State<SpotContent> {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'Descripción',
-            style: TextStyle(
+          Text(
+            AppLocalizations.of(context)?.t('spot.description_label') ?? 'Descripción',
+            style: const TextStyle(
               color: Colors.white,
               fontSize: 18,
               fontWeight: FontWeight.w600,
@@ -389,9 +382,9 @@ class _SpotContentState extends State<SpotContent> {
         ],
       );
     } else {
-      return const Text(
-        'Sin descripción',
-        style: TextStyle(color: Colors.white24),
+      return Text(
+        AppLocalizations.of(context)?.t('spot.no_description') ?? 'Sin descripción',
+        style: const TextStyle(color: Colors.white24),
       );
     }
   }
@@ -409,9 +402,9 @@ class _SpotContentState extends State<SpotContent> {
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
-                'Valoración',
-                style: TextStyle(
+              Text(
+                AppLocalizations.of(context)?.t('spot.rating_label') ?? 'Valoración',
+                style: const TextStyle(
                   color: Colors.white70,
                   fontSize: 14,
                 ),
@@ -431,7 +424,7 @@ class _SpotContentState extends State<SpotContent> {
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               Text(
-                '${_spot.totalValoraciones} valoraciones',
+                (AppLocalizations.of(context)?.t('spot.votes') ?? '{count} valoraciones').replaceAll('{count}', _spot.totalValoraciones.toString()),
                 style: const TextStyle(
                   color: Colors.white70,
                   fontSize: 14,
@@ -450,14 +443,14 @@ class _SpotContentState extends State<SpotContent> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          'Comentarios',
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 18,
-            fontWeight: FontWeight.w600,
+          Text(
+            AppLocalizations.of(context)?.t('spot.comments_label') ?? 'Comentarios',
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 18,
+              fontWeight: FontWeight.w600,
+            ),
           ),
-        ),
         const SizedBox(height: 12),
         Row(
           children: [
@@ -468,7 +461,7 @@ class _SpotContentState extends State<SpotContent> {
                 maxLines: 4,
                 style: const TextStyle(color: Colors.white),
                 decoration: InputDecoration(
-                  hintText: 'Escribe un comentario...',
+                  hintText: AppLocalizations.of(context)?.t('spot.write_comment_hint') ?? 'Escribe un comentario...',
                   hintStyle: const TextStyle(color: Colors.white38),
                   filled: true,
                   fillColor: const Color(0xFF16161A),
@@ -490,11 +483,11 @@ class _SpotContentState extends State<SpotContent> {
                   ),
           ],
         ),
-        const SizedBox(height: 16),
+          const SizedBox(height: 16),
         if (_isLoading || _commentsLoading)
           const Center(child: CircularProgressIndicator())
         else if (_comments.isEmpty)
-          const Text('Sin comentarios', style: TextStyle(color: Colors.white24))
+          Text(AppLocalizations.of(context)?.t('spot.no_comments') ?? 'Sin comentarios', style: const TextStyle(color: Colors.white24))
         else
           Column(
             children: _comments.map((c) {

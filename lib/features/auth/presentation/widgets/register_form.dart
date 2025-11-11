@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:skyshare_frontend_mobile/core/i18n/app_localizations.dart';
 import 'auth_buttons.dart';
 import '../../providers/auth_provider.dart';
 
@@ -41,7 +42,14 @@ class _RegisterFormState extends State<RegisterForm> {
       } catch (e) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Error: ${e.toString()}')),
+            SnackBar(
+              content: Text(
+                AppLocalizations.of(context)
+                        ?.t('error_generic')
+                        .replaceAll('{err}', e.toString()) ??
+                    'Error: ${e.toString()}',
+              ),
+            ),
           );
         }
       } finally {
@@ -72,8 +80,8 @@ class _RegisterFormState extends State<RegisterForm> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const SizedBox(height: 12),
-          const Text('Register', style: TextStyle(fontSize: 28, fontWeight: FontWeight.w600, color: Colors.white)),
+            const SizedBox(height: 12),
+            Text(AppLocalizations.of(context)?.t('auth.register') ?? 'Register', style: const TextStyle(fontSize: 28, fontWeight: FontWeight.w600, color: Colors.white)),
           const SizedBox(height: 18),
           Form(
             key: _formKey,
@@ -86,7 +94,7 @@ class _RegisterFormState extends State<RegisterForm> {
                 _buildPasswordInput(),
                 const SizedBox(height: 16),
                 PrimaryButton(
-                  label: 'Register',
+                  label: AppLocalizations.of(context)?.t('auth.register') ?? 'Register',
                   onPressed: _isLoading ? null : _submit,
                   isLoading: _isLoading,
                 ),
@@ -95,19 +103,19 @@ class _RegisterFormState extends State<RegisterForm> {
                   child: Wrap(
                     crossAxisAlignment: WrapCrossAlignment.center,
                     children: [
-                      const Text('Already have an account? ', style: TextStyle(color: Colors.white70)),
+                      Text(AppLocalizations.of(context)?.t('auth.already_have_account_prefix') ?? 'Already have an account? ', style: const TextStyle(color: Colors.white70)),
                       GestureDetector(
                         onTap: _isLoading ? null : widget.onLoginTap,
-                        child: const Text('Login', style: TextStyle(decoration: TextDecoration.underline, color: Colors.white)),
+                        child: Text(AppLocalizations.of(context)?.t('auth.login') ?? 'Login', style: const TextStyle(decoration: TextDecoration.underline, color: Colors.white)),
                       ),
                     ],
                   ),
                 ),
                 const SizedBox(height: 16),
-                const Center(child: Text('Or', style: TextStyle(color: Colors.white54))),
+                Center(child: Text(AppLocalizations.of(context)?.t('auth.or') ?? 'Or', style: const TextStyle(color: Colors.white54))),
                 const SizedBox(height: 12),
                 GoogleButton(
-                  label: 'Continue with Google',
+                  label: AppLocalizations.of(context)?.t('auth.continue_with_google') ?? 'Continue with Google',
                   onPressed: _isLoading ? null : _signInWithGoogle,
                 ),
                 const SizedBox(height: 20),
@@ -126,7 +134,7 @@ class _RegisterFormState extends State<RegisterForm> {
       enabled: !_isLoading,
       style: const TextStyle(color: Colors.white),
       decoration: InputDecoration(
-        hintText: 'Name',
+        hintText: AppLocalizations.of(context)?.t('auth.name_hint') ?? 'Name',
         hintStyle: const TextStyle(color: Colors.white54),
         filled: true,
         fillColor: Colors.white.withAlpha((0.03 * 255).round()),
@@ -150,13 +158,13 @@ class _RegisterFormState extends State<RegisterForm> {
       ),
       validator: (value) {
         if (value == null || value.isEmpty) {
-          return 'Name is required';
+          return AppLocalizations.of(context)?.t('auth.name_required') ?? 'Name is required';
         }
         if (value.length < 2) {
-          return 'Name must be at least 2 characters';
+          return AppLocalizations.of(context)?.t('auth.name_min_length') ?? 'Name must be at least 2 characters';
         }
         if (value.length > 50) {
-          return 'Name must be less than 50 characters';
+          return AppLocalizations.of(context)?.t('auth.name_max_length') ?? 'Name must be less than 50 characters';
         }
         return null;
       },
@@ -170,7 +178,7 @@ class _RegisterFormState extends State<RegisterForm> {
       enabled: !_isLoading,
       style: const TextStyle(color: Colors.white),
       decoration: InputDecoration(
-        hintText: 'Email',
+  hintText: AppLocalizations.of(context)?.t('auth.email_hint') ?? 'Email',
         hintStyle: const TextStyle(color: Colors.white54),
         filled: true,
         fillColor: Colors.white.withAlpha((0.03 * 255).round()),
@@ -194,11 +202,11 @@ class _RegisterFormState extends State<RegisterForm> {
       ),
       validator: (value) {
         if (value == null || value.isEmpty) {
-          return 'Email is required';
+          return AppLocalizations.of(context)?.t('auth.email_required') ?? 'Email is required';
         }
         final emailRegex = RegExp(r'^[^@]+@[^@]+\.[^@]+');
         if (!emailRegex.hasMatch(value)) {
-          return 'Please enter a valid email';
+          return AppLocalizations.of(context)?.t('auth.invalid_email') ?? 'Please enter a valid email';
         }
         return null;
       },
@@ -212,7 +220,7 @@ class _RegisterFormState extends State<RegisterForm> {
       enabled: !_isLoading,
       style: const TextStyle(color: Colors.white),
       decoration: InputDecoration(
-        hintText: 'Password',
+  hintText: AppLocalizations.of(context)?.t('auth.password_hint') ?? 'Password',
         hintStyle: const TextStyle(color: Colors.white54),
         filled: true,
         fillColor: Colors.white.withAlpha((0.03 * 255).round()),
@@ -236,13 +244,13 @@ class _RegisterFormState extends State<RegisterForm> {
       ),
       validator: (value) {
         if (value == null || value.isEmpty) {
-          return 'Password is required';
+          return AppLocalizations.of(context)?.t('auth.password_required') ?? 'Password is required';
         }
         if (value.length < 6) {
-          return 'Password must be at least 6 characters';
+          return AppLocalizations.of(context)?.t('auth.password_min_length') ?? 'Password must be at least 6 characters';
         }
         if (value.length > 128) {
-          return 'Password must be less than 128 characters';
+          return AppLocalizations.of(context)?.t('auth.password_max_length') ?? 'Password must be less than 128 characters';
         }
         return null;
       },

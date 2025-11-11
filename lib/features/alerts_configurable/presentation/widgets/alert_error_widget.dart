@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:skyshare_frontend_mobile/core/i18n/app_localizations.dart';
 
 class AlertErrorWidget extends StatelessWidget {
   final String error;
@@ -21,11 +22,11 @@ class AlertErrorWidget extends StatelessWidget {
           children: [
             _buildErrorIcon(),
             const SizedBox(height: 16),
-            _buildErrorTitle(),
+            _buildErrorTitle(context),
             const SizedBox(height: 8),
             _buildErrorMessage(),
             const SizedBox(height: 24),
-            _buildRetryButton(),
+            _buildRetryButton(context),
           ],
         ),
       ),
@@ -49,10 +50,10 @@ class AlertErrorWidget extends StatelessWidget {
     );
   }
 
-  Widget _buildErrorTitle() {
-    return const Text(
-      'Error loading alerts', // traducido
-      style: TextStyle(
+  Widget _buildErrorTitle(BuildContext context) {
+    return Text(
+      AppLocalizations.of(context)?.t('alerts.error_loading') ?? 'Error loading alerts',
+      style: const TextStyle(
         color: Colors.white,
         fontSize: 18,
         fontWeight: FontWeight.bold,
@@ -71,12 +72,12 @@ class AlertErrorWidget extends StatelessWidget {
     );
   }
 
-  Widget _buildRetryButton() {
+  Widget _buildRetryButton(BuildContext context) {
     return ElevatedButton.icon(
       key: const Key('alert_retry_button'),
       onPressed: onRetry,
       icon: const Icon(Icons.refresh),
-      label: const Text('Retry'), // traducido
+      label: Text(AppLocalizations.of(context)?.t('retry') ?? 'Retry'),
       style: ElevatedButton.styleFrom(
         backgroundColor: Colors.blue,
         foregroundColor: Colors.white,

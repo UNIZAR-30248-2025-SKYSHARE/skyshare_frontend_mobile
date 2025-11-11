@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:skyshare_frontend_mobile/core/i18n/app_localizations.dart';
 import '../../../interactive_map/data/models/spot_model.dart';
 import '../../../interactive_map/data/repositories/spot_repository.dart';
 import 'spot_edit_dialog.dart';
@@ -111,7 +112,7 @@ class _SpotPopupWidgetState extends State<SpotPopupWidget> {
                         ),
                         const SizedBox(height: 8),
                         Text(
-                          widget.spot.descripcion ?? 'Muy chulo',
+                          widget.spot.descripcion ?? AppLocalizations.of(context)?.t('spot.default_description') ?? 'Nice spot',
                           style: const TextStyle(color: Colors.white70, fontSize: 13),
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
@@ -123,7 +124,7 @@ class _SpotPopupWidgetState extends State<SpotPopupWidget> {
                             children: [
                               ElevatedButton.icon(
                                 icon: const Icon(Icons.edit, size: 16),
-                                label: const Text('Editar'),
+                                label: Text(AppLocalizations.of(context)?.t('edit') ?? 'Editar'),
                                 onPressed: () => _showEditDialog(context),
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: Colors.blue[700],
@@ -142,12 +143,12 @@ class _SpotPopupWidgetState extends State<SpotPopupWidget> {
                               style: ElevatedButton.styleFrom(
                                   backgroundColor: const Color(0xFF1E293B),
                                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8)),
-                              child: const Text('Ver detalles'),
+                              child: Text(AppLocalizations.of(context)?.t('view_details') ?? 'Ver detalles'),
                             ),
                             const SizedBox(width: 8),
                             TextButton(
                               onPressed: widget.onClose,
-                              child: const Text('Cerrar', style: TextStyle(color: Colors.white70)),
+                              child: Text(AppLocalizations.of(context)?.t('close') ?? 'Cerrar', style: const TextStyle(color: Colors.white70)),
                             ),
                           ],
                         ),

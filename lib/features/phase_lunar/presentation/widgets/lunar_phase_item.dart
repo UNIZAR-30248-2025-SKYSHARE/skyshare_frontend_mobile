@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:skyshare_frontend_mobile/core/i18n/app_localizations.dart';
 import 'package:skyshare_frontend_mobile/features/phase_lunar/data/models/lunar_phase_model.dart';
 import 'moon_phase_widget.dart';
 
@@ -30,7 +31,7 @@ class LunarPhaseItem extends StatelessWidget {
           size: imageSize,
         ),
         title: Text(phase.fase),
-        subtitle: Text('$weekday, $dateStr'),
+  subtitle: Text((AppLocalizations.of(context)?.t('phase_lunar.date_format') ?? '{weekday}, {date}').replaceAll('{weekday}', weekday).replaceAll('{date}', dateStr)),
         trailing: Row(
           mainAxisSize: MainAxisSize.min,
           children: [

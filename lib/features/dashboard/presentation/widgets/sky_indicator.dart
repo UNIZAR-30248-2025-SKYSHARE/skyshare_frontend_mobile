@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:skyshare_frontend_mobile/core/i18n/app_localizations.dart';
 import 'dart:math';
 
 class SkyIndicator extends StatelessWidget {
@@ -24,7 +25,7 @@ class SkyIndicator extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             const SizedBox(height: 16),
-            const Text('Puntuación del Cielo', style: TextStyle(color: Color.fromRGBO(255, 255, 255, 0.85), fontSize: 16)),
+            Text(AppLocalizations.of(context)?.t('dashboard.sky_score') ?? 'Puntuación del Cielo', style: const TextStyle(color: Color.fromRGBO(255, 255, 255, 0.85), fontSize: 16)),
             const SizedBox(height: 8),
             Text('${clamped.toStringAsFixed(1)} / 10', style: TextStyle(color: color, fontSize: 28, fontWeight: FontWeight.bold)),
           ],

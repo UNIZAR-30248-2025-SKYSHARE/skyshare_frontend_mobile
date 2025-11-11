@@ -6,6 +6,7 @@ import 'package:latlong2/latlong.dart';
 import 'package:provider/provider.dart';
 import 'package:skyshare_frontend_mobile/features/interactive_map/data/repositories/location_repository.dart';
 import 'package:skyshare_frontend_mobile/features/interactive_map/data/repositories/spot_repository.dart';
+import 'package:skyshare_frontend_mobile/core/i18n/app_localizations.dart';
 import 'package:skyshare_frontend_mobile/features/interactive_map/presentation/spot_detail_screen.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../providers/interactive_map_provider.dart';
@@ -139,19 +140,19 @@ class _MapScreenState extends State<MapScreen> {
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
-        title: const Text('Crear Spot'),
-        content: Text('Ciudad: $city\nPaís: $country'),
+        title: Text(AppLocalizations.of(context)?.t('map.create_spot') ?? 'Crear Spot'),
+        content: Text((AppLocalizations.of(context)?.t('map.city_country') ?? 'Ciudad: {city}\nPaís: {country}').replaceAll('{city}', city).replaceAll('{country}', country)),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Cancelar'),
+            child: Text(AppLocalizations.of(context)?.t('cancel') ?? 'Cancelar'),
           ),
           FilledButton(
             onPressed: () {
               Navigator.pop(context);
               _navigateToCreateSpot(position);
             },
-            child: const Text('Sí, crear'),
+            child: Text(AppLocalizations.of(context)?.t('map.yes_create') ?? 'Sí, crear'),
           ),
         ],
       ),
@@ -185,7 +186,7 @@ class _MapScreenState extends State<MapScreen> {
     if (result != null && mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Spot "${result['nombre']}" creado!'),
+          content: Text((AppLocalizations.of(context)?.t('map.spot_created') ?? 'Spot "{name}" creado!').replaceAll('{name}', result['nombre'] ?? '')),
         ),
       );
       _reloadSpots();
