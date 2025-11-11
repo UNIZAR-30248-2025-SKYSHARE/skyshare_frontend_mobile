@@ -129,7 +129,7 @@
   "map.yes_create": "Sí, crear",
   "map.spot_created": "Spot \"{name}\" creado!",
 
-  "dashboard.sky_score": "Puntuación del Cielo",
+  "dashboard.sky_score": "Puntuación Cielo",
   "dashboard.data_taking_long": "Los datos están tardando más de lo esperado",
   "dashboard.normal_when_new_location": "Esto es normal cuando se detecta una nueva ubicación",
   "dashboard.retry_load": "Reintentar carga",
