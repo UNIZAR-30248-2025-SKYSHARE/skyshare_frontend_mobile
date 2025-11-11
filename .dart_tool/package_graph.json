@@ -23,6 +23,7 @@
         "path_provider",
         "permission_handler",
         "provider",
+        "realtime_client",
         "sensors_plus",
         "shared_preferences",
         "supabase_flutter",
@@ -310,6 +311,17 @@
         "geocoding_android",
         "geocoding_ios",
         "geocoding_platform_interface"
+      ]
+    },
+    {
+      "name": "realtime_client",
+      "version": "2.6.0",
+      "dependencies": [
+        "collection",
+        "http",
+        "logging",
+        "meta",
+        "web_socket_channel"
       ]
     },
     {
@@ -730,7 +742,7 @@
     },
     {
       "name": "crypto",
-      "version": "3.0.6",
+      "version": "3.0.7",
       "dependencies": [
         "typed_data"
       ]
@@ -1411,12 +1423,11 @@
     },
     {
       "name": "uuid",
-      "version": "4.5.1",
+      "version": "4.5.2",
       "dependencies": [
         "crypto",
         "fixnum",
-        "meta",
-        "sprintf"
+        "meta"
       ]
     },
     {
@@ -1696,17 +1707,6 @@
       ]
     },
     {
-      "name": "realtime_client",
-      "version": "2.6.0",
-      "dependencies": [
-        "collection",
-        "http",
-        "logging",
-        "meta",
-        "web_socket_channel"
-      ]
-    },
-    {
       "name": "postgrest",
       "version": "2.5.0",
       "dependencies": [
@@ -1795,11 +1795,6 @@
     {
       "name": "fixnum",
       "version": "1.1.1",
-      "dependencies": []
-    },
-    {
-      "name": "sprintf",
-      "version": "7.0.0",
       "dependencies": []
     },
     {

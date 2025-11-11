@@ -159,44 +159,71 @@ class _SpotContentState extends State<SpotContent> {
   Future<void> _submitComment() async {
     final text = _commentController.text.trim();
     final user = _authProvider.currentUser;
+    final messenger = ScaffoldMessenger.of(context); 
     if (user == null) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Necesitas iniciar sesión para comentar'), backgroundColor: Colors.red));
-      }
+      if (!mounted) return;
+      messenger.showSnackBar(const SnackBar(
+        content: Text('Necesitas iniciar sesión para comentar'),
+        backgroundColor: Colors.red,
+      ));
       return;
     }
     if (text.isEmpty) return;
     if (!mounted) return;
+
     setState(() {
       _commentSubmitting = true;
     });
+
     final tempId = -DateTime.now().millisecondsSinceEpoch;
-    final tempComment = Comment(id: tempId, spotId: widget.spot.id, userId: user.id, text: text, createdAt: DateTime.now());
+    final tempComment = Comment(
+      id: tempId,
+      spotId: widget.spot.id,
+      userId: user.id,
+      text: text,
+      createdAt: DateTime.now(),
+    );
+
     if (!mounted) return;
     setState(() {
       _comments.insert(0, tempComment);
       _commentController.clear();
     });
+
     bool success = false;
     try {
-      success = await _repo.insertComentario(Comment(id: 0, spotId: widget.spot.id, userId: user.id, text: text, createdAt: DateTime.now()));
+      success = await _repo.insertComentario(Comment(
+        id: 0,
+        spotId: widget.spot.id,
+        userId: user.id,
+        text: text,
+        createdAt: DateTime.now(),
+      ));
     } catch (_) {
       success = false;
     }
+
     if (!mounted) return;
     if (success) {
       await _loadComments();
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Comentario publicado'), backgroundColor: Colors.green));
-      }
+
+      if (!mounted) return;
+      messenger.showSnackBar(const SnackBar(
+        content: Text('Comentario publicado'),
+        backgroundColor: Colors.green,
+      ));
     } else {
       setState(() {
         _comments.removeWhere((c) => c.id == tempId);
       });
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Error al publicar comentario'), backgroundColor: Colors.red));
-      }
+
+      if (!mounted) return;
+      messenger.showSnackBar(const SnackBar(
+        content: Text('Error al publicar comentario'),
+        backgroundColor: Colors.red,
+      ));
     }
+
     if (!mounted) return;
     setState(() {
       _commentSubmitting = false;
