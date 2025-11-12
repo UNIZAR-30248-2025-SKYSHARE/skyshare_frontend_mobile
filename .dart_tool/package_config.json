@@ -105,27 +105,27 @@
     },
     {
       "name": "camera",
-      "rootUri": "file:///home/marcos/.pub-cache/hosted/pub.dev/camera-0.11.2+1",
+      "rootUri": "file:///home/marcos/.pub-cache/hosted/pub.dev/camera-0.11.2",
       "packageUri": "lib/",
-      "languageVersion": "3.7"
+      "languageVersion": "3.6"
     },
     {
       "name": "camera_android_camerax",
-      "rootUri": "file:///home/marcos/.pub-cache/hosted/pub.dev/camera_android_camerax-0.6.19+1",
+      "rootUri": "file:///home/marcos/.pub-cache/hosted/pub.dev/camera_android_camerax-0.6.17",
       "packageUri": "lib/",
-      "languageVersion": "3.7"
+      "languageVersion": "3.6"
     },
     {
       "name": "camera_avfoundation",
-      "rootUri": "file:///home/marcos/.pub-cache/hosted/pub.dev/camera_avfoundation-0.9.21+2",
+      "rootUri": "file:///home/marcos/.pub-cache/hosted/pub.dev/camera_avfoundation-0.9.21+1",
       "packageUri": "lib/",
-      "languageVersion": "3.7"
+      "languageVersion": "3.6"
     },
     {
       "name": "camera_platform_interface",
-      "rootUri": "file:///home/marcos/.pub-cache/hosted/pub.dev/camera_platform_interface-2.11.0",
+      "rootUri": "file:///home/marcos/.pub-cache/hosted/pub.dev/camera_platform_interface-2.10.0",
       "packageUri": "lib/",
-      "languageVersion": "3.7"
+      "languageVersion": "3.4"
     },
     {
       "name": "camera_web",
@@ -243,9 +243,9 @@
     },
     {
       "name": "file_selector_macos",
-      "rootUri": "file:///home/marcos/.pub-cache/hosted/pub.dev/file_selector_macos-0.9.4+4",
+      "rootUri": "file:///home/marcos/.pub-cache/hosted/pub.dev/file_selector_macos-0.9.4+3",
       "packageUri": "lib/",
-      "languageVersion": "3.7"
+      "languageVersion": "3.6"
     },
     {
       "name": "file_selector_platform_interface",
@@ -303,9 +303,9 @@
     },
     {
       "name": "flutter_plugin_android_lifecycle",
-      "rootUri": "file:///home/marcos/.pub-cache/hosted/pub.dev/flutter_plugin_android_lifecycle-2.0.31",
+      "rootUri": "file:///home/marcos/.pub-cache/hosted/pub.dev/flutter_plugin_android_lifecycle-2.0.29",
       "packageUri": "lib/",
-      "languageVersion": "3.7"
+      "languageVersion": "3.6"
     },
     {
       "name": "flutter_test",
@@ -465,9 +465,9 @@
     },
     {
       "name": "image_picker_android",
-      "rootUri": "file:///home/marcos/.pub-cache/hosted/pub.dev/image_picker_android-0.8.13+1",
+      "rootUri": "file:///home/marcos/.pub-cache/hosted/pub.dev/image_picker_android-0.8.13",
       "packageUri": "lib/",
-      "languageVersion": "3.7"
+      "languageVersion": "3.6"
     },
     {
       "name": "image_picker_for_web",
@@ -495,9 +495,9 @@
     },
     {
       "name": "image_picker_platform_interface",
-      "rootUri": "file:///home/marcos/.pub-cache/hosted/pub.dev/image_picker_platform_interface-2.11.1",
+      "rootUri": "file:///home/marcos/.pub-cache/hosted/pub.dev/image_picker_platform_interface-2.11.0",
       "packageUri": "lib/",
-      "languageVersion": "3.7"
+      "languageVersion": "3.6"
     },
     {
       "name": "image_picker_windows",
@@ -675,15 +675,15 @@
     },
     {
       "name": "path_provider_android",
-      "rootUri": "file:///home/marcos/.pub-cache/hosted/pub.dev/path_provider_android-2.2.19",
+      "rootUri": "file:///home/marcos/.pub-cache/hosted/pub.dev/path_provider_android-2.2.17",
       "packageUri": "lib/",
-      "languageVersion": "3.7"
+      "languageVersion": "3.6"
     },
     {
       "name": "path_provider_foundation",
-      "rootUri": "file:///home/marcos/.pub-cache/hosted/pub.dev/path_provider_foundation-2.4.2",
+      "rootUri": "file:///home/marcos/.pub-cache/hosted/pub.dev/path_provider_foundation-2.4.1",
       "packageUri": "lib/",
-      "languageVersion": "3.7"
+      "languageVersion": "3.3"
     },
     {
       "name": "path_provider_linux",
@@ -837,9 +837,9 @@
     },
     {
       "name": "shared_preferences_android",
-      "rootUri": "file:///home/marcos/.pub-cache/hosted/pub.dev/shared_preferences_android-2.4.13",
+      "rootUri": "file:///home/marcos/.pub-cache/hosted/pub.dev/shared_preferences_android-2.4.11",
       "packageUri": "lib/",
-      "languageVersion": "3.7"
+      "languageVersion": "3.6"
     },
     {
       "name": "shared_preferences_foundation",
@@ -1017,15 +1017,15 @@
     },
     {
       "name": "url_launcher_android",
-      "rootUri": "file:///home/marcos/.pub-cache/hosted/pub.dev/url_launcher_android-6.3.20",
+      "rootUri": "file:///home/marcos/.pub-cache/hosted/pub.dev/url_launcher_android-6.3.17",
       "packageUri": "lib/",
-      "languageVersion": "3.7"
+      "languageVersion": "3.6"
     },
     {
       "name": "url_launcher_ios",
-      "rootUri": "file:///home/marcos/.pub-cache/hosted/pub.dev/url_launcher_ios-6.3.4",
+      "rootUri": "file:///home/marcos/.pub-cache/hosted/pub.dev/url_launcher_ios-6.3.3",
       "packageUri": "lib/",
-      "languageVersion": "3.7"
+      "languageVersion": "3.4"
     },
     {
       "name": "url_launcher_linux",
@@ -1035,9 +1035,9 @@
     },
     {
       "name": "url_launcher_macos",
-      "rootUri": "file:///home/marcos/.pub-cache/hosted/pub.dev/url_launcher_macos-3.2.3",
+      "rootUri": "file:///home/marcos/.pub-cache/hosted/pub.dev/url_launcher_macos-3.2.2",
       "packageUri": "lib/",
-      "languageVersion": "3.7"
+      "languageVersion": "3.3"
     },
     {
       "name": "url_launcher_platform_interface",

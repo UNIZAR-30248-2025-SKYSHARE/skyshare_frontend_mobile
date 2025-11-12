@@ -5,6 +5,9 @@ import 'package:skyshare_frontend_mobile/features/profile/presentation/widgets/u
 import 'package:skyshare_frontend_mobile/core/models/user_model.dart';
 import 'package:skyshare_frontend_mobile/features/profile/data/repositories/follows_repository.dart';
 import 'package:skyshare_frontend_mobile/features/profile/data/repositories/my_profile_repository.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+
+import '../../../helpers/fake_localizations_delegate.dart';
 
 class MockFollowsRepository extends Mock implements FollowsRepository {}
 class MockMyProfileRepository extends Mock implements MyProfileRepository {}
@@ -16,20 +19,27 @@ void main() {
   setUp(() {
     mockFollowsRepo = MockFollowsRepository();
     mockProfileRepo = MockMyProfileRepository();
-
     registerFallbackValue(AppUser(id: '1', username: 'Test', email: 'test@example.com'));
   });
 
   Future<void> pumpWidget(WidgetTester tester) async {
     await tester.pumpWidget(
       MaterialApp(
+        locale: const Locale('es'),
+        supportedLocales: AppLocalizations.supportedLocales,
+        localizationsDelegates: [
+          FakeLocalizationsDelegate(),
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+        ],
         home: Scaffold(
-          body: UserSearchList( 
+          body: UserSearchList(
             followsRepository: mockFollowsRepo,
             profileRepository: mockProfileRepo,
           ),
         ),
-      )
+      ),
     );
   }
 
@@ -45,17 +55,18 @@ void main() {
     when(() => mockFollowsRepo.isFollowing(any(), any())).thenAnswer((_) async => false);
 
     await pumpWidget(tester);
-    await tester.pump(); 
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 100));
     await tester.pumpAndSettle();
 
-    expect(find.text('Alice'), findsOneWidget);
-    expect(find.text('Bob'), findsOneWidget);
+    expect(find.descendant(of: find.byType(ListView), matching: find.text('Alice')), findsOneWidget);
+    expect(find.descendant(of: find.byType(ListView), matching: find.text('Bob')), findsOneWidget);
   });
 
   testWidgets('filtra usuarios según la búsqueda', (tester) async {
     final users = [
       AppUser(id: '2', username: 'Alice', email: 'alice@test.com'),
-      AppUser(id: '3', username: 'Bob', email: 'bob@test.com'),
+      AppUser(id: '3', username: 'Bob',   email: 'bob@test.com'),
     ];
 
     when(() => mockProfileRepo.getCurrentUserProfile())
@@ -66,11 +77,11 @@ void main() {
     await pumpWidget(tester);
     await tester.pumpAndSettle();
 
-    await tester.enterText(find.byType(TextField), 'Alice');
-    await tester.pump();
+    await tester.enterText(find.byKey(const Key('userSearchField')), 'Alice');
+    await tester.pumpAndSettle();
 
-    expect(find.text('Alice'), findsWidgets);
-    expect(find.text('Bob'), findsNothing);
+    expect(find.descendant(of: find.byType(ListView), matching: find.text('Alice')), findsOneWidget);
+    expect(find.descendant(of: find.byType(ListView), matching: find.text('Bob')), findsNothing);
   });
 
   testWidgets('toggle follow button llama a métodos correctos', (tester) async {
@@ -83,15 +94,16 @@ void main() {
     when(() => mockFollowsRepo.followUser('1', '2')).thenAnswer((_) async {});
 
     await pumpWidget(tester);
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 100));
     await tester.pumpAndSettle();
 
-    final followButton = find.text('Follow');
+    final followButton = find.byKey(const Key('followButton_2'));
     expect(followButton, findsOneWidget);
 
     await tester.tap(followButton);
-    await tester.pump();
+    await tester.pumpAndSettle();
 
     verify(() => mockFollowsRepo.followUser('1', '2')).called(1);
   });
 }
-

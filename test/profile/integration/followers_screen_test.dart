@@ -5,6 +5,10 @@ import 'package:skyshare_frontend_mobile/features/profile/presentation/followers
 import 'package:skyshare_frontend_mobile/core/models/user_model.dart';
 import 'package:skyshare_frontend_mobile/features/profile/data/repositories/follows_repository.dart';
 import 'package:skyshare_frontend_mobile/features/profile/data/repositories/my_profile_repository.dart';
+import 'package:skyshare_frontend_mobile/core/i18n/app_localizations.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+
+import '../../helpers/fake_localizations_delegate.dart';
 
 class MockFollowsRepository extends Mock implements FollowsRepository {}
 class MockMyProfileRepository extends Mock implements MyProfileRepository {}
@@ -18,19 +22,21 @@ void main() {
     mockProfileRepo = MockMyProfileRepository();
   });
 
-  AppUser makeUser({String id = 'user1', String username = 'User 1'}) {
-    return AppUser(
-      id: id,
-      username: username,
-      email: '$username@example.com',
-      photoUrl: null,
-    );
-  }
+  AppUser makeUser({String id = 'user1', String username = 'User 1'}) =>
+      AppUser(id: id, username: username, email: '$username@example.com');
 
   Future<void> pumpFollowersScreen(
       WidgetTester tester, String userId, bool showFollowers) async {
     await tester.pumpWidget(
       MaterialApp(
+        locale: const Locale('es'),
+        supportedLocales: AppLocalizations.supportedLocales,
+        localizationsDelegates: [
+          FakeLocalizationsDelegate(),
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+        ],
         home: FollowersScreen(
           userId: userId,
           showFollowers: showFollowers,
@@ -48,14 +54,10 @@ void main() {
         .thenAnswer((_) async => []);
 
     await pumpFollowersScreen(tester, 'user123', true);
-
-    expect(find.byType(ListView), findsOneWidget);
-
     await tester.pumpAndSettle();
 
-    expect(find.text('You have no followers yet'), findsOneWidget);
+    expect(find.text('profile.followers_screen.empty'), findsOneWidget);
   });
-
 
   testWidgets('Permite seguir y dejar de seguir un usuario', (tester) async {
     final user = makeUser(id: 'user2', username: 'User 2');
@@ -66,16 +68,15 @@ void main() {
     when(() => mockFollowsRepo.isFollowing('user1', 'user2'))
         .thenAnswer((_) async => false);
     when(() => mockFollowsRepo.followUser('user1', 'user2'))
-        .thenAnswer((_) async => true);
+        .thenAnswer((_) async {});
     when(() => mockFollowsRepo.unfollowUser('user1', 'user2'))
-        .thenAnswer((_) async => true);
+        .thenAnswer((_) async {});
 
     await pumpFollowersScreen(tester, 'user123', true);
-
     await tester.pumpAndSettle();
 
-    expect(find.text('Follow'), findsOneWidget);
-    await tester.tap(find.text('Follow'));
+    expect(find.text('profile.follow_button'), findsOneWidget);
+    await tester.tap(find.text('profile.follow_button'));
     await tester.pumpAndSettle();
 
     verify(() => mockFollowsRepo.followUser('user1', 'user2')).called(1);

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../../../core/i18n/app_localizations.dart';
 
 class ProfileStats extends StatelessWidget {
   final int spots;
@@ -21,26 +22,28 @@ class ProfileStats extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final localizations = AppLocalizations.of(context)!;
 
-    Widget buildStat(String label, int value, VoidCallback? onTap) {
-      return GestureDetector(
-        onTap: onTap,
-        child: Column(
-          children: [
-            Text(
-              '$value',
-              style: theme.textTheme.titleLarge?.copyWith(
-                fontWeight: FontWeight.bold,
+    Widget buildStat(String labelKey, int value, VoidCallback? onTap) {
+      return Expanded(
+        child: GestureDetector(
+          onTap: onTap,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                '$value',
+                style: theme.textTheme.titleLarge
+                    ?.copyWith(fontWeight: FontWeight.bold),
               ),
-            ),
-            const SizedBox(height: 4),
-            Text(
-              label,
-              style: theme.textTheme.bodyMedium?.copyWith(
-                color: Colors.black,
+              const SizedBox(height: 4),
+              Text(
+                localizations.t(labelKey),
+                style: theme.textTheme.bodyMedium
+                    ?.copyWith(color: Colors.black),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       );
     }
@@ -52,7 +55,7 @@ class ProfileStats extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.5),
+            color: Colors.black.withOpacity(0.1),
             blurRadius: 8,
             offset: const Offset(0, 3),
           ),
@@ -61,9 +64,9 @@ class ProfileStats extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          buildStat('Spots', spots, onSpotsTap),
-          buildStat('Followers', followers, onFollowersTap),
-          buildStat('Following', following, onFollowingTap),
+          buildStat('profile.stats.spots', spots, onSpotsTap),
+          buildStat('profile.stats.followers', followers, onFollowersTap),
+          buildStat('profile.stats.following', following, onFollowingTap),
         ],
       ),
     );

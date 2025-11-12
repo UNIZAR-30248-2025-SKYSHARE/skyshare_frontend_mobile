@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/observation_chats_provider.dart';
+import 'package:skyshare_frontend_mobile/core/i18n/app_localizations.dart';
+
 
 class CreateGroupBottomSheet extends StatefulWidget {
   const CreateGroupBottomSheet({super.key});
@@ -17,15 +19,18 @@ class _CreateGroupBottomSheetState extends State<CreateGroupBottomSheet> {
 
   // Función para enviar el formulario
   Future<void> _submit() async {
+    final localizations = AppLocalizations.of(context)!;
+
     if (!_formKey.currentState!.validate()) {
       return; // Validación falló
     }
-    
+   
     setState(() => _isLoading = true);
 
     final provider = context.read<ObservationChatsProvider>();
+    final groupName = _nameController.text;
     final success = await provider.createGroup(
-      _nameController.text,
+      groupName,
       _descriptionController.text,
     );
 
@@ -35,9 +40,16 @@ class _CreateGroupBottomSheetState extends State<CreateGroupBottomSheet> {
 
     if (success) {
       Navigator.of(context).pop(); // Cierra el bottom sheet
+      
+      // Usamos el argumento {name}
+      final successMessage = localizations.t(
+        'chat.create.success', 
+        {'name': groupName}
+      );
+
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Grupo "${_nameController.text}" creado con éxito.'),
+          content: Text(successMessage),
           backgroundColor: Colors.green[600],
         ),
       );
@@ -45,7 +57,7 @@ class _CreateGroupBottomSheetState extends State<CreateGroupBottomSheet> {
       // Muestra un error si falla
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: const Text('Error al crear el grupo. Inténtalo de nuevo.'),
+          content: Text(localizations.t('chat.create.error')),
           backgroundColor: Colors.red[600],
         ),
       );
@@ -61,6 +73,7 @@ class _CreateGroupBottomSheetState extends State<CreateGroupBottomSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final localizations = AppLocalizations.of(context)!;
     // Replicando el estilo de tu app
     const cardColor = Color(0xFF2A2A3D);
     const primaryColor = Color(0xFF6A4D9C);
@@ -80,41 +93,41 @@ class _CreateGroupBottomSheetState extends State<CreateGroupBottomSheet> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             // --- Título ---
-            const Text(
-              'Crear Nuevo Grupo',
+            Text(
+              localizations.t('chat.create.title'),
               textAlign: TextAlign.center,
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 22,
                 fontWeight: FontWeight.bold,
                 color: Colors.white,
               ),
             ),
             const SizedBox(height: 24),
-            
+           
             // --- Campo de Nombre ---
             TextFormField(
               controller: _nameController,
               style: const TextStyle(color: Colors.white),
               decoration: _buildInputDecoration(
-                hintText: 'Nombre del grupo (ej: EINA)',
+                hintText: localizations.t('chat.create.name_hint'),
                 icon: Icons.group,
                 fillColor: cardColor,
               ),
               validator: (value) {
                 if (value == null || value.trim().isEmpty) {
-                  return 'El nombre es obligatorio.';
+                  return localizations.t('chat.create.name_required');
                 }
                 return null;
               },
             ),
             const SizedBox(height: 16),
-            
+           
             // --- Campo de Descripción ---
             TextFormField(
               controller: _descriptionController,
               style: const TextStyle(color: Colors.white),
               decoration: _buildInputDecoration(
-                hintText: 'Descripción (ej: Grupo de observación EUPT)',
+                hintText: localizations.t('chat.create.description_hint'),
                 icon: Icons.description_outlined,
                 fillColor: cardColor,
               ),
@@ -138,9 +151,9 @@ class _CreateGroupBottomSheetState extends State<CreateGroupBottomSheet> {
                       height: 24,
                       child: CircularProgressIndicator(color: Colors.white, strokeWidth: 3),
                     )
-                  : const Text(
-                      'Crear Grupo',
-                      style: TextStyle(fontSize: 16, color: Colors.white, fontWeight: FontWeight.bold),
+                  : Text(
+                      localizations.t('chat.create.button'),
+                      style: const TextStyle(fontSize: 16, color: Colors.white, fontWeight: FontWeight.bold),
                     ),
             ),
             const SizedBox(height: 16), // Espacio inferior
@@ -149,7 +162,7 @@ class _CreateGroupBottomSheetState extends State<CreateGroupBottomSheet> {
       ),
     );
   }
-  
+ 
   // Helper para unificar el estilo de los TextFields
   InputDecoration _buildInputDecoration({
     required String hintText,

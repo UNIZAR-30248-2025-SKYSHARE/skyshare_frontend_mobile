@@ -3,6 +3,7 @@ import '../../../../../core/models/user_model.dart';
 import '../../data/repositories/my_profile_repository.dart';
 import '../../data/repositories/follows_repository.dart';
 import '../profile_screen.dart';
+import '../../../../../core/i18n/app_localizations.dart';
 
 class UserSearchList extends StatefulWidget {
   final FollowsRepository followsRepository;
@@ -47,7 +48,7 @@ class _UserSearchListState extends State<UserSearchList> {
         ? all.where((u) => u.id != _currentUserId).toList()
         : all;
 
-    _filteredUsers = _users;
+    _filterUsers(_searchQuery); // Volvemos a filtrar con la query actual
     setState(() => _loading = false);
   }
 
@@ -71,19 +72,22 @@ class _UserSearchListState extends State<UserSearchList> {
       await _repository.followUser(_currentUserId!, user.id);
     }
 
-    setState(() {});
+    setState(() {}); // Forzamos a FutureBuilder a recalcular
   }
 
   @override
   Widget build(BuildContext context) {
+    final localizations = AppLocalizations.of(context)!;
+
     return Column(
       children: [
         Padding(
           padding: const EdgeInsets.all(14.0),
           child: TextField(
+            key: const Key('userSearchField'),
             onChanged: _filterUsers,
             decoration: InputDecoration(
-              hintText: 'Search users by name…',
+              hintText: localizations.t('profile.search_hint'),
               prefixIcon: const Icon(Icons.search),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
@@ -100,10 +104,10 @@ class _UserSearchListState extends State<UserSearchList> {
                     itemBuilder: (_, _) => _buildLoadingCard(),
                   )
                 : _filteredUsers.isEmpty
-                    ? const Center(
+                    ? Center(
                         child: Padding(
-                          padding: EdgeInsets.all(20),
-                          child: Text("No users found"),
+                          padding: const EdgeInsets.all(20),
+                          child: Text(localizations.t('profile.no_users_found')),
                         ),
                       )
                     : ListView.separated(
@@ -112,8 +116,11 @@ class _UserSearchListState extends State<UserSearchList> {
                         itemCount: _filteredUsers.length,
                         itemBuilder: (_, i) {
                           final user = _filteredUsers[i];
+                          // Asumimos que el usuario actual no se muestra aquí, 
+                          // pero si se mostrara, isOwnProfile = true.
+                          
                           return FutureBuilder<bool>(
-                            future: _currentUserId == null
+                            future: _currentUserId == null || user.id == _currentUserId
                                 ? Future.value(false)
                                 : _repository.isFollowing(_currentUserId!, user.id),
                             builder: (ctx, snapshot) {
@@ -130,6 +137,7 @@ class _UserSearchListState extends State<UserSearchList> {
   }
 
   Widget _userCard(AppUser user, bool following) {
+    final localizations = AppLocalizations.of(context)!;
     final isOwnProfile = _currentUserId == user.id;
 
     return GestureDetector(
@@ -170,7 +178,7 @@ class _UserSearchListState extends State<UserSearchList> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    user.username ?? "User",
+                    user.username ?? localizations.t('profile.info.unknown'),
                     style: const TextStyle(
                         fontSize: 17,
                         fontWeight: FontWeight.bold,
@@ -186,6 +194,7 @@ class _UserSearchListState extends State<UserSearchList> {
             ),
             if (!isOwnProfile)
               ElevatedButton(
+                key: Key('followButton_${user.id}'),
                 onPressed: () => _toggleFollow(user),
                 style: ElevatedButton.styleFrom(
                   backgroundColor:
@@ -196,7 +205,11 @@ class _UserSearchListState extends State<UserSearchList> {
                   ),
                   minimumSize: const Size(90, 38),
                 ),
-                child: Text(following ? "Following" : "Follow"),
+                child: Text(
+                  following 
+                    ? localizations.t('profile.following_button') 
+                    : localizations.t('profile.follow_button')
+                ),
               ),
           ],
         ),

@@ -5,33 +5,11 @@ import 'package:skyshare_frontend_mobile/features/profile/presentation/discover_
 import 'package:skyshare_frontend_mobile/features/profile/presentation/widgets/user_search_list_widget.dart';
 import 'package:skyshare_frontend_mobile/features/profile/data/repositories/follows_repository.dart';
 import 'package:skyshare_frontend_mobile/features/profile/data/repositories/my_profile_repository.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import '../../helpers/fake_localizations_delegate.dart';
 
 class MockFollowsRepository extends Mock implements FollowsRepository {}
 class MockMyProfileRepository extends Mock implements MyProfileRepository {}
-
-class TestableDiscoverUsersScreen extends DiscoverUsersScreen {
-  final FollowsRepository followsRepository;
-  final MyProfileRepository profileRepository;
-
-  const TestableDiscoverUsersScreen({
-    super.key,
-    required this.followsRepository,
-    required this.profileRepository,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      home: Scaffold(
-        appBar: AppBar(title: const Text("Discover Users")),
-        body: UserSearchList(
-          followsRepository: followsRepository,
-          profileRepository: profileRepository,
-        ),
-      ),
-    );
-  }
-}
 
 void main() {
   late MockFollowsRepository mockFollowsRepository;
@@ -42,74 +20,92 @@ void main() {
     mockProfileRepository = MockMyProfileRepository();
   });
 
-  testWidgets(
-    'DiscoverUsersScreen renders correctly with AppBar and UserSearchList',
-    (WidgetTester tester) async {
-      when(() => mockFollowsRepository.getAllUsers()).thenAnswer((_) async => []);
-      when(() => mockProfileRepository.getCurrentUserProfile()).thenAnswer((_) async => null);
-
-      await tester.pumpWidget(
-        TestableDiscoverUsersScreen(
+  Future<void> pumpDiscoverScreen(WidgetTester tester) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        locale: const Locale('es'),
+        supportedLocales: AppLocalizations.supportedLocales,
+        localizationsDelegates: [
+          FakeLocalizationsDelegate(),
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+        ],
+        home: DiscoverUsersScreen(
           followsRepository: mockFollowsRepository,
           profileRepository: mockProfileRepository,
         ),
-      );
+      ),
+    );
+  }
 
-      await tester.pumpAndSettle();
+  testWidgets('DiscoverUsersScreen renders correctly with AppBar and UserSearchList', (tester) async {
+    when(() => mockFollowsRepository.getAllUsers()).thenAnswer((_) async => []);
+    when(() => mockProfileRepository.getCurrentUserProfile()).thenAnswer((_) async => null);
 
-      expect(find.text('Discover Users'), findsOneWidget);
-      expect(find.byType(AppBar), findsOneWidget);
-      expect(find.byType(UserSearchList), findsOneWidget);
-    },
-  );
+    await pumpDiscoverScreen(tester);
+    await tester.pumpAndSettle();
 
-  testWidgets(
-    'UserSearchList calls getAllUsers and getCurrentUserProfile',
-    (WidgetTester tester) async {
-      when(() => mockFollowsRepository.getAllUsers()).thenAnswer((_) async => []);
-      when(() => mockProfileRepository.getCurrentUserProfile()).thenAnswer((_) async => null);
+    expect(find.text('profile.discover_screen.title'), findsOneWidget);
+    expect(find.byType(AppBar), findsOneWidget);
+    expect(find.byType(UserSearchList), findsOneWidget);
+  });
 
-      await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: UserSearchList(
+  testWidgets('UserSearchList calls getAllUsers and getCurrentUserProfile', (tester) async {
+    when(() => mockFollowsRepository.getAllUsers()).thenAnswer((_) async => []);
+    when(() => mockProfileRepository.getCurrentUserProfile()).thenAnswer((_) async => null);
+
+    await tester.pumpWidget(
+      MaterialApp(
+        locale: const Locale('es'),
+        supportedLocales: AppLocalizations.supportedLocales,
+        localizationsDelegates: [
+          FakeLocalizationsDelegate(),
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+        ],
+        home: Scaffold(
+          body: UserSearchList(
+            followsRepository: mockFollowsRepository,
+            profileRepository: mockProfileRepository,
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    verify(() => mockFollowsRepository.getAllUsers()).called(1);
+    verify(() => mockProfileRepository.getCurrentUserProfile()).called(1);
+  });
+
+  testWidgets('UserSearchList renders inside a SizedBox to avoid overflow', (tester) async {
+    when(() => mockFollowsRepository.getAllUsers()).thenAnswer((_) async => []);
+    when(() => mockProfileRepository.getCurrentUserProfile()).thenAnswer((_) async => null);
+
+    await tester.pumpWidget(
+      MaterialApp(
+        locale: const Locale('es'),
+        supportedLocales: AppLocalizations.supportedLocales,
+        localizationsDelegates: [
+          FakeLocalizationsDelegate(),
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+        ],
+        home: Scaffold(
+          body: SizedBox(
+            height: 600,
+            child: UserSearchList(
               followsRepository: mockFollowsRepository,
               profileRepository: mockProfileRepository,
             ),
           ),
         ),
-      );
+      ),
+    );
+    await tester.pumpAndSettle();
 
-      await tester.pumpAndSettle();
-
-      verify(() => mockFollowsRepository.getAllUsers()).called(1);
-      verify(() => mockProfileRepository.getCurrentUserProfile()).called(1);
-    },
-  );
-
-  testWidgets(
-    'UserSearchList renders inside a SizedBox to avoid overflow',
-    (WidgetTester tester) async {
-      when(() => mockFollowsRepository.getAllUsers()).thenAnswer((_) async => []);
-      when(() => mockProfileRepository.getCurrentUserProfile()).thenAnswer((_) async => null);
-
-      await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: SizedBox(
-              height: 600,
-              child: UserSearchList(
-                followsRepository: mockFollowsRepository,
-                profileRepository: mockProfileRepository,
-              ),
-            ),
-          ),
-        ),
-      );
-
-      await tester.pumpAndSettle();
-
-      expect(find.byType(TextField), findsOneWidget);
-    },
-  );
+    expect(find.byKey(const Key('userSearchField')), findsOneWidget);
+  });
 }

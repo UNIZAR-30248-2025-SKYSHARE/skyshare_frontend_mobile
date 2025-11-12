@@ -2,13 +2,23 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:skyshare_frontend_mobile/features/observation-chats/data/models/chat_preview_model.dart';
 import 'package:skyshare_frontend_mobile/features/observation-chats/presentation/widgets/chat_list_item.dart';
+import 'package:skyshare_frontend_mobile/core/i18n/app_localizations.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+
+import '../../../../helpers/fake_localizations_delegate.dart';
 
 void main() {
   Widget createTestWidget(ChatPreview chat) {
     return MaterialApp(
-      home: Scaffold(
-        body: ChatListItem(chat: chat),
-      ),
+      locale: const Locale('es'),
+      supportedLocales: AppLocalizations.supportedLocales,
+      localizationsDelegates: [
+        FakeLocalizationsDelegate(),
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      home: Scaffold(body: ChatListItem(chat: chat)),
     );
   }
 
@@ -22,6 +32,7 @@ void main() {
     );
 
     await tester.pumpWidget(createTestWidget(chat));
+    await tester.pumpAndSettle();
 
     expect(find.text('Grupo Test'), findsOneWidget);
     expect(find.text('Juan: Hola a todos'), findsOneWidget);
@@ -35,8 +46,9 @@ void main() {
     );
 
     await tester.pumpWidget(createTestWidget(chat));
+    await tester.pumpAndSettle();
 
     expect(find.text('Grupo Vacío'), findsOneWidget);
-    expect(find.text('No hay mensajes'), findsOneWidget);
+    expect(find.text('chat.no_messages_list'), findsOneWidget);
   });
 }

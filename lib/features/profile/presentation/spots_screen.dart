@@ -5,6 +5,7 @@ import '../../interactive_map/data/repositories/spot_repository.dart';
 import '../../interactive_map/presentation/spot_detail_screen.dart';
 import 'edit_spot_screen.dart';
 import '../../../core/widgets/star_background.dart';
+import '../../../core/i18n/app_localizations.dart';
 
 class SpotsScreen extends StatefulWidget {
   final String userId;
@@ -25,7 +26,7 @@ class _SpotsScreenState extends State<SpotsScreen> {
   @override
   void initState() {
     super.initState();
-        _spotRepository = widget.spotRepository;
+    _spotRepository = widget.spotRepository;
 
     _loadCurrentUser();
   }
@@ -51,20 +52,22 @@ class _SpotsScreenState extends State<SpotsScreen> {
   }
 
   Future<void> _deleteSpot(String idSpot) async {
+    final localizations = AppLocalizations.of(context)!;
+
     final confirm = await showDialog<bool>(
       context: context,
       builder: (_) => AlertDialog(
-        title: const Text('Delete Spot'),
-        content: const Text('Are you sure you want to delete this spot?'),
+        title: Text(localizations.t('spot.edit.delete_dialog_title')),
+        content: Text(localizations.t('spot.edit.delete_dialog_content')),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('Cancel'),
+            child: Text(localizations.t('cancel')),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
             onPressed: () => Navigator.pop(context, true),
-            child: const Text('Delete'),
+            child: Text(localizations.t('spot.delete')),
           ),
         ],
       ),
@@ -77,14 +80,18 @@ class _SpotsScreenState extends State<SpotsScreen> {
         if (!mounted) return; // ✅ Verifica que el widget siga en el árbol
 
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Spot successfully deleted')),
+          SnackBar(content: Text(localizations.t('spot.edit.deleted_success'))),
         );
 
         _loadSpots(); 
       } catch (e) {
         if (!mounted) return; 
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error deleting spot: $e')),
+          SnackBar(
+            content: Text(
+              localizations.t('spot.edit.deleted_error', {'err': e.toString()})
+            ),
+          ),
         );
       }
     }
@@ -103,12 +110,17 @@ class _SpotsScreenState extends State<SpotsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final localizations = AppLocalizations.of(context)!;
     final bool isMySpots = _currentUserId == widget.userId;
+    
+    final String title = isMySpots 
+      ? localizations.t('spot.list.my_spots_title')
+      : localizations.t('spot.list.user_spots_title');
 
     return StarBackground(
       child: Scaffold(
         appBar: AppBar(
-          title: Text(isMySpots ? 'My Spots' : 'User\'s Spots'),
+          title: Text(title),
           centerTitle: true,
         ),
         body: _isLoading
@@ -117,8 +129,8 @@ class _SpotsScreenState extends State<SpotsScreen> {
                 ? Center(
                     child: Text(
                       isMySpots
-                          ? 'You haven\'t posted any spots yet'
-                          : 'This user hasn\'t posted any spots yet',
+                          ? localizations.t('spot.list.no_my_spots')
+                          : localizations.t('spot.list.no_user_spots'),
                     ),
                   )
                 : RefreshIndicator(
@@ -141,17 +153,17 @@ class _SpotsScreenState extends State<SpotsScreen> {
                             leading: (spot.urlImagen != null &&
                                     spot.urlImagen!.isNotEmpty)
                                 ? ClipRRect(
-                                    borderRadius: BorderRadius.circular(8),
-                                    child: Image.network(
-                                      spot.urlImagen!,
-                                      width: 60,
-                                      height: 60,
-                                      fit: BoxFit.cover,
-                                    ),
-                                  )
+                                      borderRadius: BorderRadius.circular(8),
+                                      child: Image.network(
+                                        spot.urlImagen!,
+                                        width: 60,
+                                        height: 60,
+                                        fit: BoxFit.cover,
+                                      ),
+                                    )
                                 : const Icon(Icons.location_on, size: 40),
                             title: Text(spot.nombre),
-                            subtitle: Text(spot.descripcion ?? 'No description'),
+                            subtitle: Text(spot.descripcion ?? localizations.t('spot.no_description')),
                             onTap: () {
                               Navigator.push(
                                 context,
@@ -162,23 +174,23 @@ class _SpotsScreenState extends State<SpotsScreen> {
                             },
                             trailing: isMySpots
                                 ? Wrap(
-                                    spacing: 8,
-                                    children: [
-                                      IconButton(
-                                        icon: const Icon(Icons.edit,
-                                            color: Colors.blue),
-                                        tooltip: 'Edit',
-                                        onPressed: () => _editSpot(spot),
-                                      ),
-                                      IconButton(
-                                        icon: const Icon(Icons.delete,
-                                            color: Colors.red),
-                                        tooltip: 'Delete',
-                                        onPressed: () =>
-                                            _deleteSpot(spot.id.toString()),
-                                      ),
-                                    ],
-                                  )
+                                      spacing: 8,
+                                      children: [
+                                        IconButton(
+                                          icon: const Icon(Icons.edit,
+                                              color: Colors.blue),
+                                          tooltip: localizations.t('spot.list.edit_tooltip'),
+                                          onPressed: () => _editSpot(spot),
+                                        ),
+                                        IconButton(
+                                          icon: const Icon(Icons.delete,
+                                              color: Colors.red),
+                                          tooltip: localizations.t('spot.list.delete_tooltip'),
+                                          onPressed: () =>
+                                              _deleteSpot(spot.id.toString()),
+                                        ),
+                                      ],
+                                    )
                                 : null, 
                           ),
                         );
@@ -189,4 +201,3 @@ class _SpotsScreenState extends State<SpotsScreen> {
     );
   }
 }
-

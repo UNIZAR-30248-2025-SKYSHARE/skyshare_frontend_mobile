@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import '../../interactive_map/data/models/spot_model.dart';
 import '../../interactive_map/data/repositories/spot_repository.dart';
+import '../../../core/i18n/app_localizations.dart';
 
 class EditSpotScreen extends StatefulWidget {
   final Spot spot;
@@ -40,6 +41,8 @@ class _EditSpotScreenState extends State<EditSpotScreen> {
   }
 
   Future<void> _saveChanges() async {
+    final localizations = AppLocalizations.of(context)!;
+    
     if (!_formKey.currentState!.validate()) return;
 
     setState(() => _saving = true);
@@ -51,25 +54,27 @@ class _EditSpotScreenState extends State<EditSpotScreen> {
       nuevaImagen: _newImage,
     );
 
-     if (!mounted) return;
+      if (!mounted) return;
       setState(() => _saving = false);
 
       if (ok) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Spot updated successfully')),
+          SnackBar(content: Text(localizations.t('spot.edit.success_update'))),
         );
         Navigator.pop(context, true);
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Error updating the spot')),
+          SnackBar(content: Text(localizations.t('spot.edit.error_update'))),
         );
       }
   }
 
   @override
   Widget build(BuildContext context) {
+    final localizations = AppLocalizations.of(context)!;
+
     return Scaffold(
-      appBar: AppBar(title: const Text("Edit Spot")),
+      appBar: AppBar(title: Text(localizations.t('spot.edit.title'))),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Form(
@@ -121,13 +126,13 @@ class _EditSpotScreenState extends State<EditSpotScreen> {
               const SizedBox(height: 20),
               TextFormField(
                 controller: _nameCtrl,
-                decoration: const InputDecoration(labelText: 'Spot Name'),
-                validator: (v) => v!.isEmpty ? 'Please enter a name' : null,
+                decoration: InputDecoration(labelText: localizations.t('spot.edit.name_label')),
+                validator: (v) => v!.isEmpty ? localizations.t('spot.edit.name_required') : null,
               ),
               const SizedBox(height: 14),
               TextFormField(
                 controller: _descriptionCtrl,
-                decoration: const InputDecoration(labelText: 'Description'),
+                decoration: InputDecoration(labelText: localizations.t('spot.edit.description_label')),
                 maxLines: 3,
               ),
               const SizedBox(height: 24),
@@ -136,7 +141,10 @@ class _EditSpotScreenState extends State<EditSpotScreen> {
                 child: ElevatedButton.icon(
                   onPressed: _saving ? null : _saveChanges,
                   icon: const Icon(Icons.save),
-                  label: Text(_saving ? 'Saving...' : 'Save Changes'),
+                  label: Text(_saving 
+                    ? localizations.t('spot.edit.saving') 
+                    : localizations.t('spot.save_changes')
+                  ),
                   style: ElevatedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 14),
                   ),

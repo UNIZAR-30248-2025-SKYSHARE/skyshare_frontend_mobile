@@ -12,6 +12,7 @@ import '../../../../features/auth/data/repositories/auth_repository.dart';
 import '../../../../features/interactive_map/data/repositories/spot_repository.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../core/widgets/star_background.dart';
+import '../../../core/i18n/app_localizations.dart';
 
 class ProfileScreen extends StatefulWidget {
   final String? userId;
@@ -26,6 +27,7 @@ class ProfileScreen extends StatefulWidget {
 }
 
 Future<void> _signOut(BuildContext context) async {
+  final localizations = AppLocalizations.of(context)!;
   final navigator = Navigator.of(context);
   final messenger = ScaffoldMessenger.of(context);
   try {
@@ -36,7 +38,7 @@ Future<void> _signOut(BuildContext context) async {
   } catch (e) {
     messenger.showSnackBar(
       SnackBar(
-        content: Text('Error signing out: $e'),
+        content: Text(localizations.t('profile.sign_out_error', {'err': e.toString()})),
         backgroundColor: Colors.red,
       ),
     );
@@ -113,6 +115,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final localizations = AppLocalizations.of(context)!;
+
     if (_isLoading) {
       return const Scaffold(
         body: Center(child: CircularProgressIndicator()),
@@ -120,10 +124,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
 
     if (_user == null) {
-      return const Scaffold(
-        body: Center(child: Text('Could not load profile')),
+      return Scaffold(
+        body: Center(child: Text(localizations.t('profile.no_load_error'))),
       );
     }
+
+    final String appBarTitle = _isMyProfile 
+      ? localizations.t('profile.my_profile_title') 
+      : localizations.t('profile.user_profile_title', {'name': _user!.username ?? ''});
+
 
     final ButtonStyle actionBtnStyle = ElevatedButton.styleFrom(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
@@ -135,9 +144,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       child: Scaffold(
         backgroundColor: Colors.transparent,
         appBar: AppBar(
-          title: Text(
-            _isMyProfile ? 'My Profile' : '${_user!.username ?? ''}\'s Profile',
-          ),
+          title: Text(appBarTitle),
           backgroundColor: Colors.transparent,
           elevation: 0,
           centerTitle: true,
@@ -156,7 +163,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     key: const Key('followButton'),
                     onPressed: _toggleFollow,
                     icon: Icon(_isFollowing ? Icons.check : Icons.person_add),
-                    label: Text(_isFollowing ? 'Following' : 'Follow'),
+                    label: Text(
+                      _isFollowing 
+                        ? localizations.t('profile.following_button') 
+                        : localizations.t('profile.follow_button')
+                    ),
                     style: ElevatedButton.styleFrom(
                       backgroundColor:
                           _isFollowing ? Colors.grey.shade300 : Colors.green,
@@ -230,7 +241,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             );
                           },
                           icon: const Icon(Icons.explore),
-                          label: const Text('Discover Users'),
+                          label: Text(localizations.t('profile.discover_users_button')),
                           style: actionBtnStyle.copyWith(
                             backgroundColor:
                                 WidgetStateProperty.all(Colors.green),
@@ -244,7 +255,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         child: ElevatedButton.icon(
                           onPressed: () => _signOut(context),
                           icon: const Icon(Icons.logout),
-                          label: const Text('Sign Out'),
+                          label: Text(localizations.t('profile.sign_out_button')),
                           style: actionBtnStyle.copyWith(
                             backgroundColor:
                                 WidgetStateProperty.all(Colors.redAccent),

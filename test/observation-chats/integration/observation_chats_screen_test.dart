@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mocktail/mocktail.dart'; 
+import 'package:mocktail/mocktail.dart';
 import 'package:provider/provider.dart';
 import 'package:skyshare_frontend_mobile/features/observation-chats/data/models/chat_preview_model.dart';
 import 'package:skyshare_frontend_mobile/features/observation-chats/data/models/group_info_model.dart';
 import 'package:skyshare_frontend_mobile/features/observation-chats/data/repositories/observation_chats_repository.dart';
 import 'package:skyshare_frontend_mobile/features/observation-chats/presentation/observation_chats_screen.dart';
 import 'package:skyshare_frontend_mobile/features/observation-chats/providers/observation_chats_provider.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+
+import '../../helpers/fake_localizations_delegate.dart';
 
 class MockObservationChatsProvider extends Mock implements ObservationChatsProvider {}
 class MockObservationChatsRepository extends Mock implements ObservationChatsRepository {}
@@ -29,9 +32,7 @@ void main() {
     GroupInfo(idGrupo: 2, nombre: 'Grupo Público', fechaCreacion: DateTime.now()),
   ];
 
-  setUpAll(() {
-    registerFallbackValue(ChatFilter.misGrupos); 
-  });
+  setUpAll(() => registerFallbackValue(ChatFilter.misGrupos));
 
   setUp(() {
     mockProvider = MockObservationChatsProvider();
@@ -55,20 +56,28 @@ void main() {
   Widget createTestScreen() {
     return MultiProvider(
       providers: [
-        ChangeNotifierProvider<ObservationChatsProvider>.value(
-          value: mockProvider,
-        ),
+        ChangeNotifierProvider<ObservationChatsProvider>.value(value: mockProvider),
         Provider<ObservationChatsRepository>.value(value: mockRepository),
         Provider<SupabaseClient>.value(value: mockSupabaseClient),
       ],
-      child: const MaterialApp(
-        home: ObservationChatsScreen(),
+      child: MaterialApp(
+        locale: const Locale('es'),
+        supportedLocales: AppLocalizations.supportedLocales,
+        localizationsDelegates: [
+          FakeLocalizationsDelegate(),
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+        ],
+        home: const ObservationChatsScreen(),
       ),
     );
   }
 
   testWidgets('muestra "Mis Grupos" por defecto', (tester) async {
     await tester.pumpWidget(createTestScreen());
+    await tester.pumpAndSettle();
+
     expect(find.text('Mi Grupo 1'), findsOneWidget);
   });
 
@@ -78,15 +87,22 @@ void main() {
     when(() => mockProvider.discoverableGroups).thenReturn(mockDiscoverableGroups);
 
     await tester.pumpWidget(createTestScreen());
-    
-    await tester.tap(find.text('Unirse'));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('chat.join_button'));
     await tester.pumpAndSettle();
 
     expect(find.byType(AlertDialog), findsOneWidget);
-    
-    await tester.tap(find.widgetWithText(ElevatedButton, 'Unirme'));
+
+    final confirmButtonInDialog = find.descendant(
+      of: find.byType(AlertDialog),
+      matching: find.widgetWithText(ElevatedButton, 'chat.join_button'),
+    );
+    expect(confirmButtonInDialog, findsOneWidget);
+
+    await tester.tap(confirmButtonInDialog);
     await tester.pumpAndSettle();
-    
+
     verify(() => mockProvider.joinGroup(2)).called(1);
   });
 }

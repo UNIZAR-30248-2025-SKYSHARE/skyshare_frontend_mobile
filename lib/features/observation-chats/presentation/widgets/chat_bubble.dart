@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import '../../data/models/chat_message_model.dart';
 
+
 class ChatBubble extends StatelessWidget {
   final ChatMessage message;
   const ChatBubble({super.key, required this.message});
 
   @override
   Widget build(BuildContext context) {
-    final myColor = const Color(0xFF6A4D9C); 
+    final myColor = const Color(0xFF6A4D9C);
     final otherColor = const Color(0xFF2A2A3D);
 
     return Container(
@@ -40,7 +41,7 @@ class ChatBubble extends StatelessWidget {
                       ),
                     ),
                   if (!message.isMe) const SizedBox(height: 3),
-                  
+                 
                   Text(
                     message.texto,
                     style: const TextStyle(color: Colors.white, fontSize: 16),
