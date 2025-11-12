@@ -2,12 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../providers/observation_chats_provider.dart';
-import 'widgets/chat_list_item.dart'; 
-import '../data/models/group_info_model.dart'; 
-import 'widgets/create_group_bottom_sheet.dart'; 
+import 'widgets/chat_list_item.dart';
+import '../data/models/group_info_model.dart';
+import 'widgets/create_group_bottom_sheet.dart';
 import 'chat_detail_screen.dart';
 import '../providers/chat_detail_provider.dart';
 import '../data/repositories/observation_chats_repository.dart';
+import 'package:skyshare_frontend_mobile/core/i18n/app_localizations.dart';
 
 class ObservationChatsScreen extends StatelessWidget {
   const ObservationChatsScreen({super.key});
@@ -15,7 +16,7 @@ class ObservationChatsScreen extends StatelessWidget {
   void _showCreateGroupSheet(BuildContext context) {
     showModalBottomSheet(
       context: context,
-      isScrollControlled: true, 
+      isScrollControlled: true,
       backgroundColor: const Color(0xFF1E1E2F),
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.only(
@@ -24,36 +25,43 @@ class ObservationChatsScreen extends StatelessWidget {
         ),
       ),
       builder: (ctx) {
-        return const CreateGroupBottomSheet(); 
+        return const CreateGroupBottomSheet();
       },
     );
   }
 
   void _showJoinGroupDialog(BuildContext context, GroupInfo groupInfo) {
     final providerActions = context.read<ObservationChatsProvider>();
-
+    final localizations = AppLocalizations.of(context)!;
+    
+    // Usamos el argumento {name}
+    final joinMessage = localizations.t(
+      'chat.join_group_message', 
+      {'name': groupInfo.nombre}
+    );
+    
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: const Color(0xFF2A2A3D),
-        title: const Text('Confirmar', style: TextStyle(color: Colors.white)),
+        title: Text(localizations.t('chat.confirm_title'), style: const TextStyle(color: Colors.white)),
         content: Text(
-          '¿Quieres unirte al grupo "${groupInfo.nombre}"?',
+          joinMessage,
           style: const TextStyle(color: Colors.white70),
         ),
         actions: [
           TextButton(
-            child: const Text('Cancelar', style: TextStyle(color: Colors.white54)),
+            child: Text(localizations.t('cancel'), style: const TextStyle(color: Colors.white54)),
             onPressed: () => Navigator.of(ctx).pop(),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFF6A4D9C),
             ),
-            child: const Text('Unirme', style: TextStyle(color: Colors.white)),
+            child: Text(localizations.t('chat.join_button'), style: const TextStyle(color: Colors.white)),
             onPressed: () {
-              Navigator.of(ctx).pop(); 
-              providerActions.joinGroup(groupInfo.idGrupo); 
+              Navigator.of(ctx).pop();
+              providerActions.joinGroup(groupInfo.idGrupo);
             },
           ),
         ],
@@ -65,17 +73,18 @@ class ObservationChatsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final provider = context.watch<ObservationChatsProvider>();
     final providerActions = context.read<ObservationChatsProvider>();
+    final localizations = AppLocalizations.of(context)!;
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Chats & Grupos", style: TextStyle(color: Colors.white)),
-        backgroundColor: Colors.transparent, 
+        title: Text(localizations.t('chat.title'), style: const TextStyle(color: Colors.white)),
+        backgroundColor: Colors.transparent,
         elevation: 0,
         actions: [
           IconButton(
             icon: const Icon(Icons.add_circle, size: 30, color: Colors.white),
             onPressed: () {
-              _showCreateGroupSheet(context); 
+              _showCreateGroupSheet(context);
             },
           ),
         ],
@@ -86,7 +95,7 @@ class ObservationChatsScreen extends StatelessWidget {
             padding: const EdgeInsets.all(16.0),
             child: TextField(
               decoration: InputDecoration(
-                hintText: "Buscar chats o grupos...",
+                hintText: localizations.t('chat.search_hint'),
                 prefixIcon: const Icon(Icons.search),
                 filled: true,
                 fillColor: const Color(0xFF2A2A3D),
@@ -101,14 +110,14 @@ class ObservationChatsScreen extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               ActionChip(
-                label: const Text("Mis Grupos"),
+                label: Text(localizations.t('chat.my_groups')),
                 backgroundColor: provider.currentFilter == ChatFilter.misGrupos
-                    ? const Color(0xFF6A4D9C) 
-                    : const Color(0xFF3A2D4C), 
+                    ? const Color(0xFF6A4D9C)
+                    : const Color(0xFF3A2D4C),
                 onPressed: () => providerActions.setFilter(ChatFilter.misGrupos),
               ),
               ActionChip(
-                label: const Text("Buscar Grupos"), 
+                label: Text(localizations.t('chat.discover_groups')),
                 backgroundColor: provider.currentFilter == ChatFilter.todos
                     ? const Color(0xFF6A4D9C)
                     : const Color(0xFF3A2D4C),
@@ -128,17 +137,19 @@ class ObservationChatsScreen extends StatelessWidget {
   }
 
   Widget _buildFilteredList(BuildContext context, ObservationChatsProvider provider) {
+    final localizations = AppLocalizations.of(context)!;
+    
     switch (provider.currentFilter) {
-      
+     
       case ChatFilter.misGrupos:
         if (provider.groupChats.isEmpty) {
-          return const Center(child: Text("No estás en ningún grupo.", style: TextStyle(color: Colors.white70)));
+          return Center(child: Text(localizations.t('chat.no_my_groups'), style: const TextStyle(color: Colors.white70)));
         }
         return ListView.builder(
           itemCount: provider.groupChats.length,
           itemBuilder: (context, index) {
             final chat = provider.groupChats[index];
-            
+           
             return GestureDetector(
               onTap: () {
                 Navigator.of(context).push(
@@ -163,7 +174,7 @@ class ObservationChatsScreen extends StatelessWidget {
 
       case ChatFilter.todos:
         if (provider.discoverableGroups.isEmpty) {
-          return const Center(child: Text("No hay grupos para descubrir.", style: TextStyle(color: Colors.white70)));
+          return Center(child: Text(localizations.t('chat.no_discover_groups'), style: const TextStyle(color: Colors.white70)));
         }
         return ListView.builder(
           itemCount: provider.discoverableGroups.length,
@@ -175,9 +186,9 @@ class ObservationChatsScreen extends StatelessWidget {
               child: ListTile(
                 leading: const Icon(Icons.public, color: Colors.white70),
                 title: Text(groupInfo.nombre, style: const TextStyle(color: Colors.white)),
-                subtitle: Text(groupInfo.descripcion ?? "Sin descripción", style: const TextStyle(color: Colors.white70)),
+                subtitle: Text(groupInfo.descripcion ?? localizations.t('spot.no_description'), style: const TextStyle(color: Colors.white70)),
                 trailing: ElevatedButton(
-                  child: const Text("Unirse"),
+                  child: Text(localizations.t('chat.join_button')),
                   onPressed: () {
                     _showJoinGroupDialog(context, groupInfo);
                   },

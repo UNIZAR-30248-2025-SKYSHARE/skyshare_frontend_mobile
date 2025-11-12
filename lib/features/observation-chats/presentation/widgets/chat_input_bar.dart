@@ -3,8 +3,10 @@ import 'package:flutter/material.dart';
 
 class ChatInputBar extends StatefulWidget {
   final Function(String) onSend;
+  // El hintText se pasa desde la pantalla padre (ChatDetailScreen) para i18n
+  final String hintText; 
 
-  const ChatInputBar({super.key, required this.onSend});
+  const ChatInputBar({super.key, required this.onSend, required this.hintText});
 
   @override
   State<ChatInputBar> createState() => _ChatInputBarState();
@@ -22,14 +24,20 @@ class _ChatInputBarState extends State<ChatInputBar> {
   }
 
   @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
       decoration: const BoxDecoration(
-        color: Color(0xFF1E1E2F), 
+        color: Color(0xFF1E1E2F),
         border: Border(top: BorderSide(color: Color(0xFF2A2A3D))),
       ),
-      child: SafeArea( 
+      child: SafeArea(
         child: Row(
           children: [
             Expanded(
@@ -37,16 +45,16 @@ class _ChatInputBarState extends State<ChatInputBar> {
                 padding: const EdgeInsets.symmetric(horizontal: 14),
                 decoration: BoxDecoration(
                   color: const Color(0xFF2A2A3D),
-                  borderRadius: BorderRadius.circular(30), 
+                  borderRadius: BorderRadius.circular(30),
                 ),
                 child: TextField(
                   controller: _controller,
                   style: const TextStyle(color: Colors.white),
                   decoration: InputDecoration(
-                    hintText: 'Escribe un mensaje...',
+                    hintText: widget.hintText,
                     // ignore: deprecated_member_use
                     hintStyle: TextStyle(color: Colors.white.withOpacity(0.5)),
-                    border: InputBorder.none, 
+                    border: InputBorder.none,
                   ),
                   onSubmitted: (value) => _sendMessage(),
                 ),
@@ -55,7 +63,7 @@ class _ChatInputBarState extends State<ChatInputBar> {
             const SizedBox(width: 8),
 
             CircleAvatar(
-              backgroundColor: const Color(0xFF6A4D9C), 
+              backgroundColor: const Color(0xFF6A4D9C),
               radius: 24,
               child: IconButton(
                 icon: const Icon(Icons.send, color: Colors.white, size: 24),

@@ -4,6 +4,7 @@ import '../data/repositories/follows_repository.dart';
 import '../data/repositories/my_profile_repository.dart';
 import 'profile_screen.dart';
 import '../../../core/widgets/star_background.dart';
+import '../../../core/i18n/app_localizations.dart';
 
 
 class FollowersScreen extends StatefulWidget {
@@ -56,23 +57,17 @@ class _FollowersScreenState extends State<FollowersScreen> {
   }
 
   Future<void> _toggleFollow(AppUser user) async {
-    if (_currentUserId == null || user.id == _currentUserId) return;
-
-    final isFollowing =
-        await _followsRepository.isFollowing(_currentUserId!, user.id);
-
-    if (isFollowing) {
-      await _followsRepository.unfollowUser(_currentUserId!, user.id);
-    } else {
-      await _followsRepository.followUser(_currentUserId!, user.id);
-    }
-
-    setState(() {});
+    // Forzamos un rebuild para actualizar el estado del botón en la lista
+    await _loadUsers(); 
   }
 
   @override
   Widget build(BuildContext context) {
-    final title = widget.showFollowers ? 'Followers' : 'Following';
+    final localizations = AppLocalizations.of(context)!;
+    
+    final String title = widget.showFollowers 
+      ? localizations.t('profile.followers_screen.title') 
+      : localizations.t('profile.following_screen.title');
 
     return StarBackground(
       child: Scaffold(
@@ -84,6 +79,7 @@ class _FollowersScreenState extends State<FollowersScreen> {
         onRefresh: _loadUsers,
         child: _loading
             ? ListView.builder(
+                // Esto es solo un placeholder, no necesita i18n
                 itemCount: 6,
                 itemBuilder: (_, _) => _buildLoadingCard(),
               )
@@ -93,8 +89,8 @@ class _FollowersScreenState extends State<FollowersScreen> {
                       padding: const EdgeInsets.all(20),
                       child: Text(
                         widget.showFollowers
-                            ? 'You have no followers yet'
-                            : 'You are not following anyone yet',
+                            ? localizations.t('profile.followers_screen.empty')
+                            : localizations.t('profile.following_screen.empty'),
                         style: Theme.of(context).textTheme.bodyMedium,
                       ),
                     ),
@@ -105,6 +101,12 @@ class _FollowersScreenState extends State<FollowersScreen> {
                     itemCount: _users.length,
                     itemBuilder: (_, i) {
                       final user = _users[i];
+                      
+                      // Si el ID de usuario actual es nulo o si es el perfil propio, no necesitamos FutureBuilder
+                      if (_currentUserId == null || user.id == _currentUserId) {
+                        return _userCard(user, false, isOwnProfile: true);
+                      }
+                      
                       return FutureBuilder<bool>(
                         future: _followsRepository.isFollowing(
                           _currentUserId!,
@@ -122,9 +124,9 @@ class _FollowersScreenState extends State<FollowersScreen> {
     );
   }
 
-  Widget _userCard(AppUser user, bool following) {
-    final isOwnProfile = _currentUserId == user.id;
-
+  Widget _userCard(AppUser user, bool following, {bool isOwnProfile = false}) {
+    final localizations = AppLocalizations.of(context)!;
+    
     return GestureDetector(
       onTap: () {
         Navigator.push(
@@ -164,7 +166,7 @@ class _FollowersScreenState extends State<FollowersScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    user.username ?? "User",
+                    user.username ?? localizations.t('profile.info.unknown'),
                     style: const TextStyle(
                       fontSize: 17,
                       fontWeight: FontWeight.bold,
@@ -191,7 +193,11 @@ class _FollowersScreenState extends State<FollowersScreen> {
                   ),
                   minimumSize: const Size(90, 38),
                 ),
-                child: Text(following ? "Following" : "Follow"),
+                child: Text(
+                  following 
+                    ? localizations.t('profile.following_button') 
+                    : localizations.t('profile.follow_button')
+                ),
               ),
           ],
         ),

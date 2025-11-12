@@ -195,7 +195,7 @@
     },
     {
       "name": "camera",
-      "version": "0.11.2+1",
+      "version": "0.11.2",
       "dependencies": [
         "camera_android_camerax",
         "camera_avfoundation",
@@ -886,7 +886,7 @@
     },
     {
       "name": "path_provider_foundation",
-      "version": "2.4.2",
+      "version": "2.4.1",
       "dependencies": [
         "flutter",
         "path_provider_platform_interface"
@@ -894,7 +894,7 @@
     },
     {
       "name": "path_provider_android",
-      "version": "2.2.19",
+      "version": "2.2.17",
       "dependencies": [
         "flutter",
         "path_provider_platform_interface"
@@ -919,7 +919,7 @@
     },
     {
       "name": "flutter_plugin_android_lifecycle",
-      "version": "2.0.31",
+      "version": "2.0.29",
       "dependencies": [
         "flutter"
       ]
@@ -937,7 +937,7 @@
     },
     {
       "name": "camera_platform_interface",
-      "version": "2.11.0",
+      "version": "2.10.0",
       "dependencies": [
         "cross_file",
         "flutter",
@@ -947,7 +947,7 @@
     },
     {
       "name": "camera_avfoundation",
-      "version": "0.9.21+2",
+      "version": "0.9.21+1",
       "dependencies": [
         "camera_platform_interface",
         "flutter",
@@ -956,7 +956,7 @@
     },
     {
       "name": "camera_android_camerax",
-      "version": "0.6.19+1",
+      "version": "0.6.17",
       "dependencies": [
         "async",
         "camera_platform_interface",
@@ -1017,7 +1017,7 @@
     },
     {
       "name": "shared_preferences_android",
-      "version": "2.4.13",
+      "version": "2.4.11",
       "dependencies": [
         "flutter",
         "shared_preferences_platform_interface"
@@ -1035,7 +1035,7 @@
     },
     {
       "name": "image_picker_platform_interface",
-      "version": "2.11.1",
+      "version": "2.11.0",
       "dependencies": [
         "cross_file",
         "flutter",
@@ -1084,7 +1084,7 @@
     },
     {
       "name": "image_picker_android",
-      "version": "0.8.13+1",
+      "version": "0.8.13",
       "dependencies": [
         "flutter",
         "flutter_plugin_android_lifecycle",
@@ -1562,7 +1562,7 @@
     },
     {
       "name": "file_selector_macos",
-      "version": "0.9.4+4",
+      "version": "0.9.4+3",
       "dependencies": [
         "cross_file",
         "file_selector_platform_interface",
@@ -1647,7 +1647,7 @@
     },
     {
       "name": "url_launcher_macos",
-      "version": "3.2.3",
+      "version": "3.2.2",
       "dependencies": [
         "flutter",
         "url_launcher_platform_interface"
@@ -1663,7 +1663,7 @@
     },
     {
       "name": "url_launcher_ios",
-      "version": "6.3.4",
+      "version": "6.3.3",
       "dependencies": [
         "flutter",
         "url_launcher_platform_interface"
@@ -1671,7 +1671,7 @@
     },
     {
       "name": "url_launcher_android",
-      "version": "6.3.20",
+      "version": "6.3.17",
       "dependencies": [
         "flutter",
         "url_launcher_platform_interface"

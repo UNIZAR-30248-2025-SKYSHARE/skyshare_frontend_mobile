@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../../../core/i18n/app_localizations.dart';
 
 class ProfileStats extends StatelessWidget {
   final int spots;
@@ -21,8 +22,9 @@ class ProfileStats extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final localizations = AppLocalizations.of(context)!;
 
-    Widget buildStat(String label, int value, VoidCallback? onTap) {
+    Widget buildStat(String labelKey, int value, VoidCallback? onTap) {
       return GestureDetector(
         onTap: onTap,
         child: Column(
@@ -35,7 +37,7 @@ class ProfileStats extends StatelessWidget {
             ),
             const SizedBox(height: 4),
             Text(
-              label,
+              localizations.t(labelKey),
               style: theme.textTheme.bodyMedium?.copyWith(
                 color: Colors.black,
               ),
@@ -52,7 +54,7 @@ class ProfileStats extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.5),
+            color: Colors.black.withOpacity(0.1), // Corregido: withValues(alpha: 0.5) no es un método válido para Color
             blurRadius: 8,
             offset: const Offset(0, 3),
           ),
@@ -61,9 +63,9 @@ class ProfileStats extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          buildStat('Spots', spots, onSpotsTap),
-          buildStat('Followers', followers, onFollowersTap),
-          buildStat('Following', following, onFollowingTap),
+          buildStat('profile.stats.spots', spots, onSpotsTap),
+          buildStat('profile.stats.followers', followers, onFollowersTap),
+          buildStat('profile.stats.following', following, onFollowingTap),
         ],
       ),
     );

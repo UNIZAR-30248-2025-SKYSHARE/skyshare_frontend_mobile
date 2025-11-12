@@ -58,7 +58,7 @@ dependencies:
   onesignal_flutter: ^5.3.4
 
   shared_preferences: ^2.5.3
-  camera: ^0.11.2+1
+  camera: 0.11.2
   sensors_plus: ^7.0.0
   flutter_compass: ^0.8.1
   path_provider: ^2.1.5
