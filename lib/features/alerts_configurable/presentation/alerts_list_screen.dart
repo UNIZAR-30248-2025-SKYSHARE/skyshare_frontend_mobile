@@ -48,21 +48,29 @@ class _AlertsListScreenState extends State<AlertsListScreen> {
 
   void _handleDeleteAlert(int alertId) {
     final provider = Provider.of<AlertProvider>(context, listen: false);
-    
+
+    final scaffoldMessenger = ScaffoldMessenger.of(context);
+    final successMsg = AppLocalizations.of(context)?.t('alerts.deleted_success') ?? 'Alert deleted successfully';
+    final errorMsg = AppLocalizations.of(context)?.t('alerts.delete_error') ?? 'Error deleting alert';
+
     showDialog(
       context: context,
       builder: (context) => DeleteAlertDialog(
         onConfirm: () async {
           Navigator.of(context).pop();
-          
+
           try {
             await provider.deleteAlert(alertId);
             if (mounted) {
-              _showSuccessMessage(AppLocalizations.of(context)?.t('alerts.deleted_success') ?? 'Alert deleted successfully');
+              scaffoldMessenger.showSnackBar(
+                SnackBar(content: Text(successMsg), backgroundColor: Colors.green, duration: const Duration(seconds: 2)),
+              );
             }
           } catch (e) {
             if (mounted) {
-              _showErrorMessage(AppLocalizations.of(context)?.t('alerts.delete_error') ?? 'Error deleting alert');
+              scaffoldMessenger.showSnackBar(
+                SnackBar(content: Text(errorMsg), backgroundColor: Colors.red, duration: const Duration(seconds: 2)),
+              );
             }
           }
         },

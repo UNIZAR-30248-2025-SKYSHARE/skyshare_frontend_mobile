@@ -498,9 +498,9 @@ class _AlertFormScreenState extends State<AlertFormScreen> {
 
   String _getAlertTypeTitle() {
     switch (_currentType) {
-      case 'fase lunar': return AppLocalizations.of(context)?.t('alerts.form.lunar_short')?.toUpperCase() ?? 'LUNAR';
-      case 'meteorologica': return AppLocalizations.of(context)?.t('alerts.form.weather_short')?.toUpperCase() ?? 'WEATHER';
-      case 'estrellas': return AppLocalizations.of(context)?.t('alerts.form.stars_short')?.toUpperCase() ?? 'STARS';
+      case 'fase lunar': return AppLocalizations.of(context)?.t('alerts.form.lunar_short').toUpperCase() ?? 'LUNAR';
+      case 'meteorologica': return AppLocalizations.of(context)?.t('alerts.form.weather_short').toUpperCase() ?? 'WEATHER';
+      case 'estrellas': return AppLocalizations.of(context)?.t('alerts.form.stars_short').toUpperCase() ?? 'STARS';
       default: return _currentType.toUpperCase();
     }
   }
@@ -525,29 +525,38 @@ class _AlertFormScreenState extends State<AlertFormScreen> {
           ),
           TextButton(
             onPressed: () async {
+              // cerramos el diálogo inmediatamente (sin await)
               Navigator.of(context).pop();
-              
+
+              // marcamos saving localmente
               setState(() => _isSaving = true);
-              
+
+              // Capturamos TODO lo que depende de `context` ANTES de cualquier await
+              final provider = Provider.of<AlertProvider>(context, listen: false);
+              final navigator = Navigator.of(context);
+              final messenger = ScaffoldMessenger.of(context);
+              final successMsg = AppLocalizations.of(context)?.t('alerts.deleted_success') ?? 'Alert deleted successfully';
+              final errorMsg = AppLocalizations.of(context)?.t('alerts.delete_error') ?? 'Error deleting alert';
+
               try {
-        final provider = Provider.of<AlertProvider>(context, listen: false);
-        final navigator = Navigator.of(context);
-        final messenger = ScaffoldMessenger.of(context);
+                await provider.deleteAlert(widget.existingAlert!.idAlerta);
 
-        await provider.deleteAlert(widget.existingAlert!.idAlerta);
-
-        if (mounted) {
-          messenger.showSnackBar(SnackBar(
-            content: Text(AppLocalizations.of(context)?.t('alerts.deleted_success') ?? 'Alert deleted successfully'),
-            backgroundColor: Colors.green,
-            duration: const Duration(seconds: 2),
-          ));
-          navigator.pop(true);
-        }
+                if (mounted) {
+                  messenger.showSnackBar(SnackBar(
+                    content: Text(successMsg),
+                    backgroundColor: Colors.green,
+                    duration: const Duration(seconds: 2),
+                  ));
+                  navigator.pop(true);
+                }
               } catch (e) {
                 if (mounted) {
                   setState(() => _isSaving = false);
-                  _showError((AppLocalizations.of(context)?.t('alerts.delete_error') ?? 'Error deleting alert') + ': $e');
+                  messenger.showSnackBar(SnackBar(
+                    content: Text('$errorMsg: $e'),
+                    backgroundColor: Colors.red,
+                    duration: const Duration(seconds: 3),
+                  ));
                 }
               }
             },

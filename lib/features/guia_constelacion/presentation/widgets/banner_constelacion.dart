@@ -32,8 +32,8 @@ class BannerConstelacionDelegate extends SliverPersistentHeaderDelegate {
           },
         ),
         Container(
-          decoration: BoxDecoration(
-            gradient: const LinearGradient(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
               colors: [
                 Color.fromRGBO(0, 0, 0, 0.6),
                 Colors.transparent,

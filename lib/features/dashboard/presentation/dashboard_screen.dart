@@ -151,7 +151,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             return Stack(
               children: [
                 content,
-                Positioned(
+                const Positioned(
                   left: 16,
                   bottom: 16,
                   child: LanguageSwitcher(),

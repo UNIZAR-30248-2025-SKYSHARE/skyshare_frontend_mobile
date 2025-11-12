@@ -160,7 +160,7 @@ class _SpotContentState extends State<SpotContent> {
   Future<void> _submitComment() async {
     final text = _commentController.text.trim();
     final user = _authProvider.currentUser;
-    final messenger = ScaffoldMessenger.of(context); 
+    ScaffoldMessenger.of(context); 
     if (user == null) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(AppLocalizations.of(context)?.t('spot.need_login_to_comment') ?? 'Necesitas iniciar sesión para comentar'), backgroundColor: Colors.red));

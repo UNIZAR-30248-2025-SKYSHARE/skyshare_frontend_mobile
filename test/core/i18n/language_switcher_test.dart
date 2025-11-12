@@ -30,7 +30,16 @@ void main() {
     await tester.tap(find.byIcon(Icons.language));
     await tester.pumpAndSettle();
 
-    await tester.tap(find.text('English'));
+    final englishMenuItem = find.byWidgetPredicate(
+      (widget) =>
+        widget is CheckedPopupMenuItem<String> &&
+        widget.value == 'en' &&
+        widget.child is Text &&
+        (widget.child as Text).data == 'English',
+    );
+
+    expect(englishMenuItem, findsOneWidget);
+    await tester.tap(englishMenuItem);
     await tester.pumpAndSettle();
 
     expect(provider.locale.languageCode, 'en');
