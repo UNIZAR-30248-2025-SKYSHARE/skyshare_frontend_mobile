@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:skyshare_frontend_mobile/features/observation-chats/data/models/chat_preview_model.dart';
 import 'package:skyshare_frontend_mobile/features/observation-chats/presentation/widgets/chat_list_item.dart';
-import 'package:skyshare_frontend_mobile/core/i18n/app_localizations.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
 import '../../../../helpers/fake_localizations_delegate.dart';

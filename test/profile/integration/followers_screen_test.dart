@@ -5,7 +5,6 @@ import 'package:skyshare_frontend_mobile/features/profile/presentation/followers
 import 'package:skyshare_frontend_mobile/core/models/user_model.dart';
 import 'package:skyshare_frontend_mobile/features/profile/data/repositories/follows_repository.dart';
 import 'package:skyshare_frontend_mobile/features/profile/data/repositories/my_profile_repository.dart';
-import 'package:skyshare_frontend_mobile/core/i18n/app_localizations.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
 import '../../helpers/fake_localizations_delegate.dart';
