@@ -229,7 +229,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (_) => StarChartScreen(latitude: lat, longitude: lon),
+                  builder: (_) => StarChartScreen(latitude: lat, longitude: lon, startTutorial: true),
                 ),
               );
             },

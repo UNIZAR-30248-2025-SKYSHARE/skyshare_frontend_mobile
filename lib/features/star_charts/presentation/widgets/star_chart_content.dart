@@ -3,18 +3,23 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter_compass/flutter_compass.dart';
 import 'package:sensors_plus/sensors_plus.dart';
+import 'package:vector_math/vector_math_64.dart' as vm;
 import 'package:skyshare_frontend_mobile/features/star_charts/presentation/widgets/constellation_info_panel.dart';
 import 'package:skyshare_frontend_mobile/features/star_charts/providers/star_chart_provider.dart';
-import 'package:vector_math/vector_math_64.dart' as vm;
 import 'package:skyshare_frontend_mobile/features/star_charts/presentation/widgets/background_star_3d.dart';
 import 'package:skyshare_frontend_mobile/features/star_charts/presentation/widgets/star_field_painter.dart';
+import 'package:skyshare_frontend_mobile/features/star_charts/tutorial/data/tutorial_data.dart';
+import 'package:skyshare_frontend_mobile/features/star_charts/tutorial/domain/tutorial_state.dart';
+import 'package:skyshare_frontend_mobile/features/star_charts/tutorial/presentation/tutorial_overlay.dart';
 
 class StarChartContent extends StatefulWidget {
   final StarChartProvider starChartProvider;
+  final bool startTutorial;
 
   const StarChartContent({
     super.key,
     required this.starChartProvider,
+    this.startTutorial = false,
   });
 
   @override
@@ -34,19 +39,31 @@ class _StarChartContentState extends State<StarChartContent> {
   int _lastGyroTs = 0;
   bool _compassReady = false;
 
+  final TutorialState _tutorialState = TutorialState();
+  List<Map<String, dynamic>> _tutorialBodies = [];
+
   @override
   void initState() {
     super.initState();
     _generateBackgroundStars();
     _waitForFirstCompassReading();
+    // If requested by the caller, ensure the tutorial is active from start
+    if (widget.startTutorial) {
+      _tutorialState.reset();
+    }
+    _tutorialState.addListener(() {
+      if (mounted) setState(() {});
+    });
   }
 
   @override
   void didUpdateWidget(StarChartContent oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.starChartProvider != widget.starChartProvider) {
-      _selectedObject = null;
-      _projectionCache.clear();
+      if (!_tutorialState.isActive) {
+        _selectedObject = null;
+        _projectionCache.clear();
+      }
     }
   }
 
@@ -55,7 +72,8 @@ class _StarChartContentState extends State<StarChartContent> {
       if (!mounted) return;
       setState(() {
         _initialHeading = event.heading ?? 0.0;
-        _compassReady = true;
+        _compassReady = true; 
+        _tutorialBodies = TutorialData.getMockCelestialBodies(_initialHeading!);
       });
       _initSensors();
     });
@@ -90,6 +108,7 @@ class _StarChartContentState extends State<StarChartContent> {
       s.cancel();
     }
     _projectionCache.clear();
+    _tutorialState.dispose(); 
     super.dispose();
   }
 
@@ -115,6 +134,8 @@ class _StarChartContentState extends State<StarChartContent> {
   }
 
   void _onStarTapped(Map<String, dynamic> object) {
+    // During the tutorial we no longer require tapping the polar star to
+    // advance. Tapping always opens the object info panel.
     setState(() => _selectedObject = object);
   }
 
@@ -140,14 +161,26 @@ class _StarChartContentState extends State<StarChartContent> {
 
   @override
   Widget build(BuildContext context) {
-    final stars = widget.starChartProvider.visibleBodies;
-    final isLoading = widget.starChartProvider.isLoading || !_compassReady;
+    final bool showTutorial = _tutorialState.isActive;
+    
+    final stars = showTutorial ? _tutorialBodies : widget.starChartProvider.visibleBodies;
+    
+    final isLoading = showTutorial 
+        ? !_compassReady 
+        : (widget.starChartProvider.isLoading || !_compassReady);
 
     return LayoutBuilder(builder: (context, cons) {
       final size = Size(cons.maxWidth, cons.maxHeight);
+      
+      bool isTutorialTargetVisible = false;
+      if (showTutorial && _compassReady) {
+        isTutorialTargetVisible = _checkTargetVisibility(size, stars);
+      }
+
       return Stack(
         children: [
           Container(color: Colors.black),
+          
           GestureDetector(
             behavior: HitTestBehavior.opaque,
             onTapUp: (details) {
@@ -170,15 +203,62 @@ class _StarChartContentState extends State<StarChartContent> {
               ),
             ),
           ),
+          
           if (isLoading) _buildLoadingOverlay(),
+          
           if (_selectedObject != null)
             ConstellationInfoPanel(
               object: _selectedObject!,
               onClose: () => setState(() => _selectedObject = null),
             ),
+
+          // 3. CAPA DE TUTORIAL (Overlay UI)
+          if (showTutorial && !isLoading)
+            TutorialOverlay(
+              currentStep: _tutorialState.currentStep,
+              isTargetVisible: isTutorialTargetVisible,
+              onNextStep: () => _tutorialState.nextStep(),
+              onSkip: () => _tutorialState.completeTutorial(),
+            ),
         ],
       );
     });
+  }
+
+  bool _checkTargetVisibility(Size screenSize, List<Map<String, dynamic>> stars) {
+    final center = Offset(screenSize.width / 2, screenSize.height / 2);
+    final rot = _deviceOrientation.asRotationMatrix();
+    const double radius = 25.0; // Mismo radio que en StarFieldPainter
+
+    // Buscamos el objeto que toca encontrar en este paso
+    for (final obj in stars) {
+      if (_tutorialState.isTargetObject(obj['id'])) {
+        
+        final rawAzDeg = (obj['az'] as num?)?.toDouble() ?? 0.0;
+        final azDeg = _correctAz(rawAzDeg); // Ajuste de heading
+        final altDeg = (obj['alt'] as num?)?.toDouble() ?? 0.0;
+        
+        final az = azDeg * math.pi / 180.0;
+        final alt = altDeg * math.pi / 180.0;
+
+        final wx = math.cos(alt) * math.sin(az);
+        final wy = -math.sin(alt);
+        final wz = -math.cos(alt) * math.cos(az);
+
+        final world = vm.Vector3(wx * radius, wy * radius, wz * radius);
+        final rotated = rot * world;
+
+        if (rotated.z >= 0) return false;
+
+        final proj = _project(rotated, center);
+
+        if (proj.dx > 50 && proj.dx < screenSize.width - 50 &&
+            proj.dy > 100 && proj.dy < screenSize.height - 150) { // Margen abajo por el panel
+          return true;
+        }
+      }
+    }
+    return false;
   }
 
   Widget _buildLoadingOverlay() {

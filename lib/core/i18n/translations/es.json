@@ -233,4 +233,14 @@
   "profile.discover_screen.title": "Descubrir Usuarios",
   "profile.search_hint": "Buscar usuarios por nombre…",
   "profile.no_users_found": "No se encontraron usuarios"
+  ,
+  "tutorial.intro": "Bienvenido al modo AR.\nVamos a calibrar tu visor.",
+  "tutorial.search_right": "Gira despacio a la DERECHA ➡\npara encontrar Andrómeda.",
+  "tutorial.search_left": "¡Bien! Ahora gira a la IZQUIERDA ⬅\npara ver el planeta Marte.",
+  "tutorial.search_up": "¡Excelente! Ahora mira ARRIBA ⬆\npara localizar la Estrella Polar.",
+  "tutorial.completed": "¡Tutorial completado!\nExplora el universo real.",
+  "tutorial.skip": "Saltar",
+  "tutorial.button.start": "EMPEZAR",
+  "tutorial.button.found": "¡LO VEO!",
+  "tutorial.button.searching": "BUSCANDO..."
 }

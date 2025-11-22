@@ -237,4 +237,14 @@
   "profile.discover_screen.title": "Discover Users",
   "profile.search_hint": "Search users by name…",
   "profile.no_users_found": "No users found"
+  ,
+  "tutorial.intro": "Welcome to AR mode.\nLet's calibrate your viewer.",
+  "tutorial.search_right": "Slowly turn RIGHT ➡\nto find Andromeda.",
+  "tutorial.search_left": "Great! Now turn LEFT ⬅\nto see the planet Mars.",
+  "tutorial.search_up": "Excellent! Now look UP ⬆\nto locate the North Star.",
+  "tutorial.completed": "Tutorial completed!\nExplore the real sky.",
+  "tutorial.skip": "Skip",
+  "tutorial.button.start": "START",
+  "tutorial.button.found": "I SEE IT!",
+  "tutorial.button.searching": "SEARCHING..."
 }
