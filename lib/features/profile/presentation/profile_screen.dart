@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../../../../core/models/user_model.dart';
 import '../data/repositories/my_profile_repository.dart';
 import '../data/repositories/follows_repository.dart';
@@ -10,7 +11,6 @@ import 'spots_screen.dart';
 import 'discover_new_users_screen.dart';
 import '../../../../features/auth/data/repositories/auth_repository.dart';
 import '../../../../features/interactive_map/data/repositories/spot_repository.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../core/widgets/star_background.dart';
 import '../../../core/i18n/app_localizations.dart';
 
@@ -31,8 +31,7 @@ Future<void> _signOut(BuildContext context) async {
   final navigator = Navigator.of(context);
   final messenger = ScaffoldMessenger.of(context);
   try {
-    final client = Supabase.instance.client;
-    final authRepo = AuthRepository(client: client);
+    final authRepo = context.read<AuthRepository>();
     await authRepo.signOut();
     navigator.pushNamedAndRemoveUntil('/login', (route) => false);
   } catch (e) {

@@ -17,10 +17,22 @@ class ChatDetailScreen extends StatelessWidget {
     final providerActions = context.read<ChatDetailProvider>();
     final localizations = AppLocalizations.of(context)!;
 
+    final visibleMessages = provider.messages.where((msg) => !provider.undecipherableMessageIds.contains(msg.id)).toList();
+
     return Scaffold(
       backgroundColor: const Color(0xFF1E1E2F),
       appBar: AppBar(
-        title: Text(groupName, style: const TextStyle(color: Colors.white)),
+        title: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(groupName, style: const TextStyle(color: Colors.white)),
+            if (provider.hasUndecipherableMessages)
+              const Text(
+                'Mensajes no descifrados',
+                style: TextStyle(color: Colors.orangeAccent, fontSize: 12),
+              ),
+          ],
+        ),
         backgroundColor: Colors.transparent,
         elevation: 0,
       ),
@@ -29,7 +41,7 @@ class ChatDetailScreen extends StatelessWidget {
           Expanded(
             child: provider.isLoading
                 ? const Center(child: CircularProgressIndicator())
-                : provider.messages.isEmpty
+                : visibleMessages.isEmpty
                     ? Center(
                         child: Text(
                           localizations.t('chat.no_messages_chat'),
@@ -39,9 +51,9 @@ class ChatDetailScreen extends StatelessWidget {
                     : ListView.builder(
                         reverse: true,
                         padding: const EdgeInsets.all(8),
-                        itemCount: provider.messages.length,
+                        itemCount: visibleMessages.length,
                         itemBuilder: (context, index) {
-                          final message = provider.messages.reversed.toList()[index];
+                          final message = visibleMessages[index];
                           return ChatBubble(message: message);
                         },
                       ),
@@ -51,7 +63,7 @@ class ChatDetailScreen extends StatelessWidget {
             onSend: (text) {
               providerActions.sendMessage(text);
             },
-            hintText: localizations.t('spot.write_comment_hint'), // Reutilizamos esta clave para el hint
+            hintText: localizations.t('spot.write_comment_hint'), 
           ),
         ],
       ),

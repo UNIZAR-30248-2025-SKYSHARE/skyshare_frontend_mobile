@@ -1,14 +1,17 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart';
+import 'package:skyshare_frontend_mobile/features/observation-chats/service/key_manager.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../../core/models/user_model.dart';
-
 class AuthRepository {
   final SupabaseClient _client;
+  final KeyManager _keyManager;
   StreamSubscription<AuthState>? _authSub;
   bool _expectingOAuthSignIn = false;
 
-  AuthRepository({required SupabaseClient client}) : _client = client {
+  AuthRepository({required SupabaseClient client, required KeyManager keyManager})
+      : _client = client,
+        _keyManager = keyManager {
     _startAuthListener();
   }
 
@@ -41,6 +44,7 @@ class AuthRepository {
       final signInResp = await _client.auth.signInWithPassword(email: email, password: password);
       final signedUser = signInResp.user ?? response.user!;
       await _ensureUserInDb(signedUser, usernameOverride: username);
+      await _keyManager.initDeviceBundle(); 
     } else {
       throw Exception('Failed to create user');
     }
@@ -56,6 +60,8 @@ class AuthRepository {
     );
     if (response.user == null) {
       throw Exception('Login failed');
+    } else {
+      await _keyManager.initDeviceBundleIfNeeded();
     }
   }
 
@@ -82,6 +88,7 @@ class AuthRepository {
         final user = session?.user;
         if (user != null) {
           await _ensureUserInDb(user);
+          await _keyManager.initDeviceBundleIfNeeded();
         }
         _expectingOAuthSignIn = false;
       }
@@ -95,7 +102,7 @@ class AuthRepository {
           (user.userMetadata?['name'] as String?) ??
           (user.email?.split('@').first ?? '');
 
-      username = username.split('.').first.trim(); 
+      username = username.split('.').first.trim();
 
       final parts = username.split(RegExp(r'\s+')).where((p) => p.isNotEmpty).toList();
       if (parts.length > 1 && parts.every((p) => p == parts.first)) {

@@ -1,7 +1,7 @@
 import 'package:skyshare_frontend_mobile/features/observation-chats/data/models/chat_message_model.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../models/chat_preview_model.dart';
-import '../models/group_info_model.dart'; 
+import '../models/group_info_model.dart';
 
 class ObservationChatsRepository {
   final SupabaseClient _supabaseClient;
@@ -39,7 +39,7 @@ class ObservationChatsRepository {
     return response as int;
   }
 
-    Future<void> joinGroup(int groupId) async {
+  Future<void> joinGroup(int groupId) async {
     await _supabaseClient.rpc(
       'join_group',
       params: {'group_id': groupId},
@@ -51,7 +51,7 @@ class ObservationChatsRepository {
       'get_messages_for_group',
       params: {'p_group_id': groupId},
     );
-    
+
     if (response is List) {
       return response
           .map((item) => ChatMessage.fromJson(item as Map<String, dynamic>))
@@ -60,9 +60,23 @@ class ObservationChatsRepository {
     return [];
   }
 
+  Future<void> sendMessageEncrypted(int groupId, String ciphertext, {required String senderDeviceId, required String senderKeyId}) async {
+    final myUserId = _supabaseClient.auth.currentUser!.id;
+
+    await _supabaseClient.from('mensajes').insert({
+      'id_grupo': groupId,
+      'id_usuario': myUserId,
+      'ciphertext': ciphertext,
+      'is_encrypted': true,
+      'sender_device': senderDeviceId,
+      'sender_key_id': senderKeyId,
+    });
+  }
+
+  /// Legacy
   Future<void> sendMessage(int groupId, String text) async {
     final myUserId = _supabaseClient.auth.currentUser!.id;
-    
+
     await _supabaseClient.from('mensajes').insert({
       'id_grupo': groupId,
       'id_usuario': myUserId,

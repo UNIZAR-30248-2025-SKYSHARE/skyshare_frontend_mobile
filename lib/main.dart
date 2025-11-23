@@ -9,6 +9,8 @@ import 'package:skyshare_frontend_mobile/features/auth/providers/auth_provider.d
 import 'package:skyshare_frontend_mobile/features/interactive_map/data/repositories/comment_repository.dart';
 import 'package:skyshare_frontend_mobile/features/interactive_map/data/repositories/rating_repository.dart';
 import 'package:skyshare_frontend_mobile/features/interactive_map/data/repositories/spot_repository.dart';
+import 'package:skyshare_frontend_mobile/features/observation-chats/service/e2ee_group_service.dart';
+import 'package:skyshare_frontend_mobile/features/observation-chats/service/key_manager.dart';
 import 'package:skyshare_frontend_mobile/features/phase_lunar/presentation/phase_lunar_screen.dart';
 import 'package:skyshare_frontend_mobile/features/push_notifications/services/one_signal_service.dart';
 import 'package:skyshare_frontend_mobile/features/profile/presentation/profile_screen.dart';
@@ -43,7 +45,7 @@ Future<void> main() async {
   await dotenv.load();
   await SupabaseService.instance.init();
   final supabase = SupabaseService.instance.client;
-
+  
   if(!kIsWeb){ 
     await OneSignalService().init();
     await OneSignalService().requestPermission();
@@ -54,30 +56,6 @@ Future<void> main() async {
     }
   }
 
-  if (kDebugMode) {
-    final devEmail = dotenv.env['DEV_EMAIL'];
-    final devPassword = dotenv.env['DEV_PASSWORD'];
-    if (devEmail != null && devPassword != null && devEmail.isNotEmpty && devPassword.isNotEmpty) {
-      try {
-        final response = await supabase.auth.signInWithPassword(
-          email: devEmail,
-          password: devPassword,
-        );
-
-        if (response.user != null) {
-          final uid = response.user!.id;
-          print('[DEBUG] Usuario dev autenticado: $uid');
-          if (!kIsWeb) {
-            print('[DEBUG] Enviando playerId a Supabase tras login dev...');
-            await OneSignalService().sendPlayerId(supabase, uid);
-          }
-        }
-      } catch (e, st) {
-        print('[DEBUG] Error al iniciar sesión en Supabase: $e\n$st');
-      }
-    }
-  }
-  
   SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
 
   runApp(MyApp(supabase: supabase));
@@ -127,8 +105,22 @@ class MyApp extends StatelessWidget {
         Provider<location_repository_map.LocationRepository>(
           create: (ctx) => location_repository_map.LocationRepository(),
         ),
+        Provider<KeyManager>(
+          create: (ctx) => KeyManager(supabase: ctx.read<SupabaseClient>()),
+          lazy: false,
+        ),
+        Provider<E2EGroupService>(
+          create: (ctx) => E2EGroupService(
+            supabase: ctx.read<SupabaseClient>(),
+            keyManager: ctx.read<KeyManager>(),
+          ),
+          lazy: false,
+        ),
         Provider<AuthRepository>(
-          create: (ctx) => AuthRepository(client: ctx.read<SupabaseClient>()),
+          create: (ctx) => AuthRepository(
+            client: ctx.read<SupabaseClient>(),
+            keyManager: ctx.read<KeyManager>(),
+          ),
         ),
         ChangeNotifierProvider<AuthProvider>(
           create: (ctx) => AuthProvider(authRepo: ctx.read<AuthRepository>()),

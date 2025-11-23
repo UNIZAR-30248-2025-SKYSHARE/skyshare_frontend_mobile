@@ -65,6 +65,11 @@ dependencies:
   vector_math: ^2.1.4
   geolocator: ^12.0.0
   permission_handler: ^11.4.0
+  libsignal_protocol_dart: ^0.7.4
+  flutter_secure_storage: ^8.0.0
+  uuid: ^4.5.2
+  pointycastle: ^4.0.0
+  crypto: ^3.0.7
 
 dependency_overrides:
   geolocator: ^14.0.2

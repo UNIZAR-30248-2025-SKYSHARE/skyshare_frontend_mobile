@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:skyshare_frontend_mobile/features/observation-chats/service/e2ee_group_service.dart';
+import 'package:skyshare_frontend_mobile/features/observation-chats/service/key_manager.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../providers/observation_chats_provider.dart';
 import 'widgets/chat_list_item.dart';
@@ -34,7 +36,6 @@ class ObservationChatsScreen extends StatelessWidget {
     final providerActions = context.read<ObservationChatsProvider>();
     final localizations = AppLocalizations.of(context)!;
     
-    // Usamos el argumento {name}
     final joinMessage = localizations.t(
       'chat.join_group_message', 
       {'name': groupInfo.nombre}
@@ -158,6 +159,8 @@ class ObservationChatsScreen extends StatelessWidget {
                       create: (_) => ChatDetailProvider(
                         repository: context.read<ObservationChatsRepository>(),
                         supabaseClient: context.read<SupabaseClient>(),
+                        e2eService: context.read<E2EGroupService>(),
+                        keyManager: context.read<KeyManager>(),
                         groupId: chat.idGrupo,
                       ),
                       child: ChatDetailScreen(
