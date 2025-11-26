@@ -20,12 +20,11 @@ class E2EGroupService {
         _storage = const FlutterSecureStorage();
 
   String _senderKeyStorageKey(int groupId, String senderDeviceId) => 'senderkey_${groupId}_$senderDeviceId';
-  String _senderKeyIdIndexKey(int groupId) => 'senderkey_id_${groupId}';
+  String _senderKeyIdIndexKey(int groupId) => 'senderkey_id_$groupId';
 
   Future<String> ensureSenderKeyForGroup(int groupId) async {
     final myDeviceId = await _keyManager.getDeviceId();
     final existingId = await _storage.read(key: _senderKeyIdIndexKey(groupId));
-    print("ensureSenderKeyForGroup: existingId for group $groupId = $existingId");
     if (existingId != null) return existingId;
 
     final secret = signal.generateRandomBytes(32);
@@ -38,8 +37,6 @@ class E2EGroupService {
     final response = await _supabase.rpc('get_group_member_devices', params: {'p_group_id': groupId});
     List devices = [];
     if (response is List) devices = response;
-
-    print("ensureSenderKeyForGroup: group $groupId devices length=${devices.length}");
 
     for (final device in devices) {
       final recipientDeviceId = device['id_device'] as String?;
@@ -91,7 +88,7 @@ class E2EGroupService {
         final encrypted = await sessionCipher.encrypt(Uint8List.fromList(utf8.encode(base64Encode(secret))));
         final encryptedBase64 = base64Encode(encrypted.serialize());
 
-        final insertResp = await _supabase.from('group_key_distribution').insert({
+        await _supabase.from('group_key_distribution').insert({
           'id_grupo': groupId,
           'sender_device': myDeviceId,
           'sender_key_id': keyId,
@@ -99,8 +96,6 @@ class E2EGroupService {
           'encrypted_sender_key': encryptedBase64,
           'created_at': DateTime.now().toIso8601String(),
         }).select().maybeSingle(); 
-
-        print("ensureSenderKeyForGroup: insertResp for recipient $recipientDeviceId => $insertResp");
       } catch (e, st) {
         debugPrint('Error distribuyendo sender key al device $recipientDeviceId: $e\n$st');
       }
