@@ -36,15 +36,15 @@ class TutorialOverlay extends StatelessWidget {
 
         Positioned(
           top: 50, // Ajustar según SafeArea
-            right: 20,
-            child: TextButton(
-              onPressed: onSkip,
-              child: Text(
-                AppLocalizations.of(context)?.t('tutorial.skip') ?? 'Skip',
-                style: const TextStyle(color: Colors.white70, fontSize: 16),
-              ),
+          right: 20,
+          child: TextButton(
+            onPressed: onSkip,
+            child: Text(
+              AppLocalizations.of(context)?.t('tutorial.skip') ?? 'Skip',
+              style: const TextStyle(color: Colors.white70, fontSize: 16),
             ),
           ),
+        ),
       ],
     );
   }
@@ -75,7 +75,8 @@ class TutorialOverlay extends StatelessWidget {
       child: Icon(
         icon,
         size: 100,
-        color: Colors.white.withOpacity(0.3), // Semitransparente
+        // CORRECCIÓN 1: Uso de withValues
+        color: Colors.white.withValues(alpha: 0.3), 
       ),
     );
   }
@@ -101,19 +102,22 @@ class TutorialOverlay extends StatelessWidget {
       } else {
         isButtonEnabled = false;
         buttonText = AppLocalizations.of(context)?.t('tutorial.button.searching') ?? 'SEARCHING...';
-        buttonColor = Colors.grey.withOpacity(0.5);
+        // CORRECCIÓN 2: Uso de withValues
+        buttonColor = Colors.grey.withValues(alpha: 0.5);
       }
     }
 
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.black.withOpacity(0.85),
+        // CORRECCIÓN 3: Uso de withValues
+        color: Colors.black.withValues(alpha: 0.85),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: Colors.white24),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.5),
+            // CORRECCIÓN 4: Uso de withValues
+            color: Colors.black.withValues(alpha: 0.5),
             blurRadius: 10,
             spreadRadius: 2,
           )
@@ -135,28 +139,28 @@ class TutorialOverlay extends StatelessWidget {
           ),
           const SizedBox(height: 20),
           
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: isButtonEnabled ? onNextStep : null,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: buttonColor,
-                  disabledBackgroundColor: buttonColor, 
-                  padding: const EdgeInsets.symmetric(vertical: 14),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton(
+              onPressed: isButtonEnabled ? onNextStep : null,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: buttonColor,
+                disabledBackgroundColor: buttonColor, 
+                padding: const EdgeInsets.symmetric(vertical: 14),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
                 ),
-                child: Text(
-                  buttonText,
-                  style: TextStyle(
-                    color: isButtonEnabled ? Colors.white : Colors.white54,
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
+              ),
+              child: Text(
+                buttonText,
+                style: TextStyle(
+                  color: isButtonEnabled ? Colors.white : Colors.white54,
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
                 ),
               ),
             ),
+          ),
         ],
       ),
     );
