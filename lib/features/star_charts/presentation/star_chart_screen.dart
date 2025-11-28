@@ -9,12 +9,14 @@ import 'package:skyshare_frontend_mobile/features/star_charts/utils/sensor_wrapp
 class StarChartScreen extends StatefulWidget {
   final double latitude;
   final double longitude;
+  final bool startTutorial;
   final SensorWrapper? sensorWrapper;
 
   const StarChartScreen({
     super.key,
     required this.latitude,
     required this.longitude,
+    this.startTutorial = false,
     this.sensorWrapper,
   });
 
@@ -61,6 +63,7 @@ class _StarChartScreenState extends State<StarChartScreen> {
               
               return StarChartContent(
                 starChartProvider: starChartProvider,
+                startTutorial: widget.startTutorial,
               );
             },
           ),

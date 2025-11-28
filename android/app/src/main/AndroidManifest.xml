@@ -12,7 +12,7 @@
     <uses-feature android:glEsVersion="0x00030000" android:required="true" />
     
     <application
-        android:label="skyshare_frontend_mobile"
+        android:label="SkyHare"
         android:name="${applicationName}"
         android:usesCleartextTraffic="true"
         android:networkSecurityConfig="@xml/network_security_config"
