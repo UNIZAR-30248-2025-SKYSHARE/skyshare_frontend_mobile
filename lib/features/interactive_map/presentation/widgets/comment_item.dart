@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:skyshare_frontend_mobile/core/i18n/app_localizations.dart';
 
 class CommentItem extends StatelessWidget {
   final String author;
@@ -41,7 +42,7 @@ class CommentItem extends StatelessWidget {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    'Hace $time',
+                    AppLocalizations.of(context)?.t('comments.time_ago', {'time': time}) ?? '$time ago',
                     style: const TextStyle(
                       color: Colors.white24,
                       fontSize: 12,

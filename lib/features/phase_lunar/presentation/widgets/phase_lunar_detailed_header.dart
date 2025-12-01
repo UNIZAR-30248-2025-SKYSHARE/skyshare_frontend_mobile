@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'moon_phase_widget.dart';
+import 'package:skyshare_frontend_mobile/core/i18n/app_localizations.dart';
 
 class PhaseLunarDetailedHeader extends StatelessWidget {
   final dynamic phase;
@@ -10,6 +11,7 @@ class PhaseLunarDetailedHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final dateStr = '${phase.date.day.toString().padLeft(2, '0')}/${phase.date.month.toString().padLeft(2, '0')}/${phase.date.year}';
+    final loc = AppLocalizations.of(context);
 
     return Column(
       children: [
@@ -27,7 +29,7 @@ class PhaseLunarDetailedHeader extends StatelessWidget {
         ),
         const SizedBox(height: 8),
         Text(
-          phase.phaseName.isNotEmpty ? phase.phaseName : 'Phase unknown',
+          phase.phaseName.isNotEmpty ? phase.phaseName : (loc?.t('phase_lunar.unknown') ?? 'Phase unknown'),
           style: const TextStyle(fontSize: 16),
         ),
         const SizedBox(height: 16),

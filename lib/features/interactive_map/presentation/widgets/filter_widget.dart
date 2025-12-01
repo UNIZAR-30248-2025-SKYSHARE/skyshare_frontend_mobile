@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:skyshare_frontend_mobile/core/i18n/app_localizations.dart';
 
 enum FilterType { nombre, valoracion }
 
@@ -60,6 +61,7 @@ class _FilterWidgetState extends State<FilterWidget> {
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
+    final loc = AppLocalizations.of(context);
     
     return Positioned(
       top: 50,
@@ -97,7 +99,7 @@ class _FilterWidgetState extends State<FilterWidget> {
                       child: IconButton(
                         icon: const Icon(Icons.close, size: 20, color: Colors.white),
                         onPressed: _toggleFilter,
-                        tooltip: 'Cerrar filtros',
+                        tooltip: loc?.t('map.filter.tooltip_close') ?? 'Close filters',
                         padding: EdgeInsets.zero,
                         constraints: const BoxConstraints(minWidth: 40, minHeight: 40),
                       ),
@@ -119,10 +121,10 @@ class _FilterWidgetState extends State<FilterWidget> {
                                   controller: _controller,
                                   focusNode: _focusNode,
                                   autofocus: false, 
-                                  decoration: const InputDecoration(
-                                    hintText: 'Nombre...',
+                                  decoration: InputDecoration(
+                                    hintText: loc?.t('map.filter.hint_name') ?? 'Name...',
                                     border: InputBorder.none,
-                                    contentPadding: EdgeInsets.symmetric(horizontal: 4),
+                                    contentPadding: const EdgeInsets.symmetric(horizontal: 4),
                                     isDense: true,
                                   ),
                                   onChanged: (value) {
@@ -196,7 +198,7 @@ class _FilterWidgetState extends State<FilterWidget> {
                 child: IconButton(
                   icon: const Icon(Icons.filter_list, color: Colors.white),
                   onPressed: _toggleFilter,
-                  tooltip: 'Filtrar spots',
+                  tooltip: loc?.t('map.filter.tooltip_open') ?? 'Filter spots',
                 ),
               ),
       ),

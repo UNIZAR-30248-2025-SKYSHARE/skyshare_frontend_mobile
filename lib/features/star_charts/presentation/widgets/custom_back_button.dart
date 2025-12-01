@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:skyshare_frontend_mobile/core/i18n/app_localizations.dart';
 
 class CustomBackButton extends StatelessWidget {
   final VoidCallback? onPressed;
@@ -30,7 +31,7 @@ class CustomBackButton extends StatelessWidget {
       child: IconButton(
         icon: Icon(Icons.arrow_back, color: iconColor),
         onPressed: onPressed ?? () => Navigator.of(context).pop(),
-        tooltip: 'Volver',
+        tooltip: AppLocalizations.of(context)?.t('navigation.back') ?? 'Volver',
       ),
     );
   }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:skyshare_frontend_mobile/core/i18n/app_localizations.dart';
 import '../../data/models/spot_model.dart';
 
 class SpotImageHeader extends StatelessWidget {
@@ -47,9 +48,9 @@ class SpotImageHeader extends StatelessWidget {
                       );
                     },
                     errorBuilder: (context, error, stackTrace) =>
-                        _buildPlaceholderImage(),
+                        _buildPlaceholderImage(context),
                   )
-                : _buildPlaceholderImage(),
+                : _buildPlaceholderImage(context),
           ),
           Positioned(
             bottom: 0,
@@ -75,18 +76,18 @@ class SpotImageHeader extends StatelessWidget {
     );
   }
 
-  Widget _buildPlaceholderImage() {
+  Widget _buildPlaceholderImage(BuildContext context) {
     return Container(
       color: const Color(0xFF20202A),
-      child: const Center(
+      child: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.image_not_supported, size: 48, color: Colors.white30),
-            SizedBox(height: 8),
+            const Icon(Icons.image_not_supported, size: 48, color: Colors.white30),
+            const SizedBox(height: 8),
             Text(
-              'Sin imagen',
-              style: TextStyle(color: Colors.white30),
+              AppLocalizations.of(context)?.t('image.no_image') ?? 'Sin imagen',
+              style: const TextStyle(color: Colors.white30),
             ),
           ],
         ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:skyshare_frontend_mobile/core/i18n/app_localizations.dart';
 
 class DeleteAlertDialog extends StatelessWidget {
   final VoidCallback onConfirm;
@@ -15,13 +16,13 @@ class DeleteAlertDialog extends StatelessWidget {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
       ),
-      title: _buildTitle(),
-      content: _buildContent(),
+      title: _buildTitle(context),
+      content: _buildContent(context),
       actions: _buildActions(context),
     );
   }
 
-  Widget _buildTitle() {
+  Widget _buildTitle(BuildContext context) {
     return Row(
       children: [
         Container(
@@ -37,11 +38,11 @@ class DeleteAlertDialog extends StatelessWidget {
           ),
         ),
         const SizedBox(width: 12),
-        const Flexible(
+        Flexible(
           fit: FlexFit.tight,
           child: Text(
-            'Delete alert?',
-            style: TextStyle(
+            AppLocalizations.of(context)?.t('alerts.form.delete_confirmation_title') ?? 'Delete alert?',
+            style: const TextStyle(
               color: Colors.white,
               fontSize: 18,
               fontWeight: FontWeight.bold,
@@ -52,12 +53,13 @@ class DeleteAlertDialog extends StatelessWidget {
     );
   }
 
-  Widget _buildContent() {
-    return const Padding(
-      padding: EdgeInsets.only(top: 8.0),
+  Widget _buildContent(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 8.0),
       child: Text(
+        AppLocalizations.of(context)?.t('alerts.form.delete_confirmation_message') ?? 
         'This action cannot be undone. The alert will be permanently deleted.',
-        style: TextStyle(
+        style: const TextStyle(
           color: Colors.white70,
           fontSize: 14,
           height: 1.5,
@@ -71,9 +73,9 @@ class DeleteAlertDialog extends StatelessWidget {
       TextButton(
         key: const Key('delete_dialog_cancel'),
         onPressed: () => Navigator.of(context).pop(),
-        child: const Text(
-          'Cancelar',
-          style: TextStyle(
+        child: Text(
+          AppLocalizations.of(context)?.t('alerts.form.cancel') ?? 'Cancel',
+          style: const TextStyle(
             color: Colors.white70,
             fontWeight: FontWeight.w500,
           ),
@@ -90,9 +92,9 @@ class DeleteAlertDialog extends StatelessWidget {
             borderRadius: BorderRadius.circular(8),
           ),
         ),
-        child: const Text(
-          'Eliminar',
-          style: TextStyle(fontWeight: FontWeight.bold),
+        child: Text(
+          AppLocalizations.of(context)?.t('alerts.form.delete') ?? 'Delete',
+          style: const TextStyle(fontWeight: FontWeight.bold),
         ),
       ),
     ];

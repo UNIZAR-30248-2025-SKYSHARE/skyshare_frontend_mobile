@@ -215,8 +215,8 @@ class _CreateSpotScreenState extends State<CreateSpotScreen> {
                                 children: [
                                   Icon(Icons.image, size: 46, color: Colors.grey.shade400),
                                   const SizedBox(height: 6),
-                  Text(AppLocalizations.of(context)?.t('spot.create.add_photo_short') ?? 'Add photo',
-                    style: TextStyle(color: Colors.grey.shade400)),
+                                  Text(AppLocalizations.of(context)?.t('spot.create.add_photo_short') ?? 'Add photo',
+                                    style: TextStyle(color: Colors.grey.shade400)),
                                 ],
                               ),
                             Positioned(
@@ -267,8 +267,8 @@ class _CreateSpotScreenState extends State<CreateSpotScreen> {
                         ),
                         contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 14),
                       ),
-            validator: (value) =>
-              value == null || value.trim().isEmpty ? (AppLocalizations.of(context)?.t('spot.name_required') ?? 'El nombre es obligatorio') : null,
+                      validator: (value) =>
+                        value == null || value.trim().isEmpty ? (AppLocalizations.of(context)?.t('spot.name_required') ?? 'El nombre es obligatorio') : null,
                     ),
 
                     const SizedBox(height: 16),
@@ -300,10 +300,10 @@ class _CreateSpotScreenState extends State<CreateSpotScreen> {
                         ),
                         contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 14),
                       ),
-            maxLines: 5,
-            validator: (value) => value == null || value.trim().isEmpty
-              ? (AppLocalizations.of(context)?.t('spot.description_required') ?? 'La descripción es obligatoria')
-              : null,
+                      maxLines: 5,
+                      validator: (value) => value == null || value.trim().isEmpty
+                        ? (AppLocalizations.of(context)?.t('spot.description_required') ?? 'La descripción es obligatoria')
+                        : null,
                     ),
 
                     const SizedBox(height: 16),
@@ -351,9 +351,9 @@ class _CreateSpotScreenState extends State<CreateSpotScreen> {
                             borderRadius: BorderRadius.circular(30),
                           ),
                         ),
-                        child: const Text(
-                          'SAVE CHANGES',
-                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                        child: Text(
+                          AppLocalizations.of(context)?.t('spot.save_changes_caps') ?? 'SAVE CHANGES',
+                          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                         ),
                       ),
                     ),

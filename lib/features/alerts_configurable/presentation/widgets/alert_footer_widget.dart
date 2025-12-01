@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:skyshare_frontend_mobile/core/i18n/app_localizations.dart';
 
 class AlertFooterWidget extends StatelessWidget {
   final DateTime? date;
@@ -12,20 +13,28 @@ class AlertFooterWidget extends StatelessWidget {
     required this.onDelete,
   });
 
-  String _getDateText() {
-    if (date == null) return 'No date set';
+  String _getDateText(BuildContext context) {
+    final loc = AppLocalizations.of(context);
+    if (date == null) return loc?.t('alerts.date.no_date') ?? 'No date set';
 
     final today = DateTime.now();
     final currentDate = DateTime(today.year, today.month, today.day);
     final targetDate = DateTime(date!.year, date!.month, date!.day);
     final diff = targetDate.difference(currentDate).inDays;
 
-    if (diff == 0) return 'Today';
-    if (diff == 1) return 'Tomorrow';
-    if (diff < 7) return 'In $diff days';
+    if (diff == 0) return loc?.t('alerts.date.today') ?? 'Today';
+    if (diff == 1) return loc?.t('alerts.date.tomorrow') ?? 'Tomorrow';
+    
+    if (diff < 7) {
+      return loc?.t('alerts.date.in_days', {'count': diff.toString()}) ?? 'In $diff days';
+    }
+    
     if (diff < 30) {
       final weeks = (diff / 7).floor();
-      return 'In $weeks ${weeks == 1 ? 'week' : 'weeks'}';
+      if (weeks == 1) {
+        return loc?.t('alerts.date.in_week_singular') ?? 'In 1 week';
+      }
+      return loc?.t('alerts.date.in_weeks', {'count': weeks.toString()}) ?? 'In $weeks weeks';
     }
 
     return '${targetDate.day.toString().padLeft(2, '0')}/'
@@ -38,13 +47,13 @@ class AlertFooterWidget extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        _buildDateInfo(),
-        _buildDeleteButton(),
+        _buildDateInfo(context),
+        _buildDeleteButton(context),
       ],
     );
   }
 
-  Widget _buildDateInfo() {
+  Widget _buildDateInfo(BuildContext context) {
     return Container(
       key: const Key('alert_footer_date'),
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
@@ -64,7 +73,7 @@ class AlertFooterWidget extends StatelessWidget {
           ),
           const SizedBox(width: 6),
           Text(
-            _getDateText(),
+            _getDateText(context),
             style: TextStyle(
               color: isActive ? Colors.white60 : Colors.grey,
               fontSize: 13,
@@ -76,14 +85,14 @@ class AlertFooterWidget extends StatelessWidget {
     );
   }
 
-  Widget _buildDeleteButton() {
+  Widget _buildDeleteButton(BuildContext context) {
     return IconButton(
       key: const Key('alert_footer_delete'),
       onPressed: onDelete,
       icon: const Icon(Icons.delete_outline),
       color: Colors.red.shade700,
       iconSize: 24,
-      tooltip: 'Delete alert',
+      tooltip: AppLocalizations.of(context)?.t('alerts.form.delete') ?? 'Delete alert',
     );
   }
 }

@@ -127,9 +127,9 @@ class _SpotEditDialogState extends State<SpotEditDialog> {
 
     if (success) {
       widget.onSpotUpdated(); 
-      _showSnackbar('Spot eliminado permanentemente.', Colors.green);
+      _showSnackbar(AppLocalizations.of(context)?.t('spot.delete_success') ?? 'Spot eliminado permanentemente.', Colors.green);
     } else {
-      _showSnackbar('Error al eliminar el spot.', Colors.red);
+      _showSnackbar(AppLocalizations.of(context)?.t('spot.delete_error') ?? 'Error al eliminar el spot.', Colors.red);
     }
   }
 

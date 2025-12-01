@@ -30,8 +30,7 @@ class _PhaseLunarScreenState extends State<PhaseLunarScreen> {
   String _formatDate(DateTime d) =>
       "${d.day.toString().padLeft(2, '0')}/${d.month.toString().padLeft(2, '0')}/${d.year}";
 
-  String _weekdayName(DateTime d) {
-    // Use localized weekday short names when available, fall back to English
+  String _weekdayName(BuildContext context, DateTime d) {
     final loc = AppLocalizations.of(context);
     final names = [
       loc?.t('weekday.mon') ?? 'Mon',
@@ -71,13 +70,16 @@ class _PhaseLunarScreenState extends State<PhaseLunarScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context);
+
     return StarBackground(
       child: Scaffold(
         backgroundColor: Colors.transparent,
         body: SafeArea(
           child: Consumer2<LunarPhaseProvider, DashboardProvider>(
             builder: (context, lunarProvider, dashboardProvider, _) {
-              final locationName = dashboardProvider.selectedLocation?.name ?? 'Unknown location';
+              final locationName = dashboardProvider.selectedLocation?.name ?? 
+                  (loc?.t('location.unknown') ?? 'Unknown location');
 
               if (lunarProvider.isLoading) {
                 return const Center(child: CircularProgressIndicator());
@@ -91,7 +93,7 @@ class _PhaseLunarScreenState extends State<PhaseLunarScreen> {
                       const Icon(Icons.error_outline, color: Colors.red, size: 48),
                       const SizedBox(height: 16),
                       Text(
-                        'Error: ${lunarProvider.error}',
+                        (loc?.t('error_generic') ?? 'Error: {err}').replaceAll('{err}', lunarProvider.error.toString()),
                         style: const TextStyle(color: Colors.white),
                         textAlign: TextAlign.center,
                       ),
@@ -100,7 +102,7 @@ class _PhaseLunarScreenState extends State<PhaseLunarScreen> {
                         onPressed: () {
                           lunarProvider.loadNext7Days();
                         },
-                        child: Text(AppLocalizations.of(context)?.t('retry') ?? 'Reintentar'),
+                        child: Text(loc?.t('retry') ?? 'Reintentar'),
                       ),
                     ],
                   ),
@@ -115,7 +117,7 @@ class _PhaseLunarScreenState extends State<PhaseLunarScreen> {
                       const Icon(Icons.nightlight_round, color: Colors.orange, size: 48),
                       const SizedBox(height: 16),
                       Text(
-                        AppLocalizations.of(context)?.t('phases_loading_slow') ?? 'Las fases lunares están tardando en cargar',
+                        loc?.t('phases_loading_slow') ?? 'Las fases lunares están tardando en cargar',
                         style: const TextStyle(color: Colors.white70),
                       ),
                       const SizedBox(height: 16),
@@ -123,7 +125,7 @@ class _PhaseLunarScreenState extends State<PhaseLunarScreen> {
                         onPressed: () {
                           lunarProvider.loadNext7Days();
                         },
-                        child: const Text('Reintentar'),
+                        child: Text(loc?.t('retry') ?? 'Reintentar'),
                       ),
                     ],
                   ),
@@ -139,7 +141,7 @@ class _PhaseLunarScreenState extends State<PhaseLunarScreen> {
                       const Icon(Icons.nightlight_round, color: Colors.grey, size: 48),
                       const SizedBox(height: 16),
                       Text(
-                        AppLocalizations.of(context)?.t('no_lunar_data') ?? 'No hay datos de fases lunares disponibles',
+                        loc?.t('no_lunar_data') ?? 'No hay datos de fases lunares disponibles',
                         style: const TextStyle(color: Colors.white70),
                       ),
                       const SizedBox(height: 16),
@@ -147,7 +149,7 @@ class _PhaseLunarScreenState extends State<PhaseLunarScreen> {
                         onPressed: () {
                           lunarProvider.loadNext7Days();
                         },
-                        child: const Text('Reintentar'),
+                        child: Text(loc?.t('retry') ?? 'Reintentar'),
                       ),
                     ],
                   ),
@@ -169,7 +171,7 @@ class _PhaseLunarScreenState extends State<PhaseLunarScreen> {
                         ),
                         const SizedBox(height: 12),
                         Text(
-                          AppLocalizations.of(context)?.t('next_7_days') ?? 'Next 7 days',
+                          loc?.t('next_7_days') ?? 'Next 7 days',
                           style: const TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.w600,
@@ -206,7 +208,7 @@ class _PhaseLunarScreenState extends State<PhaseLunarScreen> {
                       itemBuilder: (context, i) {
                         final p = phases[i];
                         final date = p.fecha;
-                        final weekday = date != null ? _weekdayName(date) : '';
+                        final weekday = date != null ? _weekdayName(context, date) : '';
                         final dateStr = date != null ? _formatDate(date) : '';
                         return LunarPhaseItem(
                           phase: p,

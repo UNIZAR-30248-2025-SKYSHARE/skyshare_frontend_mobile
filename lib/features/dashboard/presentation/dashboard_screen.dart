@@ -12,7 +12,6 @@ import 'package:skyshare_frontend_mobile/core/i18n/app_localizations.dart';
 import 'package:skyshare_frontend_mobile/core/i18n/language_switcher.dart';
 import 'package:skyshare_frontend_mobile/features/star_charts/presentation/star_chart_screen.dart';
 
-
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
 
@@ -34,9 +33,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
   Future<void> _initializeData() async {
     final provider = Provider.of<DashboardProvider>(context, listen: false);
     await provider.detectAndSyncLocation();
-    setState(() {
-      _initialLoadCompleted = true;
-    });
+    if (mounted) {
+      setState(() {
+        _initialLoadCompleted = true;
+      });
+    }
   }
 
   Future<void> _loadData() async {
@@ -56,119 +57,120 @@ class _DashboardScreenState extends State<DashboardScreen> {
           SafeArea(
             child: Consumer<DashboardProvider>(
               builder: (context, provider, child) {
-            // build the main content (varies depending on provider state)
-            Widget content;
+                Widget content;
 
-            if (provider.errorMessage != null) {
-              content = Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Icon(Icons.error_outline, color: Colors.red, size: 48),
-                    const SizedBox(height: 16),
-                    Text(
-                      provider.errorMessage!,
-                      style: const TextStyle(color: Colors.white),
-                      textAlign: TextAlign.center,
+                if (provider.errorMessage != null) {
+                  content = Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Icon(Icons.error_outline, color: Colors.red, size: 48),
+                        const SizedBox(height: 16),
+                        Text(
+                          provider.errorMessage!,
+                          style: const TextStyle(color: Colors.white),
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 16),
+                        ElevatedButton(
+                          onPressed: () {
+                            provider.clearError();
+                            _initializeData();
+                          },
+                          child: Text(AppLocalizations.of(context)?.t('retry') ?? 'Reintentar'),
+                        ),
+                      ],
                     ),
-                    const SizedBox(height: 16),
-                    ElevatedButton(
-                      onPressed: () {
-                        provider.clearError();
-                        _initializeData();
-                      },
-                      child: Text(AppLocalizations.of(context)?.t('retry') ?? 'Reintentar'),
+                  );
+                } else if (provider.shouldShowRetry) {
+                  content = Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Icon(Icons.cloud_off, color: Colors.orange, size: 48),
+                        const SizedBox(height: 16),
+                        Text(
+                          AppLocalizations.of(context)?.t('dashboard.data_taking_long') ??
+                              'Los datos están tardando más de lo esperado',
+                          style: const TextStyle(color: Colors.white70),
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          AppLocalizations.of(context)?.t('dashboard.normal_when_new_location') ??
+                              'Esto es normal cuando se detecta una nueva ubicación',
+                          style: const TextStyle(color: Colors.white54, fontSize: 12),
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 16),
+                        ElevatedButton(
+                          onPressed: _initializeData,
+                          child: Text(AppLocalizations.of(context)?.t('dashboard.retry_load') ?? 'Reintentar carga'),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
-              );
-            } else if (provider.shouldShowRetry) {
-              content = Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Icon(Icons.cloud_off, color: Colors.orange, size: 48),
-                    const SizedBox(height: 16),
-                    Text(
-                      AppLocalizations.of(context)?.t('dashboard.data_taking_long') ?? 'Los datos están tardando más de lo esperado',
-                      style: const TextStyle(color: Colors.white70),
-                      textAlign: TextAlign.center,
+                  );
+                } else if (!_initialLoadCompleted || (provider.isLoading && !provider.locationSyncCompleted)) {
+                  content = Center(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const CircularProgressIndicator(valueColor: AlwaysStoppedAnimation<Color>(Colors.white)),
+                        const SizedBox(height: 12),
+                        Text(
+                          AppLocalizations.of(context)?.t('dashboard.detecting_location') ?? 'Detectando ubicación…',
+                          style: const TextStyle(color: Colors.white70, fontSize: 12),
+                        ),
+                      ],
                     ),
-                    const SizedBox(height: 8),
-                    Text(
-                      AppLocalizations.of(context)?.t('dashboard.normal_when_new_location') ?? 'Esto es normal cuando se detecta una nueva ubicación',
-                      style: const TextStyle(color: Colors.white54, fontSize: 12),
-                      textAlign: TextAlign.center,
+                  );
+                } else if (provider.selectedLocation == null) {
+                  content = Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Icon(Icons.location_off, color: Colors.white70, size: 48),
+                        const SizedBox(height: 16),
+                        Text(
+                          AppLocalizations.of(context)?.t('dashboard.could_not_detect_location') ??
+                              'No se pudo detectar la ubicación',
+                          style: const TextStyle(color: Colors.white70),
+                        ),
+                        const SizedBox(height: 16),
+                        ElevatedButton(
+                          onPressed: _initializeData,
+                          child: Text(AppLocalizations.of(context)?.t('dashboard.try_again') ?? 'Intentar nuevamente'),
+                        ),
+                      ],
                     ),
-                    const SizedBox(height: 16),
-                    ElevatedButton(
-                      onPressed: _initializeData,
-                      child: Text(AppLocalizations.of(context)?.t('dashboard.retry_load') ?? 'Reintentar carga'),
-                    ),
-                  ],
-                ),
-              );
-            } else if (!_initialLoadCompleted || (provider.isLoading && !provider.locationSyncCompleted)) {
-              content = Center(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const CircularProgressIndicator(valueColor: AlwaysStoppedAnimation<Color>(Colors.white)),
-                    const SizedBox(height: 12),
-                    Text(
-                      AppLocalizations.of(context)?.t('dashboard.detecting_location') ?? 'Detectando ubicación…',
-                      style: const TextStyle(color: Colors.white70, fontSize: 12),
-                    ),
-                  ],
-                ),
-              );
-            } else if (provider.selectedLocation == null) {
-              content = Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Icon(Icons.location_off, color: Colors.white70, size: 48),
-                    const SizedBox(height: 16),
-                    Text(
-                      AppLocalizations.of(context)?.t('dashboard.could_not_detect_location') ?? 'No se pudo detectar la ubicación',
-                      style: const TextStyle(color: Colors.white70),
-                    ),
-                    const SizedBox(height: 16),
-                    ElevatedButton(
-                      onPressed: _initializeData,
-                      child: Text(AppLocalizations.of(context)?.t('dashboard.try_again') ?? 'Intentar nuevamente'),
-                    ),
-                  ],
-                ),
-              );
-            } else if (provider.isLoading && provider.selectedLocation != null) {
-              content = _buildContentSkeleton(provider);
-            } else {
-              content = _buildMainContent(provider);
-            }
+                  );
+                } else if (provider.isLoading && provider.selectedLocation != null) {
+                  content = _buildContentSkeleton(context, provider);
+                } else {
+                  content = _buildMainContent(context, provider);
+                }
 
-            // Place the language switcher only on the Dashboard, bottom-left, so right-side buttons remain visible
-            return Stack(
-              children: [
-                content,
-                const Positioned(
-                  left: 16,
-                  bottom: 16,
-                  child: LanguageSwitcher(),
-                ),
-              ],
-            );
+                return Stack(
+                  children: [
+                    content,
+                    const Positioned(
+                      left: 16,
+                      bottom: 16,
+                      child: LanguageSwitcher(),
+                    ),
+                  ],
+                );
               },
             ),
           ),
-          // Language switcher removed from this outer layer to avoid duplicates - it's placed inside the SafeArea consumer only
         ],
       ),
     );
   }
 
-  Widget _buildContentSkeleton(DashboardProvider provider) {
-    final locName = provider.selectedLocation?.name ?? 'Ubicación no disponible';
+  Widget _buildContentSkeleton(BuildContext context, DashboardProvider provider) {
+    final locName = provider.selectedLocation?.name ?? 
+        (AppLocalizations.of(context)?.t('dashboard.location_unavailable') ?? 'Ubicación no disponible');
     final country = provider.selectedLocation?.country ?? '';
 
     return RefreshIndicator(
@@ -183,18 +185,19 @@ class _DashboardScreenState extends State<DashboardScreen> {
           const SizedBox(height: 24),
           _buildShimmerWeatherCard(),
           const SizedBox(height: 24),
-          _buildShimmerLightPollution(),
+          _buildShimmerLightPollution(context),
           const SizedBox(height: 24),
-          _buildShimmerConstellations(),
+          _buildShimmerConstellations(context),
           const SizedBox(height: 24),
-          _buildShimmerSkyIndicator(),
+          _buildShimmerSkyIndicator(context),
         ],
       ),
     );
   }
 
-  Widget _buildMainContent(DashboardProvider provider) {
-    final locName = provider.selectedLocation?.name ?? 'Ubicación no disponible';
+  Widget _buildMainContent(BuildContext context, DashboardProvider provider) {
+    final locName = provider.selectedLocation?.name ?? 
+        (AppLocalizations.of(context)?.t('dashboard.location_unavailable') ?? 'Ubicación no disponible');
     final country = provider.selectedLocation?.country ?? '';
 
     return RefreshIndicator(
@@ -209,14 +212,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
           const SizedBox(height: 24),
           provider.weather != null
               ? WeatherCard(weather: provider.weather!)
-              : _buildNoDataCard('Datos meteorológicos no disponibles'),
+              : _buildNoDataCard(AppLocalizations.of(context)?.t('dashboard.no_weather_data') ?? 'Datos meteorológicos no disponibles'),
           const SizedBox(height: 24),
           if (provider.weather?.lightPollution != null)
             LightPollutionBar(value: provider.weather!.lightPollution!.toDouble()),
           const SizedBox(height: 24),
           provider.constellations.isNotEmpty
               ? VisibleSkySection(constellations: provider.constellations)
-              : _buildNoDataCard('No hay datos de constelaciones visibles'),
+              : _buildNoDataCard(AppLocalizations.of(context)?.t('dashboard.no_constellations') ?? 'No hay datos de constelaciones visibles'),
           const SizedBox(height: 24),
           if (provider.skyIndicator != null) SkyIndicator(value: provider.skyIndicator!.value),
           const SizedBox(height: 72),
@@ -265,30 +268,21 @@ class _DashboardScreenState extends State<DashboardScreen> {
           children: [
             Column(
               children: [
-                CircleAvatar(
-                  backgroundColor: Colors.white24,
-                  radius: 20,
-                ),
+                CircleAvatar(backgroundColor: Colors.white24, radius: 20),
                 SizedBox(height: 8),
                 Text('---', style: TextStyle(color: Colors.white70)),
               ],
             ),
             Column(
               children: [
-                CircleAvatar(
-                  backgroundColor: Colors.white24,
-                  radius: 20,
-                ),
+                CircleAvatar(backgroundColor: Colors.white24, radius: 20),
                 SizedBox(height: 8),
                 Text('---', style: TextStyle(color: Colors.white70)),
               ],
             ),
             Column(
               children: [
-                CircleAvatar(
-                  backgroundColor: Colors.white24,
-                  radius: 20,
-                ),
+                CircleAvatar(backgroundColor: Colors.white24, radius: 20),
                 SizedBox(height: 8),
                 Text('---', style: TextStyle(color: Colors.white70)),
               ],
@@ -299,17 +293,18 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
   }
 
-  Widget _buildShimmerLightPollution() {
-    return const Card(
-      color: Color.fromRGBO(0, 0, 0, 0.3),
+  Widget _buildShimmerLightPollution(BuildContext context) {
+    return Card(
+      color: const Color.fromRGBO(0, 0, 0, 0.3),
       child: Padding(
-        padding: EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Contaminación lumínica', style: TextStyle(color: Colors.white70, fontSize: 16)),
-            SizedBox(height: 8),
-            LinearProgressIndicator(
+            Text(AppLocalizations.of(context)?.t('dashboard.light_pollution') ?? 'Contaminación lumínica',
+                style: const TextStyle(color: Colors.white70, fontSize: 16)),
+            const SizedBox(height: 8),
+            const LinearProgressIndicator(
               valueColor: AlwaysStoppedAnimation<Color>(Colors.white24),
               backgroundColor: Colors.white10,
             ),
@@ -319,32 +314,34 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
   }
 
-  Widget _buildShimmerConstellations() {
-    return const Card(
-      color: Color.fromRGBO(0, 0, 0, 0.3),
+  Widget _buildShimmerConstellations(BuildContext context) {
+    return Card(
+      color: const Color.fromRGBO(0, 0, 0, 0.3),
       child: Padding(
-        padding: EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Cielo visible', style: TextStyle(color: Colors.white70, fontSize: 16)),
+            Text(AppLocalizations.of(context)?.t('cielo_visible') ?? 'Cielo visible',
+                style: const TextStyle(color: Colors.white70, fontSize: 16)),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildShimmerSkyIndicator() {
-    return const Card(
-      color: Color.fromRGBO(0, 0, 0, 0.3),
+  Widget _buildShimmerSkyIndicator(BuildContext context) {
+    return Card(
+      color: const Color.fromRGBO(0, 0, 0, 0.3),
       child: Padding(
-        padding: EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Condiciones del cielo', style: TextStyle(color: Colors.white70, fontSize: 16)),
-            SizedBox(height: 8),
-            LinearProgressIndicator(
+            Text(AppLocalizations.of(context)?.t('dashboard.conditions') ?? 'Condiciones del cielo',
+                style: const TextStyle(color: Colors.white70, fontSize: 16)),
+            const SizedBox(height: 8),
+            const LinearProgressIndicator(
               valueColor: AlwaysStoppedAnimation<Color>(Colors.white24),
               backgroundColor: Colors.white10,
             ),

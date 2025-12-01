@@ -1,11 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:skyshare_frontend_mobile/core/i18n/app_localizations.dart';
 import 'package:skyshare_frontend_mobile/features/alerts_configurable/presentation/widgets/alerts_header_widget.dart';
 
 void main() {
   testWidgets('muestra correctamente total y activas', (tester) async {
     await tester.pumpWidget(
       const MaterialApp(
+        localizationsDelegates: [
+          AppLocalizations.delegate,
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+        ],
+        supportedLocales: AppLocalizations.supportedLocales,
         home: Scaffold(
           body: AlertsHeaderWidget(
             totalAlerts: 5,
@@ -15,11 +24,14 @@ void main() {
       ),
     );
 
+    await tester.pumpAndSettle();
+
     expect(find.byKey(const Key('alerts_header_container')), findsOneWidget);
+    
     expect(find.byKey(const Key('alerts_header_total')), findsOneWidget);
     expect(find.text('5 alerts'), findsOneWidget);
 
     expect(find.byKey(const Key('alerts_header_active')), findsOneWidget);
-    expect(find.text('3 activas'), findsOneWidget);
+    expect(find.text('3 active'), findsOneWidget);
   });
 }

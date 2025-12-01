@@ -11,6 +11,7 @@ import 'package:skyshare_frontend_mobile/features/star_charts/presentation/widge
 import 'package:skyshare_frontend_mobile/features/star_charts/tutorial/data/tutorial_data.dart';
 import 'package:skyshare_frontend_mobile/features/star_charts/tutorial/domain/tutorial_state.dart';
 import 'package:skyshare_frontend_mobile/features/star_charts/tutorial/presentation/tutorial_overlay.dart';
+import 'package:skyshare_frontend_mobile/core/i18n/app_localizations.dart';
 
 class StarChartContent extends StatefulWidget {
   final StarChartProvider starChartProvider;
@@ -47,7 +48,6 @@ class _StarChartContentState extends State<StarChartContent> {
     super.initState();
     _generateBackgroundStars();
     _waitForFirstCompassReading();
-    // If requested by the caller, ensure the tutorial is active from start
     if (widget.startTutorial) {
       _tutorialState.reset();
     }
@@ -134,8 +134,6 @@ class _StarChartContentState extends State<StarChartContent> {
   }
 
   void _onStarTapped(Map<String, dynamic> object) {
-    // During the tutorial we no longer require tapping the polar star to
-    // advance. Tapping always opens the object info panel.
     setState(() => _selectedObject = object);
   }
 
@@ -204,7 +202,7 @@ class _StarChartContentState extends State<StarChartContent> {
             ),
           ),
           
-          if (isLoading) _buildLoadingOverlay(),
+          if (isLoading) _buildLoadingOverlay(context),
           
           if (_selectedObject != null)
             ConstellationInfoPanel(
@@ -212,7 +210,6 @@ class _StarChartContentState extends State<StarChartContent> {
               onClose: () => setState(() => _selectedObject = null),
             ),
 
-          // 3. CAPA DE TUTORIAL (Overlay UI)
           if (showTutorial && !isLoading)
             TutorialOverlay(
               currentStep: _tutorialState.currentStep,
@@ -228,14 +225,13 @@ class _StarChartContentState extends State<StarChartContent> {
   bool _checkTargetVisibility(Size screenSize, List<Map<String, dynamic>> stars) {
     final center = Offset(screenSize.width / 2, screenSize.height / 2);
     final rot = _deviceOrientation.asRotationMatrix();
-    const double radius = 25.0; // Mismo radio que en StarFieldPainter
+    const double radius = 25.0; 
 
-    // Buscamos el objeto que toca encontrar en este paso
     for (final obj in stars) {
       if (_tutorialState.isTargetObject(obj['id'])) {
         
         final rawAzDeg = (obj['az'] as num?)?.toDouble() ?? 0.0;
-        final azDeg = _correctAz(rawAzDeg); // Ajuste de heading
+        final azDeg = _correctAz(rawAzDeg); 
         final altDeg = (obj['alt'] as num?)?.toDouble() ?? 0.0;
         
         final az = azDeg * math.pi / 180.0;
@@ -253,7 +249,7 @@ class _StarChartContentState extends State<StarChartContent> {
         final proj = _project(rotated, center);
 
         if (proj.dx > 50 && proj.dx < screenSize.width - 50 &&
-            proj.dy > 100 && proj.dy < screenSize.height - 150) { // Margen abajo por el panel
+            proj.dy > 100 && proj.dy < screenSize.height - 150) { 
           return true;
         }
       }
@@ -261,20 +257,20 @@ class _StarChartContentState extends State<StarChartContent> {
     return false;
   }
 
-  Widget _buildLoadingOverlay() {
+  Widget _buildLoadingOverlay(BuildContext context) {
     return Container(
       color: Colors.black87,
-      child: const Center(
+      child: Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            CircularProgressIndicator(
+            const CircularProgressIndicator(
               valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF6366F1)),
             ),
-            SizedBox(height: 16),
+            const SizedBox(height: 16),
             Text(
-              'Cargando mapa estelar...',
-              style: TextStyle(
+              AppLocalizations.of(context)?.t('star_chart.loading') ?? 'Cargando mapa estelar...',
+              style: const TextStyle(
                 color: Colors.white,
                 fontSize: 16,
                 fontWeight: FontWeight.w500,
@@ -291,13 +287,15 @@ class _StarChartContentState extends State<StarChartContent> {
     const double tapRadius = 40.0;
     Map<String, dynamic>? closestObject;
     double closestDistance = double.infinity;
+    
+    final unknown = AppLocalizations.of(context)?.t('star_chart.unknown_object') ?? 'Unknown';
 
     for (final obj in stars) {
       try {
         if (obj['is_visible'] != true) continue;
         
         if (obj['type'] == 'constellation') {
-          final name = obj['name'] as String? ?? 'Unknown';
+          final name = obj['name'] as String? ?? unknown;
           final rawAzDeg = (obj['az'] as num?)?.toDouble() ?? 0.0;
           final azDeg = _correctAz(rawAzDeg);
           final altDeg = (obj['alt'] as num?)?.toDouble() ?? 0.0;

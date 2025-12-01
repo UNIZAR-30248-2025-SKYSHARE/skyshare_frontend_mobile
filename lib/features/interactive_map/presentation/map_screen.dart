@@ -304,15 +304,26 @@ class _MapScreenState extends State<MapScreen> {
     }).toList();
   }
 
-  String _getFilterDescription() {
+  String _getFilterDescription(BuildContext context) {
+    final loc = AppLocalizations.of(context);
     if (_filterValue.isEmpty) return '';
     switch (_filterType) {
       case FilterType.nombre:
-        return 'nombre contiene "$_filterValue"';
+        return loc?.t('map.filter.name_contains', {'value': _filterValue}) ?? 'name contains "$_filterValue"';
       case FilterType.valoracion:
         final rating = double.tryParse(_filterValue);
-        return rating != null ? 'valoración ≥ $rating ⭐' : '';
+        return rating != null 
+          ? (loc?.t('map.filter.rating_min', {'value': rating.toString()}) ?? 'rating ≥ $rating ⭐')
+          : '';
     }
+  }
+
+  String _getSpotsCountText(BuildContext context, int count) {
+    final loc = AppLocalizations.of(context);
+    if (count == 1) {
+      return loc?.t('map.filter.count_singular', {'count': count.toString()}) ?? '$count spot';
+    }
+    return loc?.t('map.filter.count_plural', {'count': count.toString()}) ?? '$count spots';
   }
 
   @override
@@ -371,15 +382,14 @@ class _MapScreenState extends State<MapScreen> {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
-                      '${filteredSpots.length} '
-                      'spot${filteredSpots.length != 1 ? 's' : ''}',
+                      _getSpotsCountText(context, filteredSpots.length),
                       style: const TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                     Text(
-                      _getFilterDescription(),
+                      _getFilterDescription(context),
                       style: TextStyle(
                         fontSize: 11,
                         color: Colors.grey[600],

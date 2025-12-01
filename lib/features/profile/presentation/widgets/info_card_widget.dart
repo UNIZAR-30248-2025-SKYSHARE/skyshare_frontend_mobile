@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../../core/models/user_model.dart';
+import 'package:skyshare_frontend_mobile/core/i18n/app_localizations.dart';
 
 class InfoCard extends StatelessWidget {
   final AppUser user;
@@ -8,6 +9,7 @@ class InfoCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context);
 
     return Card(
       shape: RoundedRectangleBorder(
@@ -20,10 +22,10 @@ class InfoCard extends StatelessWidget {
           children: [
             _InfoRow(
               icon: Icons.calendar_today,
-              label: 'Account created on',
+              label: loc?.t('profile.info.created_on') ?? 'Account created on',
               value: user.createdAt != null
                   ? user.createdAt!.toLocal().toString().split(' ')[0]
-                  : 'Unknown',
+                  : (loc?.t('profile.info.unknown') ?? 'Unknown'),
             ),
             const SizedBox(height: 12),
             

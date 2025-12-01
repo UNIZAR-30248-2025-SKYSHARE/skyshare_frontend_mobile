@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:skyshare_frontend_mobile/core/i18n/app_localizations.dart';
 
 class SearchBarWidget extends StatefulWidget {
   final Function(String) onSearchChanged;
@@ -48,6 +49,8 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
 
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context);
+    
     return Positioned(
       top: 50,
       left: 16,
@@ -72,17 +75,19 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
             IconButton(
               icon: Icon(_isExpanded ? Icons.close : Icons.search),
               onPressed: _toggleSearch,
-              tooltip: _isExpanded ? 'Cerrar búsqueda' : 'Buscar spots',
+              tooltip: _isExpanded 
+                ? (loc?.t('map.search.tooltip_close') ?? 'Close search')
+                : (loc?.t('map.search.tooltip_open') ?? 'Search spots'),
             ),
             if (_isExpanded)
               Expanded(
                 child: TextField(
                   controller: _controller,
                   autofocus: true,
-                  decoration: const InputDecoration(
-                    hintText: 'Buscar spots...',
+                  decoration: InputDecoration(
+                    hintText: loc?.t('map.search.hint') ?? 'Search spots...',
                     border: InputBorder.none,
-                    contentPadding: EdgeInsets.symmetric(horizontal: 8),
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 8),
                   ),
                 ),
               ),
@@ -93,7 +98,7 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
                   _controller.clear();
                   widget.onClear();
                 },
-                tooltip: 'Limpiar',
+                tooltip: loc?.t('map.search.tooltip_clear') ?? 'Clear',
               ),
           ],
         ),

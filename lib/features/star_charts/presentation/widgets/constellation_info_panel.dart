@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:skyshare_frontend_mobile/core/i18n/app_localizations.dart';
 
 class ConstellationInfoPanel extends StatelessWidget {
   final Map<String, dynamic> object;
@@ -12,6 +13,9 @@ class ConstellationInfoPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context);
+    final unknownText = loc?.t('star_chart.unknown_object') ?? 'Unknown';
+
     return Positioned(
       bottom: 20,
       left: 20,
@@ -47,7 +51,7 @@ class ConstellationInfoPanel extends StatelessWidget {
                 const SizedBox(width: 12),
                 Expanded(
                   child: Text(
-                    object['name'] ?? 'Unknown',
+                    object['name'] ?? unknownText,
                     style: const TextStyle(
                       color: Colors.white,
                       fontSize: 20,
@@ -63,11 +67,17 @@ class ConstellationInfoPanel extends StatelessWidget {
             ),
             const SizedBox(height: 12),
             if (object['type'] != null)
-              _buildInfoRow('Type', _formatType(object['type'])),
+              _buildInfoRow(
+                loc?.t('star_chart.info.type') ?? 'Type', 
+                _getLocalizedType(context, object['type'])
+              ),
             if (object['alt'] != null && object['az'] != null)
               _buildInfoRow(
-                'Position', 
-                'Alt: ${object['alt'].toStringAsFixed(1)}° Az: ${object['az'].toStringAsFixed(1)}°'
+                loc?.t('star_chart.info.position') ?? 'Position', 
+                loc?.t('star_chart.info.alt_az', {
+                  'alt': object['alt'].toStringAsFixed(1),
+                  'az': object['az'].toStringAsFixed(1)
+                }) ?? 'Alt: ${object['alt'].toStringAsFixed(1)}° Az: ${object['az'].toStringAsFixed(1)}°'
               ),
           ],
         ),
@@ -120,7 +130,19 @@ class ConstellationInfoPanel extends StatelessWidget {
     }
   }
 
-  String _formatType(String type) {
-    return type[0].toUpperCase() + type.substring(1);
+  String _getLocalizedType(BuildContext context, String? type) {
+    if (type == null) return '';
+    final loc = AppLocalizations.of(context);
+    
+    switch (type.toLowerCase()) {
+      case 'star':
+        return loc?.t('star_chart.type.star') ?? 'Star';
+      case 'planet':
+        return loc?.t('star_chart.type.planet') ?? 'Planet';
+      case 'constellation':
+        return loc?.t('star_chart.type.constellation') ?? 'Constellation';
+      default:
+        return type[0].toUpperCase() + type.substring(1);
+    }
   }
 }

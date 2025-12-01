@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'alert_style.dart';
+import 'package:skyshare_frontend_mobile/core/i18n/app_localizations.dart';
 
 class AlertsHeaderWidget extends StatelessWidget {
   final int totalAlerts;
@@ -13,6 +14,14 @@ class AlertsHeaderWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context);
+    
+    final String alertLabel = totalAlerts == 1
+        ? (loc?.t('alerts.header.alert_singular') ?? 'alert')
+        : (loc?.t('alerts.header.alert_plural') ?? 'alerts');
+        
+    final String activeLabel = loc?.t('alerts.header.active') ?? 'active';
+
     return Container(
       key: const Key('alerts_header_container'),
       width: double.infinity,
@@ -32,13 +41,13 @@ class AlertsHeaderWidget extends StatelessWidget {
           _InfoChip(
             key: const Key('alerts_header_total'),
             icon: Icons.notifications,
-            label: '$totalAlerts ${totalAlerts == 1 ? 'alert' : 'alerts'}',
+            label: '$totalAlerts $alertLabel',
             color: Colors.white70,
           ),
           _InfoChip(
             key: const Key('alerts_header_active'),
             icon: Icons.check_circle,
-            label: '$activeAlerts activas',
+            label: '$activeAlerts $activeLabel',
             color: kAlertAccentDark,
           ),
         ],

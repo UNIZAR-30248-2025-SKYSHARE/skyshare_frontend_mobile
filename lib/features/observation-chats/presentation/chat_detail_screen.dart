@@ -5,7 +5,6 @@ import 'widgets/chat_bubble.dart';
 import 'widgets/chat_input_bar.dart';
 import 'package:skyshare_frontend_mobile/core/i18n/app_localizations.dart';
 
-
 class ChatDetailScreen extends StatelessWidget {
   final String groupName;
  
@@ -15,7 +14,8 @@ class ChatDetailScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final provider = context.watch<ChatDetailProvider>();
     final providerActions = context.read<ChatDetailProvider>();
-    final localizations = AppLocalizations.of(context)!;
+    
+    final loc = AppLocalizations.of(context);
 
     final visibleMessages = provider.messages.where((msg) => !provider.undecipherableMessageIds.contains(msg.id)).toList();
 
@@ -27,9 +27,9 @@ class ChatDetailScreen extends StatelessWidget {
           children: [
             Text(groupName, style: const TextStyle(color: Colors.white)),
             if (provider.hasUndecipherableMessages)
-              const Text(
-                'Mensajes no descifrados',
-                style: TextStyle(color: Colors.orangeAccent, fontSize: 12),
+              Text(
+                loc?.t('chat.undecipherable_messages') ?? 'Mensajes no descifrados',
+                style: const TextStyle(color: Colors.orangeAccent, fontSize: 12),
               ),
           ],
         ),
@@ -44,7 +44,7 @@ class ChatDetailScreen extends StatelessWidget {
                 : visibleMessages.isEmpty
                     ? Center(
                         child: Text(
-                          localizations.t('chat.no_messages_chat'),
+                          loc?.t('chat.no_messages_chat') ?? 'No messages. Be the first!',
                           style: const TextStyle(color: Colors.white70, fontSize: 16),
                         ),
                       )
@@ -63,7 +63,7 @@ class ChatDetailScreen extends StatelessWidget {
             onSend: (text) {
               providerActions.sendMessage(text);
             },
-            hintText: localizations.t('spot.write_comment_hint'), 
+            hintText: loc?.t('spot.write_comment_hint') ?? 'Write a message...', 
           ),
         ],
       ),

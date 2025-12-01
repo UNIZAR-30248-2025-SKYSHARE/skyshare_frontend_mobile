@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:skyshare_frontend_mobile/core/i18n/app_localizations.dart'; 
 
 typedef NavTapCallback = void Function(int index);
 typedef LocationSelectCallback = void Function(int locationIndex);
@@ -21,6 +22,8 @@ class AppNavigation extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context);
+
     return Container(
       decoration: const BoxDecoration(
         gradient: LinearGradient(
@@ -43,6 +46,7 @@ class AppNavigation extends StatelessWidget {
                   child: IconButton(
                     onPressed: () => onTap(0),
                     icon: Icon(Icons.dashboard, color: selectedIndex == 0 ? Colors.white : Colors.white70),
+                    tooltip: loc?.t('nav.dashboard') ?? 'Dashboard',
                   ),
                 ),
               ),
@@ -51,6 +55,7 @@ class AppNavigation extends StatelessWidget {
                   child: IconButton(
                     onPressed: () => onTap(1),
                     icon: Icon(Icons.nights_stay, color: selectedIndex == 1 ? Colors.white : Colors.white70),
+                    tooltip: loc?.t('nav.night_sky') ?? 'Night Sky',
                   ),
                 ),
               ),
@@ -59,7 +64,7 @@ class AppNavigation extends StatelessWidget {
                   child: IconButton(
                     onPressed: () => onTap(2),
                     icon: Icon(Icons.notifications, color: selectedIndex == 2 ? Colors.white : Colors.white70),
-                    tooltip: 'Alertas',
+                    tooltip: loc?.t('nav.alerts') ?? 'Alerts',
                   ),
                 ),
               ),
@@ -68,6 +73,7 @@ class AppNavigation extends StatelessWidget {
                   child: IconButton(
                     onPressed: () => onTap(3),
                     icon: Icon(Icons.map, color: selectedIndex == 3 ? Colors.white : Colors.white70),
+                    tooltip: loc?.t('nav.map') ?? 'Map',
                   ),
                 ),
               ),
@@ -76,7 +82,7 @@ class AppNavigation extends StatelessWidget {
                   child: IconButton(
                     onPressed: () => onTap(4),
                     icon: Icon(Icons.group, color: selectedIndex == 4 ? Colors.white : Colors.white70),
-                    tooltip: 'Chats',
+                    tooltip: loc?.t('nav.chats') ?? 'Chats',
                   ),
                 ),
               ),
@@ -85,6 +91,7 @@ class AppNavigation extends StatelessWidget {
                   child: IconButton(
                     onPressed: () => onTap(5),
                     icon: Icon(Icons.person, color: selectedIndex == 5 ? Colors.white : Colors.white70),
+                    tooltip: loc?.t('nav.profile') ?? 'Profile',
                   ),
                 ),
               ),

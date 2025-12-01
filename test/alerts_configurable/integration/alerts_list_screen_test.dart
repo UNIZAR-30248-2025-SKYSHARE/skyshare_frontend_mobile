@@ -22,7 +22,7 @@ void main() {
       idUsuario: 'user123',
       idUbicacion: 1,
       tipoAlerta: 'estrellas',
-      tipoRepeticion: 'UNICA',
+      tipoRepeticion: 'Once',
       fechaObjetivo: DateTime.now(),
       activa: true,
     );
@@ -32,7 +32,7 @@ void main() {
       idUsuario: 'user123',
       idUbicacion: 2,
       tipoAlerta: 'planetas',
-      tipoRepeticion: 'UNICA',
+      tipoRepeticion: 'Once',
       fechaObjetivo: DateTime.now().add(const Duration(days: 1)),
       activa: false,
     );
@@ -75,7 +75,7 @@ void main() {
 
     expect(find.byType(DeleteAlertDialog), findsOneWidget);
 
-    final eliminarButton = find.widgetWithText(ElevatedButton, 'Eliminar');
+    final eliminarButton = find.widgetWithText(ElevatedButton, 'Delete');
     await tester.tap(eliminarButton);
     await tester.pumpAndSettle();
     verify(() => mockProvider.deleteAlert(1)).called(1);

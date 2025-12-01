@@ -17,7 +17,7 @@ void main() {
       );
 
       expect(find.text('Test User'), findsOneWidget);
-      expect(find.text('Hace 2 h'), findsOneWidget);
+      expect(find.text('2 h ago'), findsOneWidget);
     });
 
     testWidgets('should render user avatar', (tester) async {
@@ -76,8 +76,8 @@ void main() {
 
       expect(find.text('User 1'), findsOneWidget);
       expect(find.text('User 2'), findsOneWidget);
-      expect(find.text('Hace 1 h'), findsOneWidget);
-      expect(find.text('Hace 3 h'), findsOneWidget);
+      expect(find.text('1 h ago'), findsOneWidget);
+      expect(find.text('3 h ago'), findsOneWidget);
       expect(find.byType(CircleAvatar), findsNWidgets(2));
     });
   });

@@ -68,7 +68,13 @@ class _RegisterFormState extends State<RegisterForm> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: ${e.toString()}')),
+          SnackBar(
+            content: Text(
+              AppLocalizations.of(context)
+                      ?.t('error_generic', {'err': e.toString()}) ??
+                  'Error: ${e.toString()}',
+            ),
+          ),
         );
       }
     }

@@ -3,6 +3,7 @@ import '../../data/model/alert_model.dart';
 import 'alert_info_row_widget.dart';
 import 'alert_footer_widget.dart';
 import 'alert_style.dart';
+import 'package:skyshare_frontend_mobile/core/i18n/app_localizations.dart';
 import 'package:skyshare_frontend_mobile/features/dashboard/data/repositories/location_repository.dart'
     as dashboard_location;
 
@@ -31,20 +32,22 @@ class _AlertCardWidgetState extends State<AlertCardWidget> {
   String? _locationName;
   bool _isLoadingLocation = false;
 
-  String _getAlertTitle() => widget.alert.parametroObjetivo ?? 'Alert';
+  String _getAlertTitle(BuildContext context) => 
+      widget.alert.parametroObjetivo ?? (AppLocalizations.of(context)?.t('alerts.form.alert') ?? 'Alert');
 
-  String _getRepetitionText() {
+  String _getRepetitionText(BuildContext context) {
     final tipo = widget.alert.tipoRepeticion.toUpperCase();
+    final loc = AppLocalizations.of(context);
     switch (tipo) {
       case 'DIARIA':
-        return 'Every day';
+        return loc?.t('alerts.freq.daily') ?? 'Every day';
       case 'SEMANAL':
-        return 'Every week';
+        return loc?.t('alerts.freq.weekly') ?? 'Every week';
       case 'MENSUAL':
-        return 'Every month';
+        return loc?.t('alerts.freq.monthly') ?? 'Every month';
       case 'UNICA':
       default:
-        return 'Once';
+        return loc?.t('alerts.freq.once') ?? 'Once';
     }
   }
 
@@ -98,15 +101,18 @@ class _AlertCardWidgetState extends State<AlertCardWidget> {
   @override
   Widget build(BuildContext context) {
     final isActive = widget.alert.activa;
-    final repetition = _getRepetitionText();
+    final repetition = _getRepetitionText(context);
+    final loc = AppLocalizations.of(context);
 
     String subtitleText;
     if (_isLoadingLocation) {
-      subtitleText = 'Loading location... • $repetition';
+      subtitleText = '${loc?.t('alerts.location.loading') ?? 'Loading location...'} • $repetition';
     } else if (_locationName != null && _locationName!.isNotEmpty) {
       subtitleText = '$_locationName • $repetition';
     } else {
-      subtitleText = 'Location #${widget.alert.idUbicacion} • $repetition';
+      final defaultText = loc?.t('alerts.location.default', {'id': widget.alert.idUbicacion.toString()}) 
+          ?? 'Location #${widget.alert.idUbicacion}';
+      subtitleText = '$defaultText • $repetition';
     }
 
     return GestureDetector(
@@ -151,7 +157,7 @@ class _AlertCardWidgetState extends State<AlertCardWidget> {
                     }(),
                   ),
                 ),
-                title: _getAlertTitle(),
+                title: _getAlertTitle(context),
                 subtitle: subtitleText,
                 isActive: isActive,
                 switchValue: isActive,

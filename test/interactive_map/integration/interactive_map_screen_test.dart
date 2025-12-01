@@ -321,12 +321,16 @@ void main() {
     await tester.pump(const Duration(milliseconds: 600));
     await tester.pumpAndSettle();
 
+    // Aseguramos que la UI esté asentada antes de buscar el icono
+    await tester.pumpAndSettle();
+
     await tester.tap(find.byIcon(Icons.filter_list));
     await tester.pumpAndSettle();
 
     await tester.enterText(find.byType(TextField), 'mirador');
     await tester.pump();
 
+    // CORRECCIÓN: El código usa fallbacks en inglés. "1 spot".
     expect(find.text('1 spot'), findsOneWidget);
   });
 

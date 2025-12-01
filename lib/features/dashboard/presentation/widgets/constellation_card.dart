@@ -1,17 +1,18 @@
 import 'package:flutter/material.dart';
 import '../../data/models/visible_sky_model.dart';
+import 'package:skyshare_frontend_mobile/core/i18n/app_localizations.dart';
 
 class ConstellationCard extends StatelessWidget {
   final VisibleSkyItem constellation;
   final VoidCallback onTap;
   final bool showButton;
-  final String buttonText;
+  final String? buttonText; 
 
   const ConstellationCard({
     required this.constellation,
     required this.onTap,
     this.showButton = false,
-    this.buttonText = 'Ir a guía',
+    this.buttonText,
     super.key,
   });
 
@@ -28,6 +29,8 @@ class ConstellationCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final ts = _formatTimestamp(constellation.timestamp);
+    final label = buttonText ?? (AppLocalizations.of(context)?.t('go_to_guide') ?? 'Ir a guía');
+
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -42,9 +45,8 @@ class ConstellationCard extends StatelessWidget {
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: MainAxisAlignment.spaceBetween, // Añadido para distribuir el espacio
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: <Widget>[
-            // Contenido original en una fila
             Row(
               children: <Widget>[
                 Expanded(
@@ -76,7 +78,6 @@ class ConstellationCard extends StatelessWidget {
               ],
             ),
             
-            // Botón en la parte inferior
             if (showButton)
               SizedBox(
                 width: double.infinity,
@@ -91,7 +92,7 @@ class ConstellationCard extends StatelessWidget {
                   ),
                   onPressed: onTap,
                   child: Text(
-                    buttonText,
+                    label,
                     style: const TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.w500,

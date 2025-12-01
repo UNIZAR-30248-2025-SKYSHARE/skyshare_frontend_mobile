@@ -126,25 +126,26 @@ class _AlertFormScreenState extends State<AlertFormScreen> {
   }
 
   bool _validateForm() {
+    final loc = AppLocalizations.of(context);
     if (_currentType == 'fase lunar' && _lunarPhase == null) {
-      _showError(AppLocalizations.of(context)?.t('alerts.select_lunar_phase') ?? 'Please select a lunar phase');
+      _showError(loc?.t('alerts.select_lunar_phase') ?? 'Please select a lunar phase');
       return false;
     }
     
     if (_currentType == 'meteorologica') {
       if (_weatherMetric == null) {
-        _showError(AppLocalizations.of(context)?.t('alerts.select_weather_parameter') ?? 'Please select a weather parameter');
+        _showError(loc?.t('alerts.select_weather_parameter') ?? 'Please select a weather parameter');
         return false;
       }
     }
     
     if (_currentType == 'estrellas' && _starEventType == null) {
-      _showError(AppLocalizations.of(context)?.t('alerts.select_constellation') ?? 'Please select a constellation or event');
+      _showError(loc?.t('alerts.select_constellation') ?? 'Please select a constellation or event');
       return false;
     }
 
     if (_dateController.text.isEmpty) {
-      _showError(AppLocalizations.of(context)?.t('alerts.form.select_date') ?? 'Please select a date');
+      _showError(loc?.t('alerts.form.select_date') ?? 'Please select a date');
       return false;
     }
 
@@ -212,31 +213,31 @@ class _AlertFormScreenState extends State<AlertFormScreen> {
     }
 
     setState(() => _isSaving = true);
+    final loc = AppLocalizations.of(context);
 
-  final provider = Provider.of<AlertProvider>(context, listen: false);
-  final locRepo = Provider.of<dashboard_location.LocationRepository>(context, listen: false);
+    final provider = Provider.of<AlertProvider>(context, listen: false);
+    final locRepo = Provider.of<dashboard_location.LocationRepository>(context, listen: false);
 
     try {
-      
       int idUbicacion = 1;
       
       if (widget.existingAlert != null) {
         idUbicacion = widget.existingAlert!.idUbicacion;
       } else {
         try {
-          final loc = await LocationService.instance.getCurrentLocation()
+          final l = await LocationService.instance.getCurrentLocation()
               .timeout(const Duration(seconds: 8));
 
           try {
-            final existing = await locRepo.findLocationByName(loc.city, loc.country);
+            final existing = await locRepo.findLocationByName(l.city, l.country);
             if (existing != null) {
               idUbicacion = existing.id;
             } else {
               final created = await locRepo.createLocation(
-                latitude: loc.latitude,
-                longitude: loc.longitude,
-                name: loc.city,
-                country: loc.country,
+                latitude: l.latitude,
+                longitude: l.longitude,
+                name: l.city,
+                country: l.country,
               );
 
               if (created != null) {
@@ -247,7 +248,6 @@ class _AlertFormScreenState extends State<AlertFormScreen> {
           } catch (e) {
             if (kDebugMode) print('Error resolving/creating location: $e');
           }
-          
         } catch (e) {
           if (kDebugMode) print('Error getting location, using fallback: $e');
         }
@@ -256,36 +256,32 @@ class _AlertFormScreenState extends State<AlertFormScreen> {
       final alertData = _createAlertData(idUbicacion: idUbicacion);
       
       if (widget.existingAlert != null) {
-        if (kDebugMode) print('DEBUG Form: Updating alert...');
         await provider.updateAlert(widget.existingAlert!.idAlerta, alertData)
             .timeout(const Duration(seconds: 10));
         
         if (mounted) {
-          if (kDebugMode) print('DEBUG Form: Alert updated successfully');
-          _showSuccess(AppLocalizations.of(context)?.t('alerts.form.updated_success') ?? 'Alert updated successfully');
+          _showSuccess(loc?.t('alerts.form.updated_success') ?? 'Alert updated successfully');
           Navigator.of(context).pop(true);
         }
       } else {
-        if (kDebugMode) print('DEBUG Form: Creating new alert...');
         await provider.addAlert(alertData)
             .timeout(const Duration(seconds: 10));
         
         if (mounted) {
-          if (kDebugMode) print('DEBUG Form: Alert created successfully');
-          _showSuccess(AppLocalizations.of(context)?.t('alerts.form.created_success') ?? 'Alert created successfully');
+          _showSuccess(loc?.t('alerts.form.created_success') ?? 'Alert created successfully');
           Navigator.of(context).pop(true);
         }
       }
     } on TimeoutException catch (e) {
-      if (kDebugMode) print('ERROR Form: Timeout - $e');
+      if (kDebugMode) print(e);
       if (mounted) {
         setState(() => _isSaving = false);
-        _showError('The operation timed out. Check your internet connection.');
+        _showError(loc?.t('alerts.error.timeout') ?? 'The operation timed out. Check your internet connection.');
       }
     } catch (e) {
       if (mounted) {
         setState(() => _isSaving = false);
-        _showError('Error saving: ${e.toString()}');
+        _showError('${loc?.t("error_generic") ?? "Error"}: ${e.toString()}');
       }
     }
   }
@@ -345,18 +341,19 @@ class _AlertFormScreenState extends State<AlertFormScreen> {
   }
 
   Widget _buildLunarFields() {
+    final loc = AppLocalizations.of(context);
     return Column(
       children: [
         AlertFormField(
-          label: AppLocalizations.of(context)?.t('alerts.form.lunar') ?? 'Lunar phase',
+          label: loc?.t('alerts.form.lunar') ?? 'Lunar phase',
             child: AlertDropdown<String>(
-            hintText: AppLocalizations.of(context)?.t('alerts.select_lunar_phase') ?? 'Select lunar phase',
+            hintText: loc?.t('alerts.select_lunar_phase') ?? 'Select lunar phase',
             value: _lunarPhase,
             items: [
-              DropdownMenuItem(value: 'New Moon', child: Text(AppLocalizations.of(context)?.t('alerts.lunar.new_moon') ?? 'New Moon')),
-              DropdownMenuItem(value: 'First Quarter', child: Text(AppLocalizations.of(context)?.t('alerts.lunar.first_quarter') ?? 'First Quarter')),
-              DropdownMenuItem(value: 'Full Moon', child: Text(AppLocalizations.of(context)?.t('alerts.lunar.full_moon') ?? 'Full Moon')),
-              DropdownMenuItem(value: 'Last Quarter', child: Text(AppLocalizations.of(context)?.t('alerts.lunar.last_quarter') ?? 'Last Quarter')),
+              DropdownMenuItem(value: 'New Moon', child: Text(loc?.t('alerts.lunar.new_moon') ?? 'New Moon')),
+              DropdownMenuItem(value: 'First Quarter', child: Text(loc?.t('alerts.lunar.first_quarter') ?? 'First Quarter')),
+              DropdownMenuItem(value: 'Full Moon', child: Text(loc?.t('alerts.lunar.full_moon') ?? 'Full Moon')),
+              DropdownMenuItem(value: 'Last Quarter', child: Text(loc?.t('alerts.lunar.last_quarter') ?? 'Last Quarter')),
             ],
             onChanged: (value) {
               setState(() {
@@ -370,6 +367,7 @@ class _AlertFormScreenState extends State<AlertFormScreen> {
   }
 
   Widget _buildWeatherFields() {
+    // ... validateValue function same as before
     String? validateValue(String? v, String metric) {
       if (v == null || v.isEmpty) return null;
       final parsed = double.tryParse(v);
@@ -385,11 +383,13 @@ class _AlertFormScreenState extends State<AlertFormScreen> {
     }
 
     final metric = _weatherMetric ?? 'Cloudiness';
+    final loc = AppLocalizations.of(context);
 
+    // Weather metrics can also be localized if needed, but for now we keep keys as values
     return Column(
       children: [
         AlertChipSelector(
-          label: AppLocalizations.of(context)?.t('alerts.form.weather') ?? 'Weather parameter',
+          label: loc?.t('alerts.form.weather') ?? 'Weather parameter',
           options: const ['Cloudiness', 'Light pollution', 'Sky indicator'],
           selectedValue: metric,
           onChanged: (value) {
@@ -399,53 +399,35 @@ class _AlertFormScreenState extends State<AlertFormScreen> {
           },
         ),
         AlertFormField(
-          label: AppLocalizations.of(context)?.t('alerts.form.min_value') ?? 'Minimum value',
+          label: loc?.t('alerts.form.min_value') ?? 'Minimum value',
           child: TextFormField(
             controller: _valorMinController,
             keyboardType: const TextInputType.numberWithOptions(decimal: true),
             style: const TextStyle(color: Colors.white),
             decoration: InputDecoration(
-              hintText: AppLocalizations.of(context)?.t('alerts.form.min_value_hint') ?? 'Minimum value (optional)',
+              hintText: loc?.t('alerts.form.min_value_hint') ?? 'Minimum value (optional)',
               hintStyle: const TextStyle(color: Colors.white54),
               contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
-                borderSide: const BorderSide(color: Colors.white30),
-              ),
-              enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
-                borderSide: const BorderSide(color: Colors.white30),
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
-                borderSide: const BorderSide(color: Color(0xFF6C63FF)),
-              ),
+              border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: Colors.white30)),
+              enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: Colors.white30)),
+              focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: Color(0xFF6C63FF))),
             ),
             validator: (v) => validateValue(v, metric),
           ),
         ),
         AlertFormField(
-          label: AppLocalizations.of(context)?.t('alerts.form.max_value') ?? 'Maximum value',
+          label: loc?.t('alerts.form.max_value') ?? 'Maximum value',
           child: TextFormField(
             controller: _valorMaxController,
             keyboardType: const TextInputType.numberWithOptions(decimal: true),
             style: const TextStyle(color: Colors.white),
             decoration: InputDecoration(
-              hintText: AppLocalizations.of(context)?.t('alerts.form.max_value_hint') ?? 'Maximum value (optional)',
+              hintText: loc?.t('alerts.form.max_value_hint') ?? 'Maximum value (optional)',
               hintStyle: const TextStyle(color: Colors.white54),
               contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
-                borderSide: const BorderSide(color: Colors.white30),
-              ),
-              enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
-                borderSide: const BorderSide(color: Colors.white30),
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
-                borderSide: const BorderSide(color: Color(0xFF6C63FF)),
-              ),
+              border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: Colors.white30)),
+              enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: Colors.white30)),
+              focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: Color(0xFF6C63FF))),
             ),
             validator: (v) => validateValue(v, metric),
           ),
@@ -455,22 +437,23 @@ class _AlertFormScreenState extends State<AlertFormScreen> {
   }
 
   Widget _buildStarsFields() {
+    final loc = AppLocalizations.of(context);
     return Column(
       children: [
         AlertFormField(
-          label: AppLocalizations.of(context)?.t('alerts.form.constellation') ?? 'Constellation',
+          label: loc?.t('alerts.form.constellation') ?? 'Constellation',
             child: AlertDropdown<String>(
-            hintText: AppLocalizations.of(context)?.t('alerts.select_constellation') ?? 'Select constellation',
+            hintText: loc?.t('alerts.select_constellation') ?? 'Select constellation',
             value: _starEventType,
             items: [
-              DropdownMenuItem(value: 'Virgo', child: Text(AppLocalizations.of(context)?.t('alerts.constellation.virgo') ?? 'Virgo')),
-              DropdownMenuItem(value: 'Libra', child: Text(AppLocalizations.of(context)?.t('alerts.constellation.libra') ?? 'Libra')),
-              DropdownMenuItem(value: 'Vela', child: Text(AppLocalizations.of(context)?.t('alerts.constellation.vela') ?? 'Vela')),
-              DropdownMenuItem(value: 'Gemini', child: Text(AppLocalizations.of(context)?.t('alerts.constellation.gemini') ?? 'Gemini')),
-              DropdownMenuItem(value: 'Aquarius', child: Text(AppLocalizations.of(context)?.t('alerts.constellation.aquarius') ?? 'Aquarius')),
-              DropdownMenuItem(value: 'Taurus', child: Text(AppLocalizations.of(context)?.t('alerts.constellation.taurus') ?? 'Taurus')),
-              DropdownMenuItem(value: 'Pisces', child: Text(AppLocalizations.of(context)?.t('alerts.constellation.pisces') ?? 'Pisces')),
-              DropdownMenuItem(value: 'Capricornius', child: Text(AppLocalizations.of(context)?.t('alerts.constellation.capricornius') ?? 'Capricornius')),
+              DropdownMenuItem(value: 'Virgo', child: Text(loc?.t('alerts.constellation.virgo') ?? 'Virgo')),
+              DropdownMenuItem(value: 'Libra', child: Text(loc?.t('alerts.constellation.libra') ?? 'Libra')),
+              DropdownMenuItem(value: 'Vela', child: Text(loc?.t('alerts.constellation.vela') ?? 'Vela')),
+              DropdownMenuItem(value: 'Gemini', child: Text(loc?.t('alerts.constellation.gemini') ?? 'Gemini')),
+              DropdownMenuItem(value: 'Aquarius', child: Text(loc?.t('alerts.constellation.aquarius') ?? 'Aquarius')),
+              DropdownMenuItem(value: 'Taurus', child: Text(loc?.t('alerts.constellation.taurus') ?? 'Taurus')),
+              DropdownMenuItem(value: 'Pisces', child: Text(loc?.t('alerts.constellation.pisces') ?? 'Pisces')),
+              DropdownMenuItem(value: 'Capricornius', child: Text(loc?.t('alerts.constellation.capricornius') ?? 'Capricornius')),
             ],
             onChanged: (value) {
               setState(() {
@@ -485,58 +468,52 @@ class _AlertFormScreenState extends State<AlertFormScreen> {
 
   Widget _buildTypeSpecificFields() {
     switch (_currentType) {
-      case 'fase lunar':
-        return _buildLunarFields();
-      case 'meteorologica':
-        return _buildWeatherFields();
-      case 'estrellas':
-        return _buildStarsFields();
-      default:
-        return const SizedBox();
+      case 'fase lunar': return _buildLunarFields();
+      case 'meteorologica': return _buildWeatherFields();
+      case 'estrellas': return _buildStarsFields();
+      default: return const SizedBox();
     }
   }
 
   String _getAlertTypeTitle() {
+    final loc = AppLocalizations.of(context);
     switch (_currentType) {
-      case 'fase lunar': return AppLocalizations.of(context)?.t('alerts.form.lunar_short').toUpperCase() ?? 'LUNAR';
-      case 'meteorologica': return AppLocalizations.of(context)?.t('alerts.form.weather_short').toUpperCase() ?? 'WEATHER';
-      case 'estrellas': return AppLocalizations.of(context)?.t('alerts.form.stars_short').toUpperCase() ?? 'STARS';
+      case 'fase lunar': return loc?.t('alerts.form.lunar_short').toUpperCase() ?? 'LUNAR';
+      case 'meteorologica': return loc?.t('alerts.form.weather_short').toUpperCase() ?? 'WEATHER';
+      case 'estrellas': return loc?.t('alerts.form.stars_short').toUpperCase() ?? 'STARS';
       default: return _currentType.toUpperCase();
     }
   }
 
   void _showDeleteConfirmation() {
+    final loc = AppLocalizations.of(context);
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
         backgroundColor: const Color(0xFF1a1a2e),
         title: Text(
-          AppLocalizations.of(context)?.t('alerts.form.delete_confirmation_title') ?? 'Delete Alert',
+          loc?.t('alerts.form.delete_confirmation_title') ?? 'Delete Alert',
           style: const TextStyle(color: Colors.white),
         ),
         content: Text(
-          AppLocalizations.of(context)?.t('alerts.form.delete_confirmation_message') ?? 'Are you sure you want to delete this alert? This action cannot be undone.',
+          loc?.t('alerts.form.delete_confirmation_message') ?? 'Are you sure you want to delete this alert?',
           style: const TextStyle(color: Colors.white70),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: Text(AppLocalizations.of(context)?.t('alerts.form.cancel') ?? 'CANCEL', style: const TextStyle(color: Colors.white70)),
+            child: Text(loc?.t('alerts.form.cancel') ?? 'CANCEL', style: const TextStyle(color: Colors.white70)),
           ),
           TextButton(
             onPressed: () async {
-              // cerramos el diálogo inmediatamente (sin await)
               Navigator.of(context).pop();
-
-              // marcamos saving localmente
               setState(() => _isSaving = true);
 
-              // Capturamos TODO lo que depende de `context` ANTES de cualquier await
               final provider = Provider.of<AlertProvider>(context, listen: false);
               final navigator = Navigator.of(context);
               final messenger = ScaffoldMessenger.of(context);
-              final successMsg = AppLocalizations.of(context)?.t('alerts.deleted_success') ?? 'Alert deleted successfully';
-              final errorMsg = AppLocalizations.of(context)?.t('alerts.delete_error') ?? 'Error deleting alert';
+              final successMsg = loc?.t('alerts.deleted_success') ?? 'Alert deleted successfully';
+              final errorMsg = loc?.t('alerts.delete_error') ?? 'Error deleting alert';
 
               try {
                 await provider.deleteAlert(widget.existingAlert!.idAlerta);
@@ -560,7 +537,7 @@ class _AlertFormScreenState extends State<AlertFormScreen> {
                 }
               }
             },
-            child: Text(AppLocalizations.of(context)?.t('alerts.form.delete') ?? 'DELETE', style: const TextStyle(color: Colors.red)),
+            child: Text(loc?.t('alerts.form.delete') ?? 'DELETE', style: const TextStyle(color: Colors.red)),
           ),
         ],
       ),
@@ -570,6 +547,7 @@ class _AlertFormScreenState extends State<AlertFormScreen> {
   @override
   Widget build(BuildContext context) {
     final isEditing = widget.existingAlert != null;
+    final loc = AppLocalizations.of(context);
     
     return StarBackground(
       child: Scaffold(
@@ -582,7 +560,7 @@ class _AlertFormScreenState extends State<AlertFormScreen> {
             onPressed: () => Navigator.of(context).pop(),
           ),
           title: Text(
-            '${isEditing ? (AppLocalizations.of(context)?.t('edit') ?? 'EDIT') : (AppLocalizations.of(context)?.t('create') ?? 'CREATE')} ${AppLocalizations.of(context)?.t('alerts.form.alert') ?? 'ALERT'} ${_getAlertTypeTitle()}',
+            '${isEditing ? (loc?.t('edit') ?? 'EDIT') : (loc?.t('create') ?? 'CREATE')} ${loc?.t('alerts.form.alert') ?? 'ALERT'} ${_getAlertTypeTitle()}',
             style: const TextStyle(
               color: Colors.white,
               fontSize: 18,
@@ -600,14 +578,14 @@ class _AlertFormScreenState extends State<AlertFormScreen> {
                   child: ListView(
                     children: [
                       AlertFormField(
-                        label: 'ALERT TYPE',
+                        label: loc?.t('alerts.type.label') ?? 'ALERT TYPE', 
                         child: AlertDropdown<String>(
-                          hintText: 'Select type',
+                          hintText: loc?.t('alerts.type.select') ?? 'Select type',
                           value: _currentType,
-                          items: const [
-                            DropdownMenuItem(value: 'estrellas', child: Text('Stars')),
-                            DropdownMenuItem(value: 'fase lunar', child: Text('Lunar phase')),
-                            DropdownMenuItem(value: 'meteorologica', child: Text('Weather')),
+                          items: [
+                            DropdownMenuItem(value: 'estrellas', child: Text(loc?.t('alerts.type.stars') ?? 'Stars')),
+                            DropdownMenuItem(value: 'fase lunar', child: Text(loc?.t('alerts.type.lunar') ?? 'Lunar phase')),
+                            DropdownMenuItem(value: 'meteorologica', child: Text(loc?.t('alerts.type.weather') ?? 'Weather')),
                           ],
                           onChanged: (value) {
                             setState(() {
@@ -632,15 +610,15 @@ class _AlertFormScreenState extends State<AlertFormScreen> {
                       _buildTypeSpecificFields(),
                       
                       AlertFormField(
-                        label: 'FREQUENCY',
+                        label: loc?.t('alerts.freq.label') ?? 'FREQUENCY',
                         child: AlertDropdown<String>(
-                          hintText: 'Select frequency',
+                          hintText: loc?.t('alerts.freq.select') ?? 'Select frequency',
                           value: _repetitionType,
-                          items: const [
-                            DropdownMenuItem(value: 'UNICA', child: Text('Once')),
-                            DropdownMenuItem(value: 'DIARIA', child: Text('Daily')),
-                            DropdownMenuItem(value: 'SEMANAL', child: Text('Weekly')),
-                            DropdownMenuItem(value: 'MENSUAL', child: Text('Monthly')),
+                          items: [
+                            DropdownMenuItem(value: 'UNICA', child: Text(loc?.t('alerts.freq.once') ?? 'Once')),
+                            DropdownMenuItem(value: 'DIARIA', child: Text(loc?.t('alerts.freq.daily') ?? 'Daily')),
+                            DropdownMenuItem(value: 'SEMANAL', child: Text(loc?.t('alerts.freq.weekly') ?? 'Weekly')),
+                            DropdownMenuItem(value: 'MENSUAL', child: Text(loc?.t('alerts.freq.monthly') ?? 'Monthly')),
                           ],
                           onChanged: (value) {
                             setState(() {
@@ -651,9 +629,9 @@ class _AlertFormScreenState extends State<AlertFormScreen> {
                       ),
 
                       AlertFormField(
-                        label: 'STATUS',
+                        label: loc?.t('alerts.status.label') ?? 'STATUS',
                         child: AlertToggle(
-                          label: 'ACTIVE',
+                          label: loc?.t('alerts.status.active') ?? 'ACTIVE',
                           value: _isActive,
                           onChanged: (v) => setState(() => _isActive = v),
                         ),
@@ -679,17 +657,11 @@ class _AlertFormScreenState extends State<AlertFormScreen> {
                                   ? const SizedBox(
                                       height: 20,
                                       width: 20,
-                                      child: CircularProgressIndicator(
-                                        color: Colors.white,
-                                        strokeWidth: 2,
-                                      ),
+                                      child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
                                     )
                                   : Text(
-                                      isEditing ? (AppLocalizations.of(context)?.t('alerts.form.save') ?? 'Save changes') : (AppLocalizations.of(context)?.t('alerts.form.create') ?? 'Create alert'),
-                                      style: const TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.bold,
-                                      ),
+                                      isEditing ? (loc?.t('alerts.form.save') ?? 'Save changes') : (loc?.t('alerts.form.create') ?? 'Create alert'),
+                                      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                                     ),
                             ),
                           ),
@@ -702,22 +674,16 @@ class _AlertFormScreenState extends State<AlertFormScreen> {
                                   foregroundColor: Colors.red,
                                   side: const BorderSide(color: Colors.red),
                                   padding: const EdgeInsets.symmetric(vertical: 16),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
+                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                                 ),
                                 child: Text(
-                                  AppLocalizations.of(context)?.t('alerts.form.delete') ?? 'Delete',
-                                  style: const TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
-                                  ),
+                                  loc?.t('alerts.form.delete') ?? 'Delete',
+                                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                                 ),
                               ),
                             ),
                         ],
                       ),
-
                       const SizedBox(height: 16),
                     ],
                   ),
@@ -728,9 +694,7 @@ class _AlertFormScreenState extends State<AlertFormScreen> {
                 Container(
                   color: Colors.black54,
                   child: const Center(
-                    child: CircularProgressIndicator(
-                      color: Color(0xFF6C63FF),
-                    ),
+                    child: CircularProgressIndicator(color: Color(0xFF6C63FF)),
                   ),
                 ),
             ],
